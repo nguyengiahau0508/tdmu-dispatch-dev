@@ -1,0 +1,66 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Auth {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+"""Represents a user"""
+type User {
+  id: ID!
+  email: String!
+  username: String
+  firstName: String
+  lastName: String
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+
+  """Full name of the user"""
+  fullName: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Query {
+  auth(id: Int!): Auth!
+
+  """Get all users"""
+  users: [User!]!
+
+  """Get a single user by ID"""
+  user(id: ID!): User
+}
+
+type Mutation {
+  createAuth(createAuthInput: CreateAuthInput!): Auth!
+  updateAuth(updateAuthInput: UpdateAuthInput!): Auth!
+  removeAuth(id: Int!): Auth!
+
+  """Create a new user"""
+  createUser(createUserInput: CreateUserInput!): User!
+}
+
+input CreateAuthInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateAuthInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateUserInput {
+  email: String!
+  password: String!
+  username: String
+  firstName: String
+  lastName: String
+}
