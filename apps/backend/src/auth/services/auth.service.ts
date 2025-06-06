@@ -84,7 +84,7 @@ export class AuthService {
       });
     }
 
-    const isMatch = await this.otpService.verifyOTP(user.id, otp)
+    const isMatch = await this.otpService.validateOTP(user.id, otp)
     if (!isMatch) throw new UnauthorizedException({
       message: "Mã OTP không hợp lệ",
       code: ErrorCode.OTP_INVALID

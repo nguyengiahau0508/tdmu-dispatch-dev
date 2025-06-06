@@ -1,40 +1,33 @@
-
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable } from '@nestjs/common';
-import { Cache } from 'cache-manager';
+import { Injectable } from "@nestjs/common";
+import { CacheKeyBuilder } from "src/integrations/cache/cache-key.builder";
+import { CacheService } from "src/integrations/cache/cache.service";
 
 @Injectable()
 export class OtpService {
-  private readonly OTP_TTL = 300000; // 5 phút
+  private readonly OTP_TTL_SECONDS = 300;
 
-  constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) { }
+  constructor(private readonly cacheService: CacheService) { }
 
-  generateRandomOtp(): string {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-  }
-
-  async generateOTP(userId: Number): Promise<string> {
-    const otp = this.generateRandomOtp();
-    await this.cacheManager.set(`otp:${userId}`, otp, this.OTP_TTL);
+  async generateOTP(userId: number): Promise<string> {
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const key = CacheKeyBuilder.otpForUser(userId);
+    await this.cacheService.set(key, otp, this.OTP_TTL_SECONDS);
     return otp;
   }
 
-  async verifyOTP(userId: number, otp: string): Promise<boolean> {
-    const storedOtp = await this.cacheManager.get<string>(`otp:${userId}`);
-    if (!storedOtp) return false;
-
-    const isValid = storedOtp === otp;
-    if (isValid) {
-      await this.cacheManager.del(`otp:${userId}`);
+  async validateOTP(userId: number, otp: string): Promise<boolean> {
+    const key = CacheKeyBuilder.otpForUser(userId);
+    const cachedOtp = await this.cacheService.get<string>(key);
+    if (cachedOtp && cachedOtp === otp) {
+      await this.cacheService.del(key);
+      return true;
     }
-
-    return isValid;
+    return false;
   }
 
-  async clearOTP(userId: number): Promise<void> {
-    await this.cacheManager.del(`otp:${userId}`);
+  async clearOTP(userId: number) {
+    const key = CacheKeyBuilder.otpForUser(userId);
+    await this.cacheService.del(key)
   }
 }
 

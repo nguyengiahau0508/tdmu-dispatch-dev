@@ -20,9 +20,7 @@ import { IntegrationsModule } from './integrations/integrations.module';
     GraphqlApiModule,
     FeaturesModule,
     IntegrationsModule,
-    CacheModule.register({
-      isGlobal: true
-    })
+    
   ],
   controllers: [AppController],
   providers: [AppService,
