@@ -5,6 +5,8 @@ import { SignInResponse } from './dto/sign-in/sign-in.response';
 import { SignInInput } from './dto/sign-in/sign-in.input';
 import { Public } from 'src/common/decorators/public.decorator';
 import { AuthService } from './services/auth.service';
+import { SignInOtpInput } from './dto/sign-in-otp/sign-in-otp.input';
+import { SignInOtpResponse } from './dto/sign-in-otp/sign-in-otp.response';
 
 @Resolver()
 export class AuthResolver {
@@ -14,6 +16,16 @@ export class AuthResolver {
   @Public()
   async signIn(@Args('input') input: SignInInput): Promise<SignInResponse> {
     const result = await this.authService.signIn(input.email, input.password);
+    return {
+      metadata: createResponseMetadata(HttpStatus.ACCEPTED, ""),
+      data: result
+    };
+  }
+
+  @Mutation(() => SignInOtpResponse)
+  @Public()
+  async signInWithOtp(@Args('input') input: SignInOtpInput): Promise<SignInOtpResponse> {
+    const result = await this.authService.signInWithOtp(input.email, input.otp);
     return {
       metadata: createResponseMetadata(HttpStatus.ACCEPTED, ""),
       data: result

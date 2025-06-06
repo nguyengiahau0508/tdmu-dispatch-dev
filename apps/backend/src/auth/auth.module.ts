@@ -7,6 +7,7 @@ import { IJwtConfig } from 'src/config/interfaces';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { AuthService } from './services/auth.service';
 import { OtpService } from './services/otp.service';
+import { TokenService } from './services/token.service';
 
 @Global()
 @Module({
@@ -24,7 +25,7 @@ import { OtpService } from './services/otp.service';
     ConfigModule,
     UsersModule
   ],
-  providers: [AuthResolver, JwtStrategy, AuthService, OtpService],
+  providers: [AuthResolver, JwtStrategy, AuthService, OtpService, TokenService],
   exports: [AuthService]
 })
 export class AuthModule { }

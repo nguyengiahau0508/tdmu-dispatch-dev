@@ -80,6 +80,18 @@ type SignInResponse {
   metadata: Metadata!
 }
 
+type SignInOtpOutput {
+  accessToken: String!
+}
+
+type SignInOtpResponse {
+  """Dữ liệu trả về"""
+  data: SignInOtpOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
 type UserResponse {
   """Dữ liệu trả về"""
   data: User
@@ -95,6 +107,7 @@ type Query {
 
 type Mutation {
   signIn(input: SignInInput!): SignInResponse!
+  signInWithOtp(input: SignInOtpInput!): SignInOtpResponse!
   createUser(createUserInput: CreateUserInput!): UserResponse!
   updateUser(updateUserInput: UpdateUserInput!): User!
   removeUser(id: Int!): User!
@@ -103,6 +116,11 @@ type Mutation {
 input SignInInput {
   email: String!
   password: String!
+}
+
+input SignInOtpInput {
+  email: String!
+  otp: String!
 }
 
 """Dữ liệu đầu vào để tạo người dùng mới"""

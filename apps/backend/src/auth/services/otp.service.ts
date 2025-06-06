@@ -21,7 +21,7 @@ export class OtpService {
     return otp;
   }
 
-  async verifyOTP(userId: string, otp: string): Promise<boolean> {
+  async verifyOTP(userId: number, otp: string): Promise<boolean> {
     const storedOtp = await this.cacheManager.get<string>(`otp:${userId}`);
     if (!storedOtp) return false;
 
@@ -33,7 +33,7 @@ export class OtpService {
     return isValid;
   }
 
-  async clearOTP(userId: string): Promise<void> {
+  async clearOTP(userId: number): Promise<void> {
     await this.cacheManager.del(`otp:${userId}`);
   }
 }

@@ -6,7 +6,7 @@ import { Injectable, InternalServerErrorException, UnauthorizedException } from 
 import { ConfigService } from '@nestjs/config';
 import { IJwtConfig } from 'src/config/interfaces';
 import { ErrorCode } from 'src/common/enums/error-code.enum';
-import { ITokenPayload } from '../services/auth.service';
+import { ITokenPayload } from '../services/token.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
