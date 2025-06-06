@@ -1,11 +1,12 @@
 import { Global, Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
 import { UsersModule } from 'src/modules/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { IJwtConfig } from 'src/config/interfaces';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { AuthService } from './services/auth.service';
+import { OtpService } from './services/otp.service';
 
 @Global()
 @Module({
@@ -23,7 +24,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     ConfigModule,
     UsersModule
   ],
-  providers: [AuthResolver, JwtStrategy, AuthService],
+  providers: [AuthResolver, JwtStrategy, AuthService, OtpService],
   exports: [AuthService]
 })
 export class AuthModule { }

@@ -13,8 +13,9 @@ import { IJwtConfig } from 'src/config/interfaces';
 import { JwtService } from '@nestjs/jwt';
 import { ErrorCode } from 'src/common/enums/error-code.enum';
 import { Role } from 'src/common/enums/role.enums';
-import { SignInOutput } from './dto/sign-in/sign-in.output';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { SignInOutput } from '../dto/sign-in/sign-in.output';
+import { MailService } from 'src/integrations/mail/mail.service';
+import { OtpService } from './otp.service';
 
 // Defines the structure of JWT token payloads
 export interface ITokenPayload {
@@ -31,8 +32,9 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-    configService: ConfigService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly configService: ConfigService,
+    private readonly mailService: MailService,
+    private readonly otpService: OtpService
   ) {
     // Load JWT configuration from environment or configuration file
     const config = configService.get<IJwtConfig>('jwt');
@@ -97,6 +99,8 @@ export class AuthService {
     }
 
     if (user.isFirstLogin) {
+      const otp = await this.otpService.generateOTP(user.id)
+      await this.mailService.sendOtpMail(user.email, user.fullName, otp)
       throw new UnauthorizedException({
         message: 'Bạn cần đổi mật khẩu trong lần đầu đăng nhập',
         code: ErrorCode.FIRST_LOGIN_CHANGE_PASSWORD_REQUIRED,

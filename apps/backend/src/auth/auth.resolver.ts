@@ -1,10 +1,10 @@
 import { Resolver, Mutation, Args } from '@nestjs/graphql';
-import { AuthService } from './auth.service';
 import { createResponseMetadata } from 'src/common/helpers/metadata.helper';
 import { HttpStatus } from '@nestjs/common';
 import { SignInResponse } from './dto/sign-in/sign-in.response';
 import { SignInInput } from './dto/sign-in/sign-in.input';
 import { Public } from 'src/common/decorators/public.decorator';
+import { AuthService } from './services/auth.service';
 
 @Resolver()
 export class AuthResolver {
