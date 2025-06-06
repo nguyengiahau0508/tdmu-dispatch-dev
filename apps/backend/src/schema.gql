@@ -2,24 +2,48 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Auth {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-"""Represents a user"""
 type User {
-  id: ID!
+  """ID của người dùng"""
+  id: Int!
+
+  """Email của người dùng (dùng để đăng nhập)"""
   email: String!
-  username: String
-  firstName: String
-  lastName: String
+
+  """Họ của người dùng"""
+  lastName: String!
+
+  """Tên của người dùng"""
+  firstName: String!
+
+  """Tài khoản còn hoạt động không?"""
   isActive: Boolean!
+
+  """Đánh dấu người dùng đăng nhập lần đầu (để yêu cầu đổi mật khẩu)"""
+  isFirstLogin: Boolean!
+
+  """Vai trò của người dùng"""
+  role: UserRole!
+
+  """Thời gian tạo tài khoản"""
   createdAt: DateTime!
+
+  """Thời gian cập nhật cuối"""
   updatedAt: DateTime!
 
-  """Full name of the user"""
+  """Họ và tên đầy đủ của người dùng"""
   fullName: String!
+}
+
+"""Các vai trò của người dùng trong hệ thống"""
+enum UserRole {
+  CLERK
+  OFFICE_MANAGER
+  UNIVERSITY_LEADER
+  DEPARTMENT_HEAD
+  DEPARTMENT_STAFF
+  DEGREE_CERTIFICATE_MANAGER
+  UNASSIGNED_TASK_HANDLER
+  SUPER_ADMIN
 }
 
 """
@@ -27,40 +51,101 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+"""Thông tin metadata chung cho các response"""
+type Metadata {
+  """Mã trạng thái HTTP (hoặc mã lỗi tùy chỉnh)"""
+  statusCode: Int!
+
+  """Thông báo thành công hoặc lỗi"""
+  message: String
+
+  """Dấu thời gian của response"""
+  timestamp: String!
+
+  """Đường dẫn của request (nếu có)"""
+  path: String
+}
+
+type SignInOutput {
+  accessToken: String!
+  refreshToken: String!
+  user: User!
+}
+
+type SignInResponse {
+  """Dữ liệu trả về"""
+  data: SignInOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type UserResponse {
+  """Dữ liệu trả về"""
+  data: User
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
 type Query {
-  auth(id: Int!): Auth!
-
-  """Get all users"""
   users: [User!]!
-
-  """Get a single user by ID"""
-  user(id: ID!): User
+  user(id: Int!): User
 }
 
 type Mutation {
-  createAuth(createAuthInput: CreateAuthInput!): Auth!
-  updateAuth(updateAuthInput: UpdateAuthInput!): Auth!
-  removeAuth(id: Int!): Auth!
-
-  """Create a new user"""
-  createUser(createUserInput: CreateUserInput!): User!
+  signIn(input: SignInInput!): SignInResponse!
+  createUser(createUserInput: CreateUserInput!): UserResponse!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(id: Int!): User!
 }
 
-input CreateAuthInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-input UpdateAuthInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
-}
-
-input CreateUserInput {
+input SignInInput {
   email: String!
   password: String!
-  username: String
-  firstName: String
+}
+
+"""Dữ liệu đầu vào để tạo người dùng mới"""
+input CreateUserInput {
+  """Email của người dùng (phải là duy nhất)"""
+  email: String!
+
+  """Mật khẩu (tối thiểu 8 ký tự)"""
+  password: String!
+
+  """Họ của người dùng"""
+  lastName: String!
+
+  """Tên của người dùng"""
+  firstName: String!
+
+  """Vai trò của người dùng. Nếu không cung cấp, sẽ dùng vai trò mặc định."""
+  role: UserRole
+
+  """Trạng thái kích hoạt tài khoản (mặc định là true)."""
+  isActive: Boolean = true
+}
+
+"""Input để cập nhật người dùng"""
+input UpdateUserInput {
+  """Email của người dùng (phải là duy nhất)"""
+  email: String
+
+  """Mật khẩu (tối thiểu 8 ký tự)"""
+  password: String
+
+  """Họ của người dùng"""
   lastName: String
+
+  """Tên của người dùng"""
+  firstName: String
+
+  """Vai trò của người dùng. Nếu không cung cấp, sẽ dùng vai trò mặc định."""
+  role: UserRole
+
+  """Trạng thái kích hoạt tài khoản (mặc định là true)."""
+  isActive: Boolean = true
+
+  """ID của người dùng cần cập nhật"""
+  id: Int!
 }

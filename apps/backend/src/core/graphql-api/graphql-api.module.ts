@@ -18,7 +18,7 @@ import { IGraphQLConfig } from '../../config/interfaces';
           autoSchemaFile: gqlConfig?.autoSchemaFile,
           sortSchema: gqlConfig?.sortSchema,
           introspection: gqlConfig?.introspection,
-          // context: ({ req, res }) => ({ req, res }), // Nếu cần
+          context: ({ req, res }) => ({ req, res }), // Nếu cần
           // ... các tùy chọn khác nếu có
         };
       },
