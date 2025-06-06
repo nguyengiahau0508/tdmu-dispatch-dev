@@ -1,6 +1,7 @@
 
 import {
   BadRequestException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -13,6 +14,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ErrorCode } from 'src/common/enums/error-code.enum';
 import { Role } from 'src/common/enums/role.enums';
 import { SignInOutput } from './dto/sign-in/sign-in.output';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 // Defines the structure of JWT token payloads
 export interface ITokenPayload {
@@ -30,6 +32,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     configService: ConfigService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {
     // Load JWT configuration from environment or configuration file
     const config = configService.get<IJwtConfig>('jwt');

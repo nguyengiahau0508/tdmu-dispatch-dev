@@ -9,6 +9,7 @@ import { FeaturesModule } from './modules/features.module';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { GraphQLExceptionFilter } from './common/filters/graphql-exception.filter';
 import { GqlAuthGuard } from './auth/guards/gql-auth.guard';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -16,7 +17,10 @@ import { GqlAuthGuard } from './auth/guards/gql-auth.guard';
     AuthModule,
     DatabaseModule,
     GraphqlApiModule,
-    FeaturesModule
+    FeaturesModule,
+    CacheModule.register({
+      isGlobal: true
+    })
   ],
   controllers: [AppController],
   providers: [AppService,
