@@ -3,7 +3,7 @@ export class CacheKeyBuilder {
     return `otp:user:${userId}`;
   }
 
-  static tokenForUser(userId: number): string {
-    return `token:user:${userId}`;
+  static token(tokenId: string): string {
+    return `token:user:${tokenId}`;
   }
 }
