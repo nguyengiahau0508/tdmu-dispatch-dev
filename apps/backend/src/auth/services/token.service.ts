@@ -13,7 +13,7 @@ export interface ITokenPayload {
   email: string;
   type: 'access' | 'refresh' | 'onetime';
   role?: Role;
-  tokenId?: string;
+  tokenId: string;
 }
 
 @Injectable()

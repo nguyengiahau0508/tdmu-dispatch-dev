@@ -96,7 +96,7 @@ export class AuthService {
 
     // Generate both access and refresh tokens in parallel
     const [accessToken] = await Promise.all([
-      this.tokenService.generateAccessToken(payload),
+      this.tokenService.generateAccessOneTimeToken(payload),
     ]);
 
     // Return tokens and basic user info
