@@ -1,1 +1,20 @@
-/* You can add global styles to this file, and also import other style files */
+/* Light Mode - Default */
+:root {
+  --color-background-primary: #FFFFFF;   /* Trắng Sứ */
+  --color-background-secondary: #F8F9FA; /* Xám Nhạt */
+  --color-text-primary: #212529;         /* Xám Đen */
+  --color-primary: #0D47A1;              /* Xanh TDMU */
+  --color-accent: #F37021;               /* Cam Năng Lượng */
+  --color-neutral-border: #DEE2E6;       /* Xám Viền */
+}
+
+/* Dark Mode */
+.dark-mode {
+  --color-background-primary: #0A192F;   /* Xanh Đen */
+  --color-background-secondary: #172A45; /* Xanh Navy Đậm */
+  --color-text-primary: #CCD6F6;         /* Xám Trắng */
+  --color-text-heading: #E6F1FF;         /* Trắng Nhạt */
+  --color-accent: #F37021;               /* Cam Năng Lượng */
+  --color-accent-secondary: #64FFDA;     /* Xanh TDMU Sáng (hoặc #58A6FF) */
+}
+
