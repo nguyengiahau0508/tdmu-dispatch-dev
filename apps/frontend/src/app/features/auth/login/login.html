@@ -1,0 +1,35 @@
+<!-- BEM Block: login-container -->
+<div class="login-container">
+  <!-- BEM Block: login-form -->
+  <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <h2 class="login-form__title">Đăng Nhập</h2>
+    <p class="login-form__subtitle">Chào mừng bạn trở lại!</p>
+
+    <!-- BEM Block: form-group -->
+    <div class="form-group">
+      <label for="email" class="form-group__label">Email</label>
+      <input type="email" id="email" class="form-group__input" formControlName="email"
+        placeholder="nhapemail@tdmu.edu.vn">
+    </div>
+
+    <!-- BEM Block: form-group -->
+    <div class="form-group">
+      <label for="password" class="form-group__label">Mật khẩu</label>
+      <input [type]="showPassword ? 'text' : 'password'" id="password" class="form-group__input"
+        formControlName="password" placeholder="Nhập mật khẩu của bạn">
+      <button class="form-group__toggle-password" (click)="showPassword = !showPassword" type="button">
+        @if(showPassword){
+        <img class="form-group__toggle-password-icon" src="/icons/hide.png" alt="">
+        }@else{
+        <img class="form-group__toggle-password-icon" src="/icons/visual.png" alt="">
+        }
+      </button>
+    </div>
+
+    <a (click)="onGotoForgotPassword()" class="login-form__forgot-link">Quên mật khẩu?</a>
+
+    <button type="submit" class="login-form__submit-button" [disabled]="loginForm.invalid">
+      Đăng Nhập
+    </button>
+  </form>
+</div>

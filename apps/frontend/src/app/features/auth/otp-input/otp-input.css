@@ -1,0 +1,80 @@
+.otp-input-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 24px;
+  box-sizing: border-box;
+  background-color: var(--color-background-primary);
+}
+
+.otp-input__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.otp-input__description {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 24px;
+  text-align: center;
+  max-width: 320px;
+}
+
+.otp-input__fields {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.otp-input__field {
+  width: 48px;
+  height: 56px;
+  font-size: 2rem;
+  text-align: center;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  outline: none;
+  color: var(--color-text-primary);
+  background-color: var(--color-background-secondary);
+  transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s;
+  box-sizing: border-box;
+}
+
+.otp-input__field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
+  background-color: var(--color-background-primary);
+}
+
+.otp-input__resend-button {
+  padding: 0.875rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--color-primary);
+  color: var(--color-text-on-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.otp-input__resend-button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.otp-input__resend-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.otp-input__resend-button:disabled {
+  background-color: var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+}

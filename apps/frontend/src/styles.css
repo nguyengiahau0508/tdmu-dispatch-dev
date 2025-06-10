@@ -1,20 +1,69 @@
+/* src/styles.css */
+
 /* Light Mode - Default */
 :root {
-  --color-background-primary: #FFFFFF;   /* Trắng Sứ */
-  --color-background-secondary: #F8F9FA; /* Xám Nhạt */
-  --color-text-primary: #212529;         /* Xám Đen */
-  --color-primary: #0D47A1;              /* Xanh TDMU */
-  --color-accent: #F37021;               /* Cam Năng Lượng */
-  --color-neutral-border: #DEE2E6;       /* Xám Viền */
+  --color-primary: #0D47A1;
+  /* Xanh TDMU */
+  --color-accent: #F37021;
+  /* Cam Năng Lượng */
+
+  --color-background-primary: #FFFFFF;
+  /* Nền chính (vd: content) */
+  --color-background-secondary: #F8F9FA;
+  /* Nền phụ (vd: sidebar) */
+  --color-background-layout: #e9ecef;
+  /* Nền của toàn bộ layout */
+
+  --color-text-primary: #212529;
+  /* Chữ chính */
+  --color-text-secondary: #6c757d;
+  /* Chữ phụ */
+  --color-text-on-primary: #FFFFFF;
+  /* Chữ trên nền màu chính (vd: trên button) */
+
+  --color-border: #DEE2E6;
+  /* Màu viền */
+  --shadow-default: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Dark Mode */
+/* Dark Mode - Sẽ được kích hoạt khi có class .dark-mode trên body */
 .dark-mode {
-  --color-background-primary: #0A192F;   /* Xanh Đen */
-  --color-background-secondary: #172A45; /* Xanh Navy Đậm */
-  --color-text-primary: #CCD6F6;         /* Xám Trắng */
-  --color-text-heading: #E6F1FF;         /* Trắng Nhạt */
-  --color-accent: #F37021;               /* Cam Năng Lượng */
-  --color-accent-secondary: #64FFDA;     /* Xanh TDMU Sáng (hoặc #58A6FF) */
+  --color-primary: #58A6FF;
+  /* Xanh Sáng */
+  --color-accent: #F37021;
+  /* Cam Năng Lượng (giữ nguyên) */
+
+  --color-background-primary: #172A45;
+  /* Nền chính (vd: content) */
+  --color-background-secondary: #0A192F;
+  /* Nền phụ (vd: sidebar, header) */
+  --color-background-layout: #0A192F;
+  /* Nền của toàn bộ layout */
+
+  --color-text-primary: #CCD6F6;
+  /* Chữ chính */
+  --color-text-secondary: #8892b0;
+  /* Chữ phụ */
+  --color-text-on-primary: #0A192F;
+  /* Chữ trên nền màu chính */
+
+  --color-border: #2c3e5a;
+  /* Màu viền */
+  --shadow-default: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
+/* Global Styles */
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  background-color: var(--color-background-layout);
+  color: var(--color-text-primary);
+  transition: background-color 0.3s, color 0.3s;
+  overflow: hidden;
+}
+
+a {
+  cursor: pointer;
+}

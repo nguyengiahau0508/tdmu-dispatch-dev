@@ -1,0 +1,35 @@
+
+<div class="otp-input-container">
+  <h2 class="otp-input__title">Nhập mã OTP</h2>
+  <p class="otp-input__description">Vui lòng kiểm tra điện thoại hoặc email để lấy mã OTP.</p>
+
+  <div class="otp-input__fields">
+    @for (value of otpValues; track $index) {
+      <input
+        id="otp-input__field-{{$index}}"
+        type="text"
+        maxlength="1"
+        class="otp-input__field"
+        [value]="value()"
+        (input)="onInput($event, $index)"
+        (keydown)="onKeyDown($event, $index)"
+        autocomplete="one-time-code"
+        inputmode="numeric"
+      />
+    }
+  </div>
+
+  <button
+    class="otp-input__resend-button"
+    type="button"
+    (click)="onResendOtp()"
+    [disabled]="resendCooldown() > 0"
+  >
+    {{
+      resendCooldown() > 0
+        ? 'Gửi lại mã OTP (' + resendCooldown() + 's)'
+        : 'Gửi lại mã OTP'
+    }}
+  </button>
+</div>
+
