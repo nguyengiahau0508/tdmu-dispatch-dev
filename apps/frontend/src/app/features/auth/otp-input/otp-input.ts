@@ -1,6 +1,7 @@
 
 import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-otp-input',
@@ -15,6 +16,10 @@ export class OtpInput {
 
   resendCooldown = signal(0); // thời gian còn lại (giây)
   private timer: any; // để lưu setInterval ID
+
+  constructor(
+    private router: Router
+  ) { }
 
   onInput(event: Event, index: number) {
     const input = event.target as HTMLInputElement;
@@ -74,8 +79,8 @@ export class OtpInput {
   checkOtpComplete() {
     const otp = this.otpValues.map(s => s()).join('');
     if (otp.length == this.otpLength) {
+      this.router.navigate(['auth', 'reset-password'])
       console.log('OTP hoàn tất:', otp);
-      // Gửi OTP hoặc xử lý tiếp
     }
   }
 
