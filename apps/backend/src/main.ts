@@ -7,6 +7,7 @@ async function bootstrap(): Promise<void> {
 
   // Middleware
   app.useGlobalPipes(new ValidationPipe())
+  app.enableCors()
   //app.useGlobalFilters(new AllExceptionsFilter())
   await app.listen(process.env.PORT ?? 3000);
 }

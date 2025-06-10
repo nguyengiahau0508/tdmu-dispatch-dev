@@ -17,6 +17,10 @@
     "@angular/forms": "^20.0.2",
     "@angular/platform-browser": "^20.0.2",
     "@angular/router": "^20.0.2",
+    "@apollo/client": "^3.13.8",
+    "apollo-angular": "^10.0.3",
+    "graphql": "^16.11.0",
+    "ngx-toastr": "^19.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

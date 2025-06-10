@@ -2,6 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { LoginInputModel } from './models/login.input';
+import { AuthService } from '../../../core/services/auth.service';
+import { ErrorHandlerService } from '../../../core/services/error-handler.service';
+import { GraphQLResponseError } from '../../../shared/models/graphql-error.model';
+import { ErrorCode } from '../../../shared/enums/error-code.enum';
+import { ToastrService } from 'ngx-toastr';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -12,9 +19,13 @@ import { Router } from '@angular/router';
 export class Login {
   loginForm!: FormGroup
   showPassword = false
+  isLoading = false
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private authService: AuthService,
+    private errorHandlerService: ErrorHandlerService,
+    private toarst: ToastrService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -23,11 +34,34 @@ export class Login {
   }
 
   onSubmit(): void {
+    this.isLoading = true
+    this.loginForm.disable()
     if (this.loginForm.invalid) {
       return;
     }
-
-    console.log('Form Submitted!', this.loginForm.value);
+    const loginData: LoginInputModel = this.loginForm.value
+    this.authService.login({
+      email: loginData.email,
+      password: loginData.password
+    }).pipe(
+      finalize(() => {
+        this.loginForm.enable()
+        this.isLoading = false
+      })
+    )
+      .subscribe({
+        next: response => {
+          console.log(response.data?.user.fullName)
+        },
+        error: (errorResponse: GraphQLResponseError) => {
+          const { message, code } = this.errorHandlerService.extractGraphQLError(errorResponse);
+          if (code === ErrorCode.FIRST_LOGIN_CHANGE_PASSWORD_REQUIRED) {
+            this.router.navigate(['auth', 'otp-input'])
+          } else {
+            this.toarst.error(message)
+          }
+        }
+      })
   }
 
   onGotoForgotPassword() {

@@ -8,37 +8,41 @@
   /* Cam Năng Lượng */
 
   --color-background-primary: #FFFFFF;
-  /* Nền chính (vd: content) */
+  /* Nền chính */
   --color-background-secondary: #F8F9FA;
-  /* Nền phụ (vd: sidebar) */
+  /* Nền phụ */
   --color-background-layout: #e9ecef;
   /* Nền của toàn bộ layout */
+  --color-background-disabled: #E9ECEF;
+  /* Nền khi disable */
 
   --color-text-primary: #212529;
   /* Chữ chính */
   --color-text-secondary: #6c757d;
   /* Chữ phụ */
   --color-text-on-primary: #FFFFFF;
-  /* Chữ trên nền màu chính (vd: trên button) */
+  /* Chữ trên nền màu chính */
 
   --color-border: #DEE2E6;
   /* Màu viền */
   --shadow-default: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Dark Mode - Sẽ được kích hoạt khi có class .dark-mode trên body */
+/* Dark Mode */
 .dark-mode {
   --color-primary: #58A6FF;
   /* Xanh Sáng */
   --color-accent: #F37021;
-  /* Cam Năng Lượng (giữ nguyên) */
+  /* Cam Năng Lượng */
 
   --color-background-primary: #172A45;
-  /* Nền chính (vd: content) */
+  /* Nền chính */
   --color-background-secondary: #0A192F;
-  /* Nền phụ (vd: sidebar, header) */
+  /* Nền phụ */
   --color-background-layout: #0A192F;
-  /* Nền của toàn bộ layout */
+  /* Nền layout */
+  --color-background-disabled: #2C3E50;
+  /* Nền khi disable */
 
   --color-text-primary: #CCD6F6;
   /* Chữ chính */
@@ -53,6 +57,13 @@
 }
 
 /* Global Styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -60,10 +71,32 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   background-color: var(--color-background-layout);
   color: var(--color-text-primary);
-  transition: background-color 0.3s, color 0.3s;
   overflow: hidden;
 }
 
 a {
   cursor: pointer;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+input:disabled {
+  background-color: var(--color-background-disabled);
+  cursor: not-allowed;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
+.button:disabled {
+  background-color: var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
 }

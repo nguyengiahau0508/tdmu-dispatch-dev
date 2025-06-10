@@ -9,7 +9,7 @@
     <div class="form-group">
       <label for="email" class="form-group__label">Email</label>
       <input type="email" id="email" class="form-group__input" formControlName="email"
-        placeholder="nhapemail@tdmu.edu.vn">
+        placeholder="nhapemail@tdmu.edu.vn" >
     </div>
 
     <!-- BEM Block: form-group -->
@@ -28,8 +28,12 @@
 
     <a (click)="onGotoForgotPassword()" class="login-form__forgot-link">Quên mật khẩu?</a>
 
-    <button type="submit" class="login-form__submit-button" [disabled]="loginForm.invalid">
-      Đăng Nhập
+    <button type="submit" class="login-form__submit-button" [disabled]="loginForm.invalid || isLoading">
+      @if(isLoading){
+          Đang xử lý...
+        }@else{
+          Đăng nhập
+        }
     </button>
   </form>
 </div>

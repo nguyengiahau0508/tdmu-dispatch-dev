@@ -50,7 +50,7 @@ export class AuthService {
 
     if (user.isFirstLogin) {
       const otp = await this.otpService.generateOTP(user.id)
-      await this.mailService.sendOtpMail(user.email, user.fullName, otp)
+      this.mailService.sendOtpMail(user.email, user.fullName, otp)
       throw new UnauthorizedException({
         message: 'Bạn cần đổi mật khẩu trong lần đầu đăng nhập',
         code: ErrorCode.FIRST_LOGIN_CHANGE_PASSWORD_REQUIRED,
