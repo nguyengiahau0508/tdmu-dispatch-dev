@@ -9,6 +9,7 @@ import { GraphQLResponseError } from '../../../shared/models/graphql-error.model
 import { ErrorCode } from '../../../shared/enums/error-code.enum';
 import { ToastrService } from 'ngx-toastr';
 import { finalize } from 'rxjs';
+import { AuthState } from '../../../core/state/auth.state';
 
 @Component({
   selector: 'app-login',
@@ -25,7 +26,8 @@ export class Login {
     private router: Router,
     private authService: AuthService,
     private errorHandlerService: ErrorHandlerService,
-    private toarst: ToastrService
+    private toarst: ToastrService,
+    private authState: AuthState
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -56,6 +58,7 @@ export class Login {
         error: (errorResponse: GraphQLResponseError) => {
           const { message, code } = this.errorHandlerService.extractGraphQLError(errorResponse);
           if (code === ErrorCode.FIRST_LOGIN_CHANGE_PASSWORD_REQUIRED) {
+            this.authState.setEmailForOtp(loginData.email)
             this.router.navigate(['auth', 'otp-input'])
           } else {
             this.toarst.error(message)
