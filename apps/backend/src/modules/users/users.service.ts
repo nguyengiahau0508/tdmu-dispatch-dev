@@ -37,11 +37,16 @@ export class UsersService {
     })
   }
 
+  async changePassword(userId: number, newPassword: string) {
+    const hash = await bcrypt.hash(newPassword, SALT_OR_ROUNDS);
+    return this.repository.update(userId, { passwordHash: hash })
+  }
+
   findAll() {
     return this.repository.find()
   }
 
-  findOne(id: number) {
+  findOneById(id: number) {
     return this.repository.findOne({
       where: {
         id

@@ -5,12 +5,14 @@ import { ConfigService } from '@nestjs/config';
 import { IJwtConfig } from 'src/config/interfaces';
 import { ErrorCode } from 'src/common/enums/error-code.enum';
 import { ITokenPayload, TokenService } from '../services/token.service';
+import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private readonly configService: ConfigService,
-    private readonly tokenService: TokenService
+    private readonly tokenService: TokenService,
+    private readonly userService: UsersService
   ) {
     const jwtConfig = configService.get<IJwtConfig>('jwt');
     if (!jwtConfig) {
@@ -43,6 +45,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (payload.type == 'onetime') {
       await this.tokenService.revokeToken(payload.tokenId)
     }
-    return { userId: payload.sub, username: payload.email, role: payload.role };
+
+    const currentUser = await this.userService.findOneById(payload.sub)
+    return currentUser
   }
 }

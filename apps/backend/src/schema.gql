@@ -100,6 +100,18 @@ type UserResponse {
   metadata: Metadata!
 }
 
+type ChangePasswordOutput {
+  status: String!
+}
+
+type ChangePasswordResponse {
+  """Dữ liệu trả về"""
+  data: ChangePasswordOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
 type Query {
   users: [User!]!
   user(id: Int!): User
@@ -109,6 +121,7 @@ type Mutation {
   signIn(input: SignInInput!): SignInResponse!
   signInWithOtp(input: SignInOtpInput!): SignInOtpResponse!
   createUser(createUserInput: CreateUserInput!): UserResponse!
+  changePassword(input: ChangePasswordInput!): ChangePasswordResponse!
   updateUser(updateUserInput: UpdateUserInput!): User!
   removeUser(id: Int!): User!
 }
@@ -142,6 +155,10 @@ input CreateUserInput {
 
   """Trạng thái kích hoạt tài khoản (mặc định là true)."""
   isActive: Boolean = true
+}
+
+input ChangePasswordInput {
+  newPassword: String!
 }
 
 """Input để cập nhật người dùng"""
