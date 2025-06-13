@@ -68,7 +68,6 @@ scalar DateTime
 
 type SignInOutput {
   accessToken: String!
-  refreshToken: String!
   user: User!
 }
 

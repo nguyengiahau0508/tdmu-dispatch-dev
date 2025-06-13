@@ -1,7 +1,7 @@
 import { Resolver, Query, Mutation, Args, Int, ObjectType } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
-import { HttpStatus, Req } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Req } from '@nestjs/common';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/enums/role.enums';
 import { createResponseMetadata } from 'src/common/helpers/metadata.helper';
@@ -32,6 +32,8 @@ export class UsersResolver {
     @CurrentUser() user: User
   ): Promise<ChangePasswordResponse> {
     const updated = await this.usersService.changePassword(user.id, input.newPassword)
+    if (updated.affected == 0) throw new BadRequestException("Đổi mật khẩu thất bại")
+    if (user.isFirstLogin) await this.usersService.setFalseForFistLogin(user.id)
     const message = updated.affected != 0 ? "Đổi mật khẩu thành công" : "Đổi mật khẩu thất bại"
     const httpStatus = updated.affected != 0 ? HttpStatus.ACCEPTED : HttpStatus.BAD_REQUEST
     return {

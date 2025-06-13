@@ -18,8 +18,11 @@ import { IGraphQLConfig } from '../../config/interfaces';
           autoSchemaFile: gqlConfig?.autoSchemaFile,
           sortSchema: gqlConfig?.sortSchema,
           introspection: gqlConfig?.introspection,
+          cors: {
+            origin: true,
+            credentials: true,
+          },
           context: ({ req, res }) => ({ req, res }), // Nếu cần
-          // ... các tùy chọn khác nếu có
         };
       },
       inject: [ConfigService],

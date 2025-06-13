@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LoginInputModel } from './models/login.input';
 import { AuthService } from '../../../core/services/auth.service';
 import { ErrorHandlerService } from '../../../core/services/error-handler.service';
 import { GraphQLResponseError } from '../../../shared/models/graphql-error.model';
@@ -10,6 +9,7 @@ import { ErrorCode } from '../../../shared/enums/error-code.enum';
 import { ToastrService } from 'ngx-toastr';
 import { finalize } from 'rxjs';
 import { AuthState } from '../../../core/state/auth.state';
+import { ILoginInput } from './interfaces/login.input';
 
 @Component({
   selector: 'app-login',
@@ -41,7 +41,7 @@ export class Login {
     if (this.loginForm.invalid) {
       return;
     }
-    const loginData: LoginInputModel = this.loginForm.value
+    const loginData: ILoginInput = this.loginForm.value
     this.authService.login({
       email: loginData.email,
       password: loginData.password

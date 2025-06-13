@@ -6,8 +6,8 @@ export class SignInOutput {
   @Field(() => String)
   accessToken: string;
 
-  @Field(() => String)
-  refreshToken: string;
+  // @Field(() => String)
+  // refreshToken: string;
 
   @Field(() => User)
   user: User;

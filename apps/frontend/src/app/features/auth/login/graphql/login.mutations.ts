@@ -11,7 +11,6 @@ export const LOGIN_MUTATION = gql`
             message
           }
           data {
-            refreshToken
             accessToken
             user {
               fullName

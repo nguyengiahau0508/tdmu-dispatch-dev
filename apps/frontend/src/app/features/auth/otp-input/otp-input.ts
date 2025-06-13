@@ -2,6 +2,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
+import { AuthState } from '../../../core/state/auth.state';
+import { ToastrService } from 'ngx-toastr';
+import { finalize } from 'rxjs';
+import { GraphQLResponseError } from '../../../shared/models/graphql-error.model';
+import { ErrorHandlerService } from '../../../core/services/error-handler.service';
+import { ErrorCode } from '../../../shared/enums/error-code.enum';
+import { ILoginOtpInput } from './interfaces/login-otp.input';
 
 @Component({
   selector: 'app-otp-input',
@@ -17,8 +25,13 @@ export class OtpInput {
   resendCooldown = signal(0); // thời gian còn lại (giây)
   private timer: any; // để lưu setInterval ID
 
+  isLoading = false
   constructor(
-    private router: Router
+    private router: Router,
+    private authService: AuthService,
+    private authState: AuthState,
+    private errorHandlerService: ErrorHandlerService,
+    private toastr: ToastrService
   ) { }
 
   onInput(event: Event, index: number) {
@@ -79,8 +92,38 @@ export class OtpInput {
   checkOtpComplete() {
     const otp = this.otpValues.map(s => s()).join('');
     if (otp.length == this.otpLength) {
-      this.router.navigate(['auth', 'reset-password'])
-      console.log('OTP hoàn tất:', otp);
+      this.isLoading = true
+      const email = this.authState.getEmailForOtp()
+      if (!email) {
+        this.toastr.error('Có lổi xảy ra vui lòng thử lại')
+        this.router.navigate(['auth'])
+        return;
+      }
+      const loginWithOtpData: ILoginOtpInput = { email, otp }
+      this.authService.loginWithOtp(loginWithOtpData).pipe(finalize(() => {
+        this.isLoading = true
+      })).subscribe({
+        next: response => {
+          this.router.navigate(['auth', 'reset-password'])
+        },
+        error: (errorResponse: GraphQLResponseError) => {
+          const { message, code } = this.errorHandlerService.extractGraphQLError(errorResponse);
+          this.toastr.error(message)
+          if (code === ErrorCode.OTP_INVALID) {
+            this.clearCurrentOtp()
+          }
+        }
+      })
+    }
+  }
+
+  clearCurrentOtp() {
+    for (let i = 0; i < this.otpLength; i++) {
+      const input = document.getElementById(`otp-input__field-${i}`) as HTMLInputElement | null;
+      if (input) {
+        input.value = ''
+        if (i == 0) input.focus()
+      }
     }
   }
 

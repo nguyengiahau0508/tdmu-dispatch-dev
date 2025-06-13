@@ -1,6 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { UsersService } from '../../../core/services/users.service';
+import { IResetPasswordInput } from './interfaces/reset-password.input';
+import { finalize } from 'rxjs';
+import { GraphQLResponseError } from '../../../shared/models/graphql-error.model';
+import { ErrorHandlerService } from '../../../core/services/error-handler.service';
+import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-reset-password',
@@ -13,7 +20,11 @@ export class ResetPassword {
   showPassword = false;
   showConfirmPassword = false;
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private usersService: UsersService,
+    private errorHandlerService: ErrorHandlerService,
+    private toastr: ToastrService,
+    private router: Router
   ) {
     this.resetPasswordForm = this.fb.group({
       password: [
@@ -37,10 +48,27 @@ export class ResetPassword {
   }
 
   onSubmit(): void {
+    this.resetPasswordForm.disable()
     if (this.resetPasswordForm.invalid) {
       return;
     }
 
-    console.log('Form Submitted!', this.resetPasswordForm.value);
+    const resetPasswordData: IResetPasswordInput = {
+      newPassword: this.resetPasswordForm.get('password')?.value
+    }
+    this.usersService.changePassword(resetPasswordData).pipe(
+      finalize(() => {
+        this.resetPasswordForm.enable()
+      })
+    ).subscribe({
+      next: response => {
+        this.toastr.success(response.metadata.message)
+        this.router.navigate(['auth'])
+      },
+      error: (errorResponse: GraphQLResponseError) => {
+        const { message, code } = this.errorHandlerService.extractGraphQLError(errorResponse);
+        this.toastr.error(message)
+      }
+    })
   }
 }

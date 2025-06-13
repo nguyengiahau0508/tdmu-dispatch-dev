@@ -42,6 +42,10 @@ export class UsersService {
     return this.repository.update(userId, { passwordHash: hash })
   }
 
+  async setFalseForFistLogin(userId: number) {
+    return this.repository.update(userId, { isFirstLogin: false })
+  }
+
   findAll() {
     return this.repository.find()
   }

@@ -1,4 +1,4 @@
-export interface LoginInputModel {
+export interface ILoginInput {
   email: string
   password: string
 }

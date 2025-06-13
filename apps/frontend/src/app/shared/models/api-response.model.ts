@@ -1,6 +1,6 @@
 import { Metadata } from "./metadata.model";
 // TGenericData là kiểu dữ liệu của `data` mà bạn mong đợi
-export interface ApiResponse<TGenericData> {
+export interface IApiResponse<TGenericData> {
   data: TGenericData | null | undefined; // Dữ liệu trả về có thể là một object, null hoặc undefined
   metadata: Metadata;
 }

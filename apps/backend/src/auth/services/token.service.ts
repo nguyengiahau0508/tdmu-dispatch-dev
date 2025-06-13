@@ -72,7 +72,6 @@ export class TokenService {
     return token;
   }
 
-
   /**
    * Generates a refresh token and stores it in cache for validation/revocation.
    */

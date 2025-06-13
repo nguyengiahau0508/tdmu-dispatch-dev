@@ -2,6 +2,8 @@
 import {
   BadRequestException,
   Injectable,
+  Req,
+  Res,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from 'src/modules/users/users.service';
@@ -12,6 +14,7 @@ import { MailService } from 'src/integrations/mail/mail.service';
 import { OtpService } from './otp.service';
 import { SignInOtpOutput } from '../dto/sign-in-otp/sign-in-otp.output';
 import { TokenService } from './token.service';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -27,7 +30,7 @@ export class AuthService {
  * Handles user sign-in logic.
  * Validates credentials and returns JWT tokens if successful.
  */
-  public async signIn(email: string, pass: string): Promise<SignInOutput> {
+  public async signIn(email: string, pass: string, @Res({ passthrough: true }) res: Response): Promise<SignInOutput> {
     // Find user by email
     const user = await this.usersService.findOneByEmail(email);
     if (!user) {
@@ -65,10 +68,18 @@ export class AuthService {
       this.tokenService.generateRefreshToken(payload),
     ]);
 
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,         // bảo mật - không cho JS đọc
+      secure: false,          // cho phép qua HTTP (chỉ dùng trong dev)
+      sameSite: 'lax',        // hoặc 'none' nếu cần chia sẻ full cross-site
+      path: '/',              // hoặc '/graphql' nếu bạn chỉ xử lý ở đó
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+    });
+
     // Return tokens and basic user info
     return {
       accessToken,
-      refreshToken,
+      //refreshToken,
       user
     };
   }

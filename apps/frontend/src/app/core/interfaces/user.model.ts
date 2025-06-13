@@ -1,6 +1,6 @@
 import { Role } from "../../shared/enums/role.enum";
 
-export interface UserModel {
+export interface IUser {
   id: number;
   email: string;
   // passwordHash KHÔNG NÊN được truyền ra client, nên không có trong interface này
