@@ -115,5 +115,19 @@ export class AuthService {
       accessToken,
     };
   }
+
+  async sentOtp(email: string) {
+    const user = await this.usersService.findOneByEmail(email);
+    if (!user) {
+      // If user does not exist, throw an error
+      throw new BadRequestException({
+        message: 'Tài khoản không tồn tại',
+        code: ErrorCode.ACCOUNT_NOT_FOUND,
+      });
+    }
+
+    const otp = await this.otpService.generateOTP(user.id)
+    this.mailService.sendOtpMail(user.email, user.fullName, otp)
+  }
 }
 

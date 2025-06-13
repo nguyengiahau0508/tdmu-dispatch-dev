@@ -1,9 +1,8 @@
 import { inject, Injectable } from "@angular/core";
 import { Apollo } from "apollo-angular";
-import { IResetPasswordInput } from "../../features/auth/reset-password/interfaces/reset-password.input";
+import { IResetPasswordInput, IResetPasswordOutput } from "../../features/auth/reset-password/interfaces/reset-password.interface";
 import { map, Observable } from "rxjs";
 import { IApiResponse } from "../../shared/models/api-response.model";
-import { IResetPasswordOutput } from "../../features/auth/reset-password/interfaces/reset-password.output";
 import { CHANGE_PASSWORD_MUTATION } from "../../features/auth/reset-password/graphql/reset-password.mutations";
 
 @Injectable({ providedIn: 'root' })

@@ -8,6 +8,8 @@ import { AuthService } from './services/auth.service';
 import { SignInOtpInput } from './dto/sign-in-otp/sign-in-otp.input';
 import { SignInOtpResponse } from './dto/sign-in-otp/sign-in-otp.response';
 import { Response } from 'express';
+import { SentOtpResponse } from './dto/sent-otp/sent-otp.response';
+import { SentOtpInput } from './dto/sent-otp/sent-opt.input';
 
 @Resolver()
 export class AuthResolver {
@@ -31,6 +33,19 @@ export class AuthResolver {
       metadata: createResponseMetadata(HttpStatus.ACCEPTED, ""),
       data: result
     };
+  }
+
+
+  @Mutation(() => SentOtpResponse)
+  @Public()
+  async sentOtp(@Args('input') input: SentOtpInput): Promise<SentOtpResponse> {
+    await this.authService.sentOtp(input.email);
+    return {
+      metadata: createResponseMetadata(HttpStatus.ACCEPTED, ""),
+      data: {
+        status: true
+      }
+    }
   }
 }
 

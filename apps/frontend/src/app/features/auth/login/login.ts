@@ -9,7 +9,7 @@ import { ErrorCode } from '../../../shared/enums/error-code.enum';
 import { ToastrService } from 'ngx-toastr';
 import { finalize } from 'rxjs';
 import { AuthState } from '../../../core/state/auth.state';
-import { ILoginInput } from './interfaces/login.input';
+import { ILoginInput } from './interfaces/login.interface';
 
 @Component({
   selector: 'app-login',

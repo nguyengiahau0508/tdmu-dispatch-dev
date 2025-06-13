@@ -1,5 +1,11 @@
 import { IUser } from "../../../../core/interfaces/user.model";
 
+export interface ILoginInput {
+  email: string
+  password: string
+}
+
+
 export interface ILoginOutput {
   accessToken: string;
   //refreshToken: string;

@@ -16,3 +16,17 @@ export const LOGIN_WITH_OTP_MUTATION = gql`
     }
   }
 `;
+
+export const SENT_OTP_MUTATION = gql`
+  mutation SentOtp($input: SentOtpInput!) {
+    sentOtp(input: $input) {
+      metadata {
+        message
+        statusCode
+      }
+      data {
+        status
+      }
+    }
+  }
+`;

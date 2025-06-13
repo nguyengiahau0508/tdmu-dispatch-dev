@@ -91,6 +91,18 @@ type SignInOtpResponse {
   metadata: Metadata!
 }
 
+type SentOtpOutput {
+  status: Boolean!
+}
+
+type SentOtpResponse {
+  """Dữ liệu trả về"""
+  data: SentOtpOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
 type UserResponse {
   """Dữ liệu trả về"""
   data: User
@@ -119,6 +131,7 @@ type Query {
 type Mutation {
   signIn(input: SignInInput!): SignInResponse!
   signInWithOtp(input: SignInOtpInput!): SignInOtpResponse!
+  sentOtp(input: SentOtpInput!): SentOtpResponse!
   createUser(createUserInput: CreateUserInput!): UserResponse!
   changePassword(input: ChangePasswordInput!): ChangePasswordResponse!
   updateUser(updateUserInput: UpdateUserInput!): User!
@@ -133,6 +146,10 @@ input SignInInput {
 input SignInOtpInput {
   email: String!
   otp: String!
+}
+
+input SentOtpInput {
+  email: String!
 }
 
 """Dữ liệu đầu vào để tạo người dùng mới"""

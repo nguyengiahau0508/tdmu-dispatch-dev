@@ -3,13 +3,12 @@ import { inject, Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { map, Observable, tap } from 'rxjs';
 import { LOGIN_MUTATION } from '../../features/auth/login/graphql/login.mutations';
-import { LOGIN_WITH_OTP_MUTATION } from '../../features/auth/otp-input/graphql/otp-input.mutations';
+import { LOGIN_WITH_OTP_MUTATION, SENT_OTP_MUTATION } from '../../features/auth/otp-input/graphql/otp-input.mutations';
 import { AuthState } from '../state/auth.state';
-import { ILoginOutput } from '../../features/auth/login/interfaces/login.output';
 import { IApiResponse } from '../../shared/models/api-response.model';
-import { ILoginOtpOutput } from '../../features/auth/otp-input/interfaces/login-otp.output';
-import { ILoginInput } from '../../features/auth/login/interfaces/login.input';
-import { ILoginOtpInput } from '../../features/auth/otp-input/interfaces/login-otp.input';
+import { ILoginInput, ILoginOutput } from '../../features/auth/login/interfaces/login.interface';
+import { ILoginOtpInput, ILoginOtpOutput } from '../../features/auth/otp-input/interfaces/login-otp.interface';
+import { ISentOtpInput, ISentOtpOutput } from '../../features/auth/otp-input/interfaces/sent-otp.interface';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -44,6 +43,17 @@ export class AuthService {
         if (accessToken) this.authState.setAccessToken(accessToken)
       }),
       map(response => response.data!.signInWithOtp)
+    )
+  }
+
+  sentOtp(input: ISentOtpInput): Observable<IApiResponse<ISentOtpOutput>> {
+    return this.apollo.mutate<{
+      sentOtp: IApiResponse<ISentOtpOutput>
+    }>({
+      mutation: SENT_OTP_MUTATION,
+      variables: { input }
+    }).pipe(
+      map(response => response.data!.sentOtp)
     )
   }
 }

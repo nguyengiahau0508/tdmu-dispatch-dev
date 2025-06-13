@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UsersService } from '../../../core/services/users.service';
-import { IResetPasswordInput } from './interfaces/reset-password.input';
+import { IResetPasswordInput } from './interfaces/reset-password.interface';
 import { finalize } from 'rxjs';
 import { GraphQLResponseError } from '../../../shared/models/graphql-error.model';
 import { ErrorHandlerService } from '../../../core/services/error-handler.service';

@@ -9,7 +9,7 @@ import { finalize } from 'rxjs';
 import { GraphQLResponseError } from '../../../shared/models/graphql-error.model';
 import { ErrorHandlerService } from '../../../core/services/error-handler.service';
 import { ErrorCode } from '../../../shared/enums/error-code.enum';
-import { ILoginOtpInput } from './interfaces/login-otp.input';
+import { ILoginOtpInput } from './interfaces/login-otp.interface';
 
 @Component({
   selector: 'app-otp-input',
@@ -68,9 +68,17 @@ export class OtpInput {
 
   onResendOtp() {
     if (this.resendCooldown() > 0) return; // không cho gửi khi còn cooldown
+    const email = this.authState.getEmailForOtp()
 
-    console.log('Gửi lại mã OTP');
-    // Gọi API gửi OTP ở đây nếu có
+    if (!email) {
+      this.toastr.error('Có lổi xảy ra vui lòng thử lại')
+      this.router.navigate(['auth'])
+      return;
+    }
+
+    this.authService.sentOtp({
+      email
+    }).subscribe()
 
     this.startResendCooldown();
   }
@@ -120,6 +128,7 @@ export class OtpInput {
   clearCurrentOtp() {
     for (let i = 0; i < this.otpLength; i++) {
       const input = document.getElementById(`otp-input__field-${i}`) as HTMLInputElement | null;
+      this.otpValues[i].set('');
       if (input) {
         input.value = ''
         if (i == 0) input.focus()
