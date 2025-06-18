@@ -36,6 +36,9 @@ type User {
   """Đánh dấu người dùng đăng nhập lần đầu (để yêu cầu đổi mật khẩu)"""
   isFirstLogin: Boolean!
 
+  """Ảnh đại diện của người dùng"""
+  avatar: String!
+
   """Vai trò của người dùng"""
   role: UserRole!
 
@@ -103,6 +106,18 @@ type SentOtpResponse {
   metadata: Metadata!
 }
 
+type RefreshTokenOutput {
+  accessToken: String!
+}
+
+type RefreshTokenReponse {
+  """Dữ liệu trả về"""
+  data: RefreshTokenOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
 type UserResponse {
   """Dữ liệu trả về"""
   data: User
@@ -123,6 +138,18 @@ type ChangePasswordResponse {
   metadata: Metadata!
 }
 
+type GetCurrentUserDataOutput {
+  user: User!
+}
+
+type getCurrentUserDataReponse {
+  """Dữ liệu trả về"""
+  data: GetCurrentUserDataOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
 type Query {
   users: [User!]!
   user(id: Int!): User
@@ -132,8 +159,10 @@ type Mutation {
   signIn(input: SignInInput!): SignInResponse!
   signInWithOtp(input: SignInOtpInput!): SignInOtpResponse!
   sentOtp(input: SentOtpInput!): SentOtpResponse!
+  refreshToken: RefreshTokenReponse!
   createUser(createUserInput: CreateUserInput!): UserResponse!
   changePassword(input: ChangePasswordInput!): ChangePasswordResponse!
+  getCurrentUserData: getCurrentUserDataReponse!
   updateUser(updateUserInput: UpdateUserInput!): User!
   removeUser(id: Int!): User!
 }

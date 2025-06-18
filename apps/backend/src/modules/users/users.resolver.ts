@@ -11,6 +11,8 @@ import { UpdateUserInput } from './dto/update-user/update-user.input';
 import { ChangePasswordResponse } from './dto/change-password/change-password.response';
 import { ChangePasswordInput } from './dto/change-password/change-password.input';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
+import { GetCurrentUserDataOutput } from './dto/get-current-user-data/get-current-user-data.output';
+import { getCurrentUserDataReponse } from './dto/get-current-user-data/get-current-user-data.response';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -40,6 +42,18 @@ export class UsersResolver {
       metadata: createResponseMetadata(httpStatus, message),
       data: {
         status: updated.affected != 0 ? 'success' : 'failed'
+      }
+    }
+  }
+
+  @Mutation(() => getCurrentUserDataReponse)
+  async getCurrentUserData(
+    @CurrentUser() user: User
+  ): Promise<getCurrentUserDataReponse> {
+    return {
+      metadata: createResponseMetadata(HttpStatus.ACCEPTED, "Thành công"),
+      data: {
+        user
       }
     }
   }

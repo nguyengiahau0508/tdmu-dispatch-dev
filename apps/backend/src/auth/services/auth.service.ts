@@ -14,7 +14,8 @@ import { MailService } from 'src/integrations/mail/mail.service';
 import { OtpService } from './otp.service';
 import { SignInOtpOutput } from '../dto/sign-in-otp/sign-in-otp.output';
 import { TokenService } from './token.service';
-import { Response } from 'express';
+import { Response, Request } from 'express';
+import { RefreshTokenOutput } from '../dto/refresh-token/refresh-token.output';
 
 @Injectable()
 export class AuthService {
@@ -128,6 +129,25 @@ export class AuthService {
 
     const otp = await this.otpService.generateOTP(user.id)
     this.mailService.sendOtpMail(user.email, user.fullName, otp)
+  }
+
+  async refreshToken(@Req() req: Request): Promise<RefreshTokenOutput> {
+    const refreshToken = req.cookies['refreshToken']
+    if (!refreshToken) throw new UnauthorizedException({
+      message: 'Có lổi xảy ra',
+      code: ErrorCode.TOKEN_INVALID,
+    })
+    const decode = await this.tokenService.extractToken(refreshToken)
+
+    const accessToken = await this.tokenService.generateAccessToken({
+      sub: decode.sub,
+      email: decode.email,
+      role: decode.role
+    })
+
+    return {
+      accessToken
+    }
   }
 }
 

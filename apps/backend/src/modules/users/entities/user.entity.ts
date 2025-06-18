@@ -48,6 +48,10 @@ export class User {
   @Field(() => Boolean, { description: 'Đánh dấu người dùng đăng nhập lần đầu (để yêu cầu đổi mật khẩu)' })
   isFirstLogin: boolean;
 
+  @Column({ nullable: true, type: 'text' })
+  @Field(() => String, { description: "Ảnh đại diện của người dùng" })
+  avatar: string
+
   // Thêm trường role
   @Column({
     type: 'enum',

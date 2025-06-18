@@ -1,7 +1,8 @@
 
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
+import { ErrorCode } from "src/common/enums/error-code.enum";
 import { Role } from "src/common/enums/role.enums";
 import { generateUniqueKey } from "src/common/utils/key-generator.util";
 import { IJwtConfig } from "src/config/interfaces";
@@ -12,7 +13,7 @@ export interface ITokenPayload {
   sub: number;
   email: string;
   type: 'access' | 'refresh' | 'onetime';
-  role?: Role;
+  role: Role;
   tokenId: string;
 }
 
@@ -53,11 +54,10 @@ export class TokenService {
     return token;
   }
 
-
   /**
    * Generates a one-time token (revocable via cache).
    */
-  async generateAccessOneTimeToken(payload: { sub: number; email: string }): Promise<string> {
+  async generateAccessOneTimeToken(payload: { sub: number; email: string, role: Role }): Promise<string> {
     const tokenId = generateUniqueKey();
     const tokenPayload: ITokenPayload = { ...payload, type: 'onetime', tokenId };
 
@@ -75,7 +75,7 @@ export class TokenService {
   /**
    * Generates a refresh token and stores it in cache for validation/revocation.
    */
-  async generateRefreshToken(payload: { sub: number; email: string }): Promise<string> {
+  async generateRefreshToken(payload: { sub: number; email: string, role: Role }): Promise<string> {
     const tokenId = generateUniqueKey();
     const tokenPayload: ITokenPayload = { ...payload, type: 'refresh', tokenId };
 
@@ -105,6 +105,25 @@ export class TokenService {
     const key = CacheKeyBuilder.token(tokenId);
     const exists = await this.cacheService.get(key);
     return !!exists;
+  }
+
+  async extractToken(token: string) {
+    const decode: ITokenPayload = await this.jwtService.verifyAsync(token, {
+      secret: this.jwtConfig.secret
+    })
+    if (!decode) throw new UnauthorizedException({
+      message: 'Có lổi xảy ra vui lòng thử lại',
+      code: ErrorCode.TOKEN_INVALID,
+    })
+
+    const key = CacheKeyBuilder.token(decode.tokenId);
+    const existsToken = this.cacheService.get(key)
+    if (!existsToken) throw new UnauthorizedException({
+      message: 'Có lổi xảy ra vui lòng thử lại',
+      code: ErrorCode.TOKEN_INVALID,
+    })
+
+    return decode
   }
 }
 

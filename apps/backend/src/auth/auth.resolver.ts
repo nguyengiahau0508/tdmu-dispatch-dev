@@ -7,9 +7,10 @@ import { Public } from 'src/common/decorators/public.decorator';
 import { AuthService } from './services/auth.service';
 import { SignInOtpInput } from './dto/sign-in-otp/sign-in-otp.input';
 import { SignInOtpResponse } from './dto/sign-in-otp/sign-in-otp.response';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { SentOtpResponse } from './dto/sent-otp/sent-otp.response';
 import { SentOtpInput } from './dto/sent-otp/sent-opt.input';
+import { RefreshTokenReponse } from './dto/refresh-token/refresh-token.response';
 
 @Resolver()
 export class AuthResolver {
@@ -45,6 +46,15 @@ export class AuthResolver {
       data: {
         status: true
       }
+    }
+  }
+
+  @Mutation(() => RefreshTokenReponse)
+  @Public()
+  async refreshToken(@Context('req') req: Request): Promise<RefreshTokenReponse> {
+    return {
+      metadata: createResponseMetadata(HttpStatus.ACCEPTED, ""),
+      data: await this.authService.refreshToken(req)
     }
   }
 }
