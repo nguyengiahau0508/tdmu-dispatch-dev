@@ -5,6 +5,7 @@ import { ApolloClientOptions, InMemoryCache, ApolloLink } from '@apollo/client/c
 import { environment } from '../../../environments/environment';
 import { AuthState } from '../state/auth.state';
 import { setContext } from '@apollo/client/link/context';
+import { onError } from '@apollo/client/link/error'
 
 const uri = environment.apiBaseUrl + '/graphql';
 
@@ -12,7 +13,7 @@ export function apolloOptionsFactory(): ApolloClientOptions<any> {
   const authState = inject(AuthState);
   const httpLink = inject(HttpLink);
 
-  const auth = setContext((operation, context) => {
+  const authLink = setContext((operation, context) => {
     const accessToken = authState.getAccessToken();
     // Truy cập headers bằng index signature
     const headers = {
@@ -25,7 +26,11 @@ export function apolloOptionsFactory(): ApolloClientOptions<any> {
     };
   });
 
-  const link = ApolloLink.from([auth, httpLink.create({ uri, withCredentials: true })]);
+  const errorLink = onError(({ graphQLErrors, operation, forward }) => {
+
+  })
+
+  const link = ApolloLink.from([authLink, errorLink, httpLink.create({ uri, withCredentials: true })]);
 
   return {
     link,

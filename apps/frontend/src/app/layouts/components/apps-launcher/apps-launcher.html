@@ -1,0 +1,22 @@
+@if (isOpen) {
+<div class="apps-launcher-backdrop" >
+  <div class="apps-launcher">
+    <button class="apps-launcher__close-btn" (click)="isOpen = false" title="Đóng">×</button>
+    <h2 class="apps-launcher__title">Ứng dụng</h2>
+    <div class="apps-launcher__grid">
+      <div class="apps-launcher__item" (click)="onGoToAdmin()">
+        <img src="/icons/admin_panel.svg" alt="Bảng điều khiển">
+        <span>Quản trị hệ thống</span>
+      </div>
+      <div class="apps-launcher__item">
+        <img src="/icons/smart_toy.svg" alt="AI">
+        <span>AI</span>
+      </div>
+      <div class="apps-launcher__item">
+          <img src="/icons/calendar.svg" alt="Lịch">
+      <span>Lịch</span>
+    </div>
+    </div>
+  </div>
+</div>
+}

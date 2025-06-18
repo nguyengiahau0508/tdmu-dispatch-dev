@@ -9,7 +9,9 @@ export interface IUser {
   isActive: boolean;
   isFirstLogin: boolean;
   role: Role;
+  avatar?: string
   createdAt: Date;
   updatedAt: Date;
   fullName?: string; // Đây là một trường tùy chọn, có thể được tạo ra ở client
 }
+

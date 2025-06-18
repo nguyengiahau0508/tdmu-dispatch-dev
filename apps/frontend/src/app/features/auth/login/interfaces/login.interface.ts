@@ -1,4 +1,4 @@
-import { IUser } from "../../../../core/interfaces/user.model";
+import { IUser } from "../../../../core/interfaces/user.interface";
 
 export interface ILoginInput {
   email: string

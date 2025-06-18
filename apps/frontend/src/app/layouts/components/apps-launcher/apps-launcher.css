@@ -1,0 +1,106 @@
+/* Backdrop phủ toàn màn hình */
+.apps-launcher-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Container chính của ứng dụng */
+.apps-launcher {
+  background-color: var(--color-background-primary);
+  color: var(--color-text-primary);
+  padding: 24px 32px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-default);
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+  animation: fadeInScale 0.3s ease-out;
+}
+
+/* Tiêu đề */
+.apps-launcher__title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+/* Nút đóng (×) */
+.apps-launcher__close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.apps-launcher__close-btn:hover {
+  color: var(--color-primary);
+}
+
+/* Grid chứa các mục ứng dụng */
+.apps-launcher__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 16px;
+}
+
+/* Mỗi ô ứng dụng */
+.apps-launcher__item {
+  background-color: var(--color-background-secondary);
+  border-radius: 12px;
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.apps-launcher__item:hover {
+  background-color: var(--color-background-layout);
+  transform: translateY(-2px);
+}
+
+/* Icon ứng dụng */
+.apps-launcher__item img {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 8px;
+  object-fit: contain;
+  filter: grayscale(100%) brightness(0.5);
+}
+
+/* Tên ứng dụng */
+.apps-launcher__item span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

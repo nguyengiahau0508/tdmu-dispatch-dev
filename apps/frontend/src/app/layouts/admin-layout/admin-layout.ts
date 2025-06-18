@@ -1,20 +1,17 @@
 import { Component, Renderer2 } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
-import { UserState } from '../../core/state/user.state';
+import { RouterOutlet } from '@angular/router';
+import { AppsLauncher } from '../components/apps-launcher/apps-launcher';
 import { IUser } from '../../core/interfaces/user.interface';
 import { Subscription } from 'rxjs';
-import { AppsLauncher } from '../components/apps-launcher/apps-launcher';
+import { UserState } from '../../core/state/user.state';
 
 @Component({
-  selector: 'app-main-layout',
-  standalone: true,
+  selector: 'app-admin-layout',
   imports: [RouterOutlet, AppsLauncher],
-  templateUrl: './main-layout.html',
-  styleUrl: './main-layout.css'
+  templateUrl: './admin-layout.html',
+  styleUrl: './admin-layout.css'
 })
-export class MainLayout {
-
-
+export class AdminLayout {
   isDarkMode = false;
   currentUser: IUser | null = null
 

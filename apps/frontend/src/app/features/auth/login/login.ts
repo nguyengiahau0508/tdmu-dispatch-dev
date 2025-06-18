@@ -54,6 +54,7 @@ export class Login {
       .subscribe({
         next: response => {
           console.log(response.data?.user.fullName)
+          this.router.navigate([''])
         },
         error: (errorResponse: GraphQLResponseError) => {
           const { message, code } = this.errorHandlerService.extractGraphQLError(errorResponse);

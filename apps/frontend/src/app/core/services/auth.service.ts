@@ -9,6 +9,7 @@ import { IApiResponse } from '../../shared/models/api-response.model';
 import { ILoginInput, ILoginOutput } from '../../features/auth/login/interfaces/login.interface';
 import { ILoginOtpInput, ILoginOtpOutput } from '../../features/auth/otp-input/interfaces/login-otp.interface';
 import { ISentOtpInput, ISentOtpOutput } from '../../features/auth/otp-input/interfaces/sent-otp.interface';
+import { REFRESH_TOKEN_MUTAION } from '../../features/auth/auth.mutations';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -25,7 +26,6 @@ export class AuthService {
       tap(response => {
         const accessToken = response.data?.signIn.data?.accessToken
         if (accessToken) this.authState.setAccessToken(accessToken)
-        console.log(accessToken)
       }),
       map(response => response.data!.signIn)
     );
@@ -54,6 +54,24 @@ export class AuthService {
       variables: { input }
     }).pipe(
       map(response => response.data!.sentOtp)
+    )
+  }
+
+  refreshToken(): Observable<IApiResponse<{
+    accessToken: string
+  }>> {
+    return this.apollo.mutate<{
+      refreshToken: IApiResponse<{
+        accessToken: string
+      }>
+    }>({
+      mutation: REFRESH_TOKEN_MUTAION
+    }).pipe(
+      tap(response => {
+        const accessToken = response.data?.refreshToken.data?.accessToken
+        if (accessToken) this.authState.setAccessToken(accessToken)
+      }),
+      map(response => response.data!.refreshToken)
     )
   }
 }
