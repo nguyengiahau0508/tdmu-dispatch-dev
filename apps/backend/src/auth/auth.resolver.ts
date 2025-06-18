@@ -11,6 +11,7 @@ import { Request, Response } from 'express';
 import { SentOtpResponse } from './dto/sent-otp/sent-otp.response';
 import { SentOtpInput } from './dto/sent-otp/sent-opt.input';
 import { RefreshTokenReponse } from './dto/refresh-token/refresh-token.response';
+import { LogoutResponse } from './dto/logout/logout.response';
 
 @Resolver()
 export class AuthResolver {
@@ -55,6 +56,20 @@ export class AuthResolver {
     return {
       metadata: createResponseMetadata(HttpStatus.ACCEPTED, ""),
       data: await this.authService.refreshToken(req)
+    }
+  }
+
+  @Mutation(() => LogoutResponse)
+  async logout(
+    @Context('req') req: Request,
+    @Context('res') res: Response
+  ): Promise<LogoutResponse> {
+    await this.authService.logout(req, res)
+    return {
+      metadata: createResponseMetadata(HttpStatus.ACCEPTED, ""),
+      data: {
+        status: true
+      }
     }
   }
 }

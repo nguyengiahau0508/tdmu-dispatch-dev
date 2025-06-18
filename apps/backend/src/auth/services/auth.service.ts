@@ -149,5 +149,17 @@ export class AuthService {
       accessToken
     }
   }
+
+  async logout(@Req() req: Request, @Res() res: Response) {
+    const refreshToken = req.cookies['refreshToken']
+    if (!refreshToken) throw new UnauthorizedException({
+      message: 'Có lổi xảy ra',
+      code: ErrorCode.TOKEN_INVALID,
+    })
+    const decode = await this.tokenService.extractToken(refreshToken)
+
+    await this.tokenService.revokeToken(decode.tokenId)
+    res.clearCookie('refreshToken')
+  }
 }
 

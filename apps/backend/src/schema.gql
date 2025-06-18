@@ -118,6 +118,18 @@ type RefreshTokenReponse {
   metadata: Metadata!
 }
 
+type LogoutOutput {
+  status: Boolean!
+}
+
+type LogoutResponse {
+  """Dữ liệu trả về"""
+  data: LogoutOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
 type UserResponse {
   """Dữ liệu trả về"""
   data: User
@@ -160,6 +172,7 @@ type Mutation {
   signInWithOtp(input: SignInOtpInput!): SignInOtpResponse!
   sentOtp(input: SentOtpInput!): SentOtpResponse!
   refreshToken: RefreshTokenReponse!
+  logout: LogoutResponse!
   createUser(createUserInput: CreateUserInput!): UserResponse!
   changePassword(input: ChangePasswordInput!): ChangePasswordResponse!
   getCurrentUserData: getCurrentUserDataReponse!
