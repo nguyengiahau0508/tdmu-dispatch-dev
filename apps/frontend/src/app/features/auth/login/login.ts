@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 import { finalize } from 'rxjs';
 import { AuthState } from '../../../core/state/auth.state';
 import { ILoginInput } from './interfaces/login.interface';
+import { UserState } from '../../../core/state/user.state';
 
 @Component({
   selector: 'app-login',
@@ -25,6 +26,7 @@ export class Login {
     private fb: FormBuilder,
     private router: Router,
     private authService: AuthService,
+    private userState: UserState,
     private errorHandlerService: ErrorHandlerService,
     private toarst: ToastrService,
     private authState: AuthState
@@ -53,7 +55,7 @@ export class Login {
     )
       .subscribe({
         next: response => {
-          console.log(response.data?.user.fullName)
+          this.userState.setUser(response.data!.user)
           this.router.navigate([''])
         },
         error: (errorResponse: GraphQLResponseError) => {

@@ -10,7 +10,7 @@ mutation {
       user{
         id
         lastName
-        fullName
+        firstName
         email
         role
         fullName

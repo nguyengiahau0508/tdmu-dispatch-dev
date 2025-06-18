@@ -17,4 +17,8 @@ export class AppsLauncher {
   onGoToAdmin() {
     this.router.navigate(['admin'])
   }
+
+  onGoToDispatch() {
+    this.router.navigate([''])
+  }
 }

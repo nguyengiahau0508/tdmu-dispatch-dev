@@ -13,7 +13,13 @@ export const LOGIN_MUTATION = gql`
           data {
             accessToken
             user {
+              id
               fullName
+              lastName
+              firstName
+              email
+              role
+              avatar
             }
           }
         }
