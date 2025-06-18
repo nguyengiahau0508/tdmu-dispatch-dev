@@ -162,9 +162,80 @@ type getCurrentUserDataReponse {
   metadata: Metadata!
 }
 
+type Unit {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+type UnitType {
+  """Example field (placeholder)"""
+  exampleField: Int!
+
+  """ID của loại đơn vị"""
+  id: Int!
+
+  """Tên của loại đơn vị"""
+  typeName: String!
+
+  """Mô tả của loại đơn vị"""
+  description: String!
+}
+
+type CreateUnitTypeOutput {
+  unitType: UnitType!
+}
+
+type CreateUnitTypeResponse {
+  """Dữ liệu trả về"""
+  data: CreateUnitTypeOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type UpdateUnitTypeOutput {
+  unitType: UnitType!
+}
+
+type UpdateUnitTypeResponse {
+  """Dữ liệu trả về"""
+  data: UpdateUnitTypeOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type RemoveUnitTypeOutput {
+  unitType: UnitType!
+}
+
+type RemoveUnitTypeResponse {
+  """Dữ liệu trả về"""
+  data: RemoveUnitTypeOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type GetUnitTypeOutput {
+  unitType: UnitType!
+}
+
+type GetUnitTypeResponse {
+  """Dữ liệu trả về"""
+  data: GetUnitTypeOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
 type Query {
   users: [User!]!
   user(id: Int!): User
+  units: [Unit!]!
+  unit(id: Int!): Unit!
+  unitTypes: [UnitType!]!
+  unitType(id: Int!): GetUnitTypeResponse!
 }
 
 type Mutation {
@@ -178,6 +249,12 @@ type Mutation {
   getCurrentUserData: getCurrentUserDataReponse!
   updateUser(updateUserInput: UpdateUserInput!): User!
   removeUser(id: Int!): User!
+  createUnit(createUnitInput: CreateUnitInput!): Unit!
+  updateUnit(updateUnitInput: UpdateUnitInput!): Unit!
+  removeUnit(id: Int!): Unit!
+  createUnitType(createUnitTypeInput: CreateUnitTypeInput!): CreateUnitTypeResponse!
+  updateUnitType(updateUnitTypeInput: UpdateUnitTypeInput!): UpdateUnitTypeResponse!
+  removeUnitType(id: Int!): RemoveUnitTypeResponse!
 }
 
 input SignInInput {
@@ -241,4 +318,26 @@ input UpdateUserInput {
 
   """ID của người dùng cần cập nhật"""
   id: Int!
+}
+
+input CreateUnitInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateUnitInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateUnitTypeInput {
+  typeName: String!
+  description: String!
+}
+
+input UpdateUnitTypeInput {
+  id: Int!
+  typeName: String!
+  description: String!
 }
