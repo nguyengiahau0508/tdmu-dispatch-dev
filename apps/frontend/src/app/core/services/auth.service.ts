@@ -9,12 +9,14 @@ import { IApiResponse } from '../../shared/models/api-response.model';
 import { ILoginInput, ILoginOutput } from '../../features/auth/login/interfaces/login.interface';
 import { ILoginOtpInput, ILoginOtpOutput } from '../../features/auth/otp-input/interfaces/login-otp.interface';
 import { ISentOtpInput, ISentOtpOutput } from '../../features/auth/otp-input/interfaces/sent-otp.interface';
-import { REFRESH_TOKEN_MUTAION } from '../../features/auth/auth.mutations';
+import { LOGOUT_MUTATION, REFRESH_TOKEN_MUTAION } from '../../features/auth/auth.mutations';
+import { UserState } from '../state/user.state';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private apollo = inject(Apollo);
   private authState = inject(AuthState)
+  private userState = inject(UserState)
 
   login(credentials: ILoginInput): Observable<IApiResponse<ILoginOutput>> {
     return this.apollo.mutate<{
@@ -73,5 +75,20 @@ export class AuthService {
       }),
       map(response => response.data!.refreshToken)
     )
+  }
+
+
+  logout(): Observable<IApiResponse<{ status: boolean }>> {
+    return this.apollo.mutate<{
+      logout: IApiResponse<{ status: boolean }>
+    }>({
+      mutation: LOGOUT_MUTATION
+    }).pipe(
+      tap(() => {
+        this.authState.clearAccessToken();
+        this.userState.clearUser();
+      }),
+      map(response => response.data!.logout)
+    );
   }
 }

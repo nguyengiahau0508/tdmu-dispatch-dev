@@ -27,15 +27,16 @@
 
     <!-- Cài đặt -->
     <div class="sidebar__footer">
-      <div class="sidebar__menu-item">
-        <img src="/icons/exit_to_app.svg" alt="" title="Cài đặt">
+      <div class="sidebar__menu-item" (click)="onLogout()">
+        <img src="/icons/exit_to_app.svg" alt="" title="Đăng xuất">
+        <span class="sidebar__tooltip">Đăng xuất</span>
       </div>
     </div>
   </aside>
 
   <div class="layout__main">
     <header class="header">
-      <h1 class="header__title">Công văn đến</h1>
+      <h1 class="header__title">Quản lí công văn</h1>
       <div class="header__tools">
 
         <button (click)="toggleTheme()" class="tool-btn" title="Chuyển chế độ sáng/tối">

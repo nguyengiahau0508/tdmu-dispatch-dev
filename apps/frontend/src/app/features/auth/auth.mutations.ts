@@ -12,3 +12,17 @@ export const REFRESH_TOKEN_MUTAION = gql`
   }
 }
 `
+
+export const LOGOUT_MUTATION = gql`
+mutation{
+  logout{
+    metadata{
+      statusCode
+      message
+    }
+    data{
+      status
+    }
+  }
+}
+`

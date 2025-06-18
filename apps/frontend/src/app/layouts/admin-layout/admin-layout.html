@@ -8,9 +8,13 @@
 
     <!-- Menu chính -->
     <div class="sidebar__menu">
-      <div class="sidebar__menu-item" title="Quản lí người dùng">
+      <div class="sidebar__menu-item" title="Quản lí người dùng" (click)="onGoToUsers()">
         <img src="/icons/person.svg" alt="" />
         <span class="sidebar__tooltip">Quản lí người dùng</span>
+      </div>
+      <div class="sidebar__menu-item" title="Quản lí cơ cấu tổ chức" (click)="onGoToOrganizational()">
+        <img src="/icons/hub.svg" alt="" />
+        <span class="sidebar__tooltip">Quản lí cơ cấu tổ chức</span>
       </div>
       <div class="sidebar__menu-item" title="Danh mục">
         <img src="/icons/category.svg" alt="" />
@@ -24,9 +28,9 @@
 
     <!-- Cài đặt -->
     <div class="sidebar__footer">
-      <div class="sidebar__menu-item" title="Cài đặt">
+      <div class="sidebar__menu-item" title="Đăng xuất">
         <img src="/icons/exit_to_app.svg" alt="" />
-        <span class="sidebar__tooltip">Cài đặt</span>
+        <span class="sidebar__tooltip">Đăng xuất</span>
       </div>
     </div>
   </aside>
@@ -34,7 +38,7 @@
 
   <div class="layout__main">
     <header class="header">
-      <h1 class="header__title">Công văn đến</h1>
+      <h1 class="header__title">Quản trị hệ thống</h1>
       <div class="header__tools">
 
         <button (click)="toggleTheme()" class="tool-btn" title="Chuyển chế độ sáng/tối">
@@ -59,7 +63,7 @@
       </div>
     </header>
 
-    <main class="main-content">
+    <main class="main-content" [@routeAnimations]="getAnimationData()">
       <router-outlet></router-outlet>
     </main>
   </div>

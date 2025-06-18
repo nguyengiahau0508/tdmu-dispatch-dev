@@ -1,15 +1,18 @@
 import { Component, Renderer2 } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { AppsLauncher } from '../components/apps-launcher/apps-launcher';
 import { IUser } from '../../core/interfaces/user.interface';
 import { Subscription } from 'rxjs';
 import { UserState } from '../../core/state/user.state';
+import { AuthService } from '../../core/services/auth.service';
+import { routeAnimations } from '../../shared/animations/route-animations';
 
 @Component({
   selector: 'app-admin-layout',
   imports: [RouterOutlet, AppsLauncher],
   templateUrl: './admin-layout.html',
-  styleUrl: './admin-layout.css'
+  styleUrl: './admin-layout.css',
+  animations: [routeAnimations]
 })
 export class AdminLayout {
   isDarkMode = false;
@@ -20,7 +23,9 @@ export class AdminLayout {
   private subscriptions = new Subscription();
   constructor(
     private renderer: Renderer2,
-    private userState: UserState
+    private userState: UserState,
+    private authService: AuthService,
+    private router: Router
   ) {
     const storedTheme = localStorage.getItem('theme');
     this.isDarkMode = storedTheme === 'dark';
@@ -31,6 +36,10 @@ export class AdminLayout {
         this.currentUser = user;
       })
     );
+  }
+
+  getAnimationData() {
+    return location.pathname; // hoặc router url để thay đổi animation khi route đổi
   }
 
   toggleTheme() {
@@ -49,5 +58,21 @@ export class AdminLayout {
     } else {
       this.renderer.removeClass(document.documentElement, 'dark-mode');
     }
+  }
+
+  onLogout() {
+    this.authService.logout().subscribe({
+      next: response => {
+        this.router.navigate(['auth'])
+      }
+    })
+  }
+
+  onGoToUsers() {
+    this.router.navigate(['admin', 'users'])
+  }
+
+  onGoToOrganizational() {
+    this.router.navigate(['admin', 'organizational'])
   }
 }

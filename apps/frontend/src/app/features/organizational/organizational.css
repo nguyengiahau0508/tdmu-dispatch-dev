@@ -1,0 +1,66 @@
+.organizational {
+  display: flex;
+  background-color: var(--color-background-layout);
+  overflow: hidden;
+  height: 100%;
+}
+
+/* ======= SIDEBAR ======= */
+.organizational__sidebar {
+  /* ← tăng chiều rộng để chứa được cả icon và text */
+  background-color: var(--color-background-primary);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+  box-shadow: var(--shadow-default);
+}
+
+/* Danh sách menu */
+.sidebar__menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+/* Menu item */
+.sidebar__menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  background-color: var(--color-background-secondary);
+}
+
+.sidebar__menu-item:hover {
+  background-color: var(--color-primary);
+  color: var(--color-background-secondary);
+
+  img {
+    filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+  }
+}
+
+.sidebar__menu-item img {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  filter: brightness(0) saturate(100%) invert(27%) sepia(87%) saturate(5091%) hue-rotate(202deg) brightness(94%) contrast(101%);
+}
+
+.sidebar__menu-item span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.organizational__main {
+  flex: 1;
+  position: relative;
+  background-color: var(--color-background-layout);
+}

@@ -1,9 +1,10 @@
 import { Component, Renderer2 } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { UserState } from '../../core/state/user.state';
 import { IUser } from '../../core/interfaces/user.interface';
 import { Subscription } from 'rxjs';
 import { AppsLauncher } from '../components/apps-launcher/apps-launcher';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-main-layout',
@@ -13,8 +14,6 @@ import { AppsLauncher } from '../components/apps-launcher/apps-launcher';
   styleUrl: './main-layout.css'
 })
 export class MainLayout {
-
-
   isDarkMode = false;
   currentUser: IUser | null = null
 
@@ -23,7 +22,9 @@ export class MainLayout {
   private subscriptions = new Subscription();
   constructor(
     private renderer: Renderer2,
-    private userState: UserState
+    private userState: UserState,
+    private authService: AuthService,
+    private router: Router
   ) {
     const storedTheme = localStorage.getItem('theme');
     this.isDarkMode = storedTheme === 'dark';
@@ -52,5 +53,13 @@ export class MainLayout {
     } else {
       this.renderer.removeClass(document.documentElement, 'dark-mode');
     }
+  }
+
+  onLogout() {
+    this.authService.logout().subscribe({
+      next: response => {
+        this.router.navigate(['auth'])
+      }
+    })
   }
 }
