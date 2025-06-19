@@ -10,9 +10,10 @@ import { routeAnimations } from '../../shared/animations/route-animations';
   animations: [routeAnimations]
 })
 export class Organizational {
+
   constructor(private router: Router) { }
   getAnimationData() {
-    return location.pathname; // hoặc router url để thay đổi animation khi route đổi
+    return location.pathname;
   }
 
   onGoToUnits() {
@@ -22,4 +23,6 @@ export class Organizational {
   onGoToUnitType() {
     this.router.navigate(['admin', 'organizational', 'unit-types'])
   }
+
+
 }

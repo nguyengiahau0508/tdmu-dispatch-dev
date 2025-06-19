@@ -4,32 +4,16 @@
       <input type="text" placeholder="Tìm loại đơn vị..." />
     </div>
     <div class="header__add">
-      <button>
+      <button (click)="toggleUnitTypeCreate()">
         <img src="/icons/add.svg" alt="Thêm" />
         Thêm loại đơn vị
       </button>
     </div>
   </div>
   <div class="unit-types__main">
-    <!-- Nội dung danh sách hoặc bảng hiển thị các loại đơn vị -->
     <p>Chưa có dữ liệu loại đơn vị.</p>
-    <p>Chưa có dữ liệu loại đơn vị.</p>
-    <p>Chưa có dữ liệu loại đơn vị.</p>
-    <p>Chưa có dữ liệu loại đơn vị.</p>
-    <!-- Nội dung danh sách hoặc bảng hiển thị các loại đơn vị -->
-    <p>Chưa có dữ liệu loại đơn vị.</p>
-    <p>Chưa có dữ liệu loại đơn vị.</p>
-    <p>Chưa có dữ liệu loại đơn vị.</p>
-    <p>Chưa có dữ liệu loại đơn vị.</p>
-    <!-- Nội dung danh sách hoặc bảng hiển thị các loại đơn vị -->
-    <p>Chưa có dữ liệu loại đơn vị.</p>
-    <p>Chưa có dữ liệu loại đơn vị.</p>
-    <p>Chưa có dữ liệu loại đơn vị.</p>
-    <p>Chưa có dữ liệu loại đơn vị.</p>
-    <!-- Nội dung danh sách hoặc bảng hiển thị các loại đơn vị -->
-    <p>Chưa có dữ liệu loại đơn vị.</p>
-    <p>Chưa có dữ liệu loại đơn vị.</p>
-    <p>Chưa có dữ liệu loại đơn vị.</p>
-    <p>Chưa có dữ liệu loại đơn vị. Het</p>
   </div>
 </div>
+
+
+<app-unit-type-create [isOpen]="isUnitTypeCreateOpen" (close)="isUnitTypeCreateOpen = false"></app-unit-type-create>

@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 })
 export class AppsLauncher {
   @Input() isOpen = false
+  @Output() close = new EventEmitter<void>()
 
   constructor(
     private router: Router
@@ -20,5 +21,10 @@ export class AppsLauncher {
 
   onGoToDispatch() {
     this.router.navigate([''])
+  }
+
+  onClose() {
+    this.isOpen = false
+    this.close.emit()
   }
 }

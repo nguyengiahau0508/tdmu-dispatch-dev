@@ -1,7 +1,7 @@
 @if (isOpen) {
 <div class="apps-launcher-backdrop" >
   <div class="apps-launcher">
-    <button class="apps-launcher__close-btn" (click)="isOpen = false" title="Đóng">×</button>
+    <button class="apps-launcher__close-btn" (click)="onClose()" title="Đóng">×</button>
     <h2 class="apps-launcher__title">Ứng dụng</h2>
     <div class="apps-launcher__grid">
       <div class="apps-launcher__item" (click)="onGoToAdmin()">
