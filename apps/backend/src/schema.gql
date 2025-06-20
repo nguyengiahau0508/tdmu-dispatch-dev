@@ -168,9 +168,6 @@ type Unit {
 }
 
 type UnitType {
-  """Example field (placeholder)"""
-  exampleField: Int!
-
   """ID của loại đơn vị"""
   id: Int!
 
@@ -178,7 +175,16 @@ type UnitType {
   typeName: String!
 
   """Mô tả của loại đơn vị"""
-  description: String!
+  description: String
+}
+
+type PageMetaDto {
+  page: Int!
+  take: Int!
+  itemCount: Int!
+  pageCount: Int!
+  hasPreviousPage: Boolean!
+  hasNextPage: Boolean!
 }
 
 type CreateUnitTypeOutput {
@@ -229,13 +235,47 @@ type GetUnitTypeResponse {
   metadata: Metadata!
 }
 
+type GetUnitTypesPaginatedResponse {
+  """Dữ liệu trả về (danh sách)"""
+  data: [UnitType!]
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+
+  """Tổng số mục (cho phân trang)"""
+  totalCount: Int
+
+  """Còn trang tiếp theo không (cho phân trang)"""
+  hasNextPage: Boolean
+}
+
 type Query {
   users: [User!]!
   user(id: Int!): User
   units: [Unit!]!
   unit(id: Int!): Unit!
-  unitTypes: [UnitType!]!
+  unitTypes(input: GetUnitTypesPaginatedInput!): GetUnitTypesPaginatedResponse!
   unitType(id: Int!): GetUnitTypeResponse!
+}
+
+input GetUnitTypesPaginatedInput {
+  """Thứ tự sắp xếp"""
+  order: Order = ASC
+
+  """Số trang hiện tại"""
+  page: Int = 1
+
+  """Số lượng item trên mỗi trang"""
+  take: Int = 10
+
+  """Từ khóa tìm kiếm theo tên hoặc mô tả"""
+  search: String
+}
+
+"""Thứ tự sắp xếp"""
+enum Order {
+  ASC
+  DESC
 }
 
 type Mutation {
@@ -332,12 +372,20 @@ input UpdateUnitInput {
 }
 
 input CreateUnitTypeInput {
+  """Tên của loại đơn vị"""
   typeName: String!
-  description: String!
+
+  """Mô tả của loại đơn vị"""
+  description: String
 }
 
 input UpdateUnitTypeInput {
+  """ID của loại đơn vị"""
   id: Int!
-  typeName: String!
-  description: String!
+
+  """Tên của loại đơn vị"""
+  typeName: String
+
+  """Mô tả của loại đơn vị"""
+  description: String
 }

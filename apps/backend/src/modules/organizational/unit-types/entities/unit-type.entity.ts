@@ -4,9 +4,6 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @ObjectType()
 @Entity()
 export class UnitType {
-  @Field(() => Int, { description: 'Example field (placeholder)' })
-  exampleField: number;
-
   @PrimaryGeneratedColumn()
   @Field(() => Int, { description: 'ID của loại đơn vị' })
   id: number
@@ -16,6 +13,6 @@ export class UnitType {
   typeName: string
 
   @Column({ nullable: true, type: 'text' })
-  @Field(() => String, { description: 'Mô tả của loại đơn vị' })
+  @Field(() => String, { nullable: true, description: 'Mô tả của loại đơn vị' })
   description: string
 }

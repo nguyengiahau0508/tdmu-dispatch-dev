@@ -1,14 +1,15 @@
 import { Field, InputType } from "@nestjs/graphql";
-import { IsString, MaxLength } from "class-validator";
+import { IsString, MaxLength, IsOptional } from "class-validator";
 
 @InputType()
 export class CreateUnitTypeInput {
-  @Field(() => String)
+  @Field(() => String, { description: 'Tên của loại đơn vị' })
   @IsString()
   @MaxLength(256)
   typeName: string
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true, description: 'Mô tả của loại đơn vị' })
   @IsString()
-  description: string
+  @IsOptional()
+  description?: string
 }

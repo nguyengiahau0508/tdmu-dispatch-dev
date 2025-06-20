@@ -7,10 +7,13 @@ import { UpdateUnitTypeResponse } from './dto/update-unit-type/update-unit-type.
 import { UpdateUnitTypeInput } from './dto/update-unit-type/update-unit-type.input';
 import { RemoveUnitTypeResponse } from './dto/remove-unit-type/remove-unit-type.response';
 import { GetUnitTypeResponse } from './dto/get-unit-type/get-unit-type.response';
+import { GetUnitTypesPaginatedResponse } from './dto/get-unit-types-paginated/get-unit-types-paginated.response';
+import { GetUnitTypesPaginatedInput } from './dto/get-unit-types-paginated/get-unit-types-paginated.input';
 import { Role } from 'src/common/enums/role.enums';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { createResponseMetadata } from 'src/common/helpers/metadata.helper';
 import { HttpStatus } from '@nestjs/common';
+import { Public } from 'src/common/decorators/public.decorator';
 
 @Resolver(() => UnitType)
 export class UnitTypesResolver {
@@ -25,9 +28,16 @@ export class UnitTypesResolver {
     }
   }
 
-  @Query(() => [UnitType], { name: 'unitTypes' })
-  findAll() {
-    return this.unitTypesService.findAll();
+  @Query(() => GetUnitTypesPaginatedResponse, { name: 'unitTypes' })
+  @Public()
+  async findAll(@Args('input') input: GetUnitTypesPaginatedInput): Promise<GetUnitTypesPaginatedResponse> {
+    const pageData = await this.unitTypesService.findAll(input);
+    return {
+      metadata: createResponseMetadata(HttpStatus.OK, "Lấy dữ liệu thành công"),
+      data: pageData.data,
+      totalCount: pageData.meta.itemCount,
+      hasNextPage: pageData.meta.hasNextPage
+    }
   }
 
   @Query(() => GetUnitTypeResponse, { name: 'unitType' })
