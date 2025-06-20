@@ -8,18 +8,26 @@
 
     <!-- Menu chính -->
     <div class="sidebar__menu">
-      <div class="sidebar__menu-item" title="Quản lí người dùng" (click)="onGoToUsers()">
+
+      <!-- Quản lí người dùng -->
+      <div class="sidebar__menu-item" [class.active]="isActive('/admin/users')" (click)="onGoToUsers()"
+        title="Quản lí người dùng">
         <img src="/icons/person.svg" alt="" />
         <span class="sidebar__tooltip">Quản lí người dùng</span>
       </div>
-      <div class="sidebar__menu-item" title="Quản lí cơ cấu tổ chức" (click)="onGoToOrganizational()">
+
+      <!-- Quản lí cơ cấu tổ chức -->
+      <div class="sidebar__menu-item" [class.active]="isActive('/admin/organizational')"
+        (click)="onGoToOrganizational()" title="Quản lí cơ cấu tổ chức">
         <img src="/icons/hub.svg" alt="" />
         <span class="sidebar__tooltip">Quản lí cơ cấu tổ chức</span>
       </div>
+
       <div class="sidebar__menu-item" title="Danh mục">
         <img src="/icons/category.svg" alt="" />
         <span class="sidebar__tooltip">Danh mục</span>
       </div>
+
       <div class="sidebar__menu-item" title="Đánh số tự động">
         <img src="/icons/pin.svg" alt="" />
         <span class="sidebar__tooltip">Đánh số tự động</span>

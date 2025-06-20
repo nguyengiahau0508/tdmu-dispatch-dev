@@ -60,9 +60,10 @@ export class UnitTypesResolver {
   @Mutation(() => RemoveUnitTypeResponse)
   @Roles(Role.SUPER_ADMIN)
   async removeUnitType(@Args('id', { type: () => Int }) id: number): Promise<RemoveUnitTypeResponse> {
+    const data = await this.unitTypesService.remove(id)
     return {
       metadata: createResponseMetadata(HttpStatus.ACCEPTED, "Xóa thành công"),
-      data: await this.unitTypesService.remove(id)
+      data: data
     }
   }
 }

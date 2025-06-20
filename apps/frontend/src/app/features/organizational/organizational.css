@@ -36,6 +36,7 @@
   color: var(--color-text-primary);
   font-size: 14px;
   background-color: var(--color-background-secondary);
+  font-weight: 600;
 }
 
 .sidebar__menu-item:hover {
@@ -58,6 +59,15 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.sidebar__menu-item.active {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.sidebar__menu-item.active img {
+  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
 }
 
 .organizational__main {

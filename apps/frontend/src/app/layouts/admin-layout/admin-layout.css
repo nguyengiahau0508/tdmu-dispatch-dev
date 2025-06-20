@@ -16,6 +16,7 @@
   flex-direction: column;
   padding: 16px 0;
   box-shadow: var(--shadow-default);
+  font-weight: 600;
 }
 
 /* Logo */
@@ -47,6 +48,16 @@
   padding-top: 12px;
   display: flex;
   justify-content: center;
+}
+
+
+.sidebar__menu-item.active {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.sidebar__menu-item.active img {
+  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
 }
 
 /* Menu item */

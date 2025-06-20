@@ -8,7 +8,7 @@ async function bootstrap(): Promise<void> {
 
   // Middleware
   app.use(cookieParser())
-  app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalPipes(new ValidationPipe({ transform: true }))
   app.enableCors({
     origin: true,
     credentials: true,

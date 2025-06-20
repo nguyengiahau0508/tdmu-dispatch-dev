@@ -1,0 +1,33 @@
+<div class="pagination">
+  <div class="pagination__options">
+    <label class="pagination__label">
+      Hiển thị:
+      <select class="pagination__select" [value]="pageOptions.take" (change)="changePageSize($event)">
+        @for (size of [5, 10, 20, 50]; track size) {
+        <option [value]="size">{{ size }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="pagination__label">
+      Sắp xếp:
+      <select class="pagination__select" [value]="pageOptions.order" (change)="changeOrder($event)">
+        @for (ord of orders; track ord) {
+        <option [value]="ord">{{ ord }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  <div class="pagination__controls">
+    <button class="pagination__button" (click)="prevPage()" [disabled]="pageOptions.page === 1">
+      &laquo;
+    </button>
+    <span class="pagination__page-info">
+      Trang {{ pageOptions.page }} / {{ totalPages }}
+    </span>
+    <button class="pagination__button" (click)="nextPage()" [disabled]="pageOptions.page === totalPages">
+      &raquo;
+    </button>
+  </div>
+</div>

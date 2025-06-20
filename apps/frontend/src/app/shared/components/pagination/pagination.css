@@ -1,0 +1,67 @@
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  background-color: var(--color-background-primary);
+  width: 100%;
+  margin: 0 auto;
+  /* thêm một chút padding nếu cần */
+  font-size: 0.85rem;
+  /* toàn bộ phần này nhỏ lại */
+}
+
+.pagination__controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pagination__button {
+  background-color: var(--color-primary);
+  color: var(--color-text-on-primary);
+  border: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.25rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  line-height: 1;
+}
+
+.pagination__button:disabled {
+  background-color: var(--color-background-disabled);
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+}
+
+.pagination__page-info {
+  font-weight: 500;
+  color: var(--color-text-primary);
+  font-size: 0.85rem;
+}
+
+.pagination__options {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pagination__label {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.pagination__select {
+  padding: 0.3rem 0.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.25rem;
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  font-size: 0.8rem;
+  cursor: pointer;
+}

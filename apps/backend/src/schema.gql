@@ -212,7 +212,7 @@ type UpdateUnitTypeResponse {
 }
 
 type RemoveUnitTypeOutput {
-  unitType: UnitType!
+  unitType: UnitType
 }
 
 type RemoveUnitTypeResponse {

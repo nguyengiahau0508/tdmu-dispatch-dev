@@ -3,7 +3,7 @@ import { CreateUnitTypeInput } from './dto/create-unit-type/create-unit-type.inp
 import { UpdateUnitTypeInput } from './dto/update-unit-type/update-unit-type.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UnitType } from './entities/unit-type.entity';
-import { Repository, Like } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateUnitTypeOutput } from './dto/create-unit-type/create-unit-type.output';
 import { UpdateUnitTypeOutput } from './dto/update-unit-type/update-unit-type.output';
 import { RemoveUnitTypeOutput } from './dto/remove-unit-type/remove-unit-type.output';
@@ -32,7 +32,6 @@ export class UnitTypesService {
 
   async findAll(input: GetUnitTypesPaginatedInput): Promise<PageDto<UnitType>> {
     const { search, page, take, order } = input;
-
     // Tạo query builder với điều kiện tìm kiếm
     const queryBuilder = this.repository.createQueryBuilder('unitType');
 
@@ -45,15 +44,12 @@ export class UnitTypesService {
 
     // Thêm sắp xếp
     queryBuilder.orderBy('unitType.id', order);
-
     // Thêm phân trang
     queryBuilder.skip(input.skip).take(take);
-
     // Thực hiện query
     const [data, itemCount] = await queryBuilder.getManyAndCount();
     // Tạo metadata cho phân trang
     const pageMetaDto = new PageMetaDto({ pageOptionsDto: input, itemCount });
-
     return new PageDto(data, pageMetaDto);
   }
 
@@ -98,9 +94,8 @@ export class UnitTypesService {
 
     const removed = await this.repository.remove(unitType);
     if (!removed) throw new BadRequestException();
-
     return {
-      unitType: removed
+      unitType: null
     }
   }
 }

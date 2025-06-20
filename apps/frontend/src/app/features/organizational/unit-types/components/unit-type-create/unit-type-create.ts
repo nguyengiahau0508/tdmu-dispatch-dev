@@ -17,7 +17,7 @@ import { finalize } from 'rxjs';
 export class UnitTypeCreate {
   @Input() isOpen = false
   @Output() close = new EventEmitter<void>()
-
+  @Output() createdSuccessfully = new EventEmitter<void>()
   unitTypeCreateForm!: FormGroup
   isLoading = false;
 
@@ -42,15 +42,18 @@ export class UnitTypeCreate {
     this.unitTypesService.createUnitType(unitTypeFormData).pipe(
       finalize(() => {
         this.isLoading = false
-        this.onFormClose()
+        this.unitTypeCreateForm.enable()
       })
     ).subscribe({
       next: (response) => {
+        this.createdSuccessfully.emit()
         this.toarst.success("Tạo thành công")
+        this.onFormClose()
       },
       error: (errorResponse: GraphQLResponseError) => {
         const { message, code } = this.errorHandlerService.extractGraphQLError(errorResponse);
         this.toarst.error("Có lổi xảy ra vui lòng thử lại")
+        console.log(errorResponse)
       }
     })
   }

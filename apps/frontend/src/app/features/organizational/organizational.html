@@ -1,11 +1,12 @@
 <div class="organizational">
   <div class="organizational__sidebar">
     <div class="sidebar__menu">
-      <div class="sidebar__menu-item" (click)="onGoToUnitType()">
+      <div class="sidebar__menu-item" (click)="onGoToUnitType()"
+        [class.active]="isActive('/admin/organizational/unit-types')">
         <img src="/icons/room.svg" alt="" title="Loại đơn vị" />
         <span>Loại đơn vị</span>
       </div>
-      <div class="sidebar__menu-item" (click)="onGoToUnits()">
+      <div class="sidebar__menu-item" (click)="onGoToUnits()" [class.active]="isActive('/admin/organizational/units')">
         <img src="/icons/moving_ministry.svg" alt="" title="Đơn vị" />
         <span>Đơn vị</span>
       </div>

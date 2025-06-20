@@ -1,5 +1,5 @@
 import { Component, Renderer2 } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { AppsLauncher } from '../components/apps-launcher/apps-launcher';
 import { IUser } from '../../core/interfaces/user.interface';
 import { Subscription } from 'rxjs';
@@ -17,6 +17,7 @@ import { routeAnimations } from '../../shared/animations/route-animations';
 export class AdminLayout {
   isDarkMode = false;
   currentUser: IUser | null = null
+  currentUrl = ''
 
   isAppsLauncherOpen = false
 
@@ -31,11 +32,21 @@ export class AdminLayout {
     this.isDarkMode = storedTheme === 'dark';
     this.updateThemeClass();
 
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.currentUrl = event.urlAfterRedirects;
+      }
+    })
+
     this.subscriptions.add(
       this.userState.user$.subscribe(user => {
         this.currentUser = user;
       })
     );
+  }
+
+  isActive(path: string): boolean {
+    return this.currentUrl.startsWith(path);
   }
 
   getAnimationData() {

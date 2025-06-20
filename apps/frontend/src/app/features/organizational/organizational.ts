@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { routeAnimations } from '../../shared/animations/route-animations';
 
 @Component({
@@ -10,8 +10,21 @@ import { routeAnimations } from '../../shared/animations/route-animations';
   animations: [routeAnimations]
 })
 export class Organizational {
+  currentUrl = ''
 
-  constructor(private router: Router) { }
+  constructor(private router: Router) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.currentUrl = event.urlAfterRedirects;
+        console.log(this.currentUrl)
+      }
+    })
+  }
+
+  isActive(path: string): boolean {
+    return this.currentUrl.startsWith(path);
+  }
+
   getAnimationData() {
     return location.pathname;
   }
@@ -23,6 +36,4 @@ export class Organizational {
   onGoToUnitType() {
     this.router.navigate(['admin', 'organizational', 'unit-types'])
   }
-
-
 }

@@ -5,6 +5,15 @@ export interface IApiResponse<TGenericData> {
   metadata: Metadata;
 }
 
+
+export interface IPaginatedResponse<TGenericData> {
+  data?: TGenericData[]
+  metadata: Metadata
+
+  totalCount?: number
+  hasNextPage?: boolean
+}
+
 // Ví dụ về cách sử dụng:
 // import { User } from '../../core/models/user.interface'; // Giả sử bạn có User interface
 // type UserApiResponse = ApiResponse<User>; // Response khi lấy thông tin một User cụ thể

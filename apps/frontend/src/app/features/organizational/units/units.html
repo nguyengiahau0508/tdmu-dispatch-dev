@@ -1,16 +1,23 @@
 <div class="units">
   <div class="units__header">
-    <div class="header__search">
-      <input type="text" placeholder="Tìm đơn vị..." />
+    <div class="header__group">
+      <div class="header__search">
+        <input type="text" placeholder="Tìm đơn vị..." />
+      </div>
+      <div class="header__add">
+        <button>
+          <img src="/icons/add.svg" alt="Thêm" />
+          Thêm đơn vị
+        </button>
+      </div>
     </div>
-    <div class="header__add">
-      <button>
-        <img src="/icons/add.svg" alt="Thêm" />
-        Thêm đơn vị
-      </button>
+    <div class="header__group header__group--block">
+      <app-pagination></app-pagination>
     </div>
   </div>
-  <div class="units__main">
-    <p>Chưa có dữ liệu đơn vị.</p>
+
+  <div class="unit-types__main">
+
   </div>
+
 </div>

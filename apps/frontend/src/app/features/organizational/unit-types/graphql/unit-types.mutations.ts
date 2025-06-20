@@ -18,3 +18,22 @@ export const CREATE_UNIT_TYPE_MUTATION = gql`
     }
   }
 `;
+
+
+export const REMOVE_UNIT_TYPE = gql`
+  mutation RemoveUnitType($id: Int!) {
+    removeUnitType(id: $id) {
+      metadata {
+        statusCode
+        message
+      }
+      data {
+        unitType {
+          id
+          typeName
+          description
+        }
+      }
+    }
+  }
+`;

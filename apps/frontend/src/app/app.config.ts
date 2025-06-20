@@ -7,7 +7,8 @@ import { provideApollo } from 'apollo-angular';
 import { apolloOptionsFactory } from './core/config/apollo-options.factory';
 import { provideHttpClient } from '@angular/common/http';
 import { appInitializerFactory } from './core/init/app.init';
-
+import { providePrimeNG } from 'primeng/config';
+import { Tdmu } from '../theme/tdmu';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(),
@@ -18,5 +19,10 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideApollo(apolloOptionsFactory),
     provideToastr(),
+    providePrimeNG({
+      theme: {
+        preset: Tdmu
+      }
+    })
   ]
 };
