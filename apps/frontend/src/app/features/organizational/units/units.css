@@ -73,6 +73,7 @@
   background-color: var(--color-background-primary);
   border-radius: 0.5rem;
   overflow: auto;
+  height: 100%;
 }
 
 /* Table style */
@@ -101,7 +102,7 @@
 }
 
 /* Cột tên có tooltip */
-.type-name-cell {
+.unit-name-cell {
   max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;

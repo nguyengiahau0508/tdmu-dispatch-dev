@@ -5,19 +5,72 @@
         <input type="text" placeholder="Tìm đơn vị..." />
       </div>
       <div class="header__add">
-        <button>
+        <button (click)="toggleUnitCreate()">
           <img src="/icons/add.svg" alt="Thêm" />
           Thêm đơn vị
         </button>
       </div>
     </div>
     <div class="header__group header__group--block">
-      <app-pagination></app-pagination>
+      <app-pagination [totalCount]="totalCount || 0" [pageOptions]="pageOptions" (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)" (orderChange)="onOrderChange($event)"></app-pagination>
     </div>
   </div>
 
-  <div class="unit-types__main">
+  <div class="units__main">
+    @if (units.length > 0) {
+        <table class="units__table">
+          <thead>
+           <tr>
+             <th>ID</th>
+             <th>Tên đơn vị</th>
+             <th>Loại đơn vị</th>
+             <th>Đơn vị cha</th>
+             <th>Ngày thành lập</th>
+             <th>Email</th>
+             <th>Số điện thoại</th>
+             <th></th>
+           </tr>
+         </thead>
 
+         <tbody>
+           @for (unit of units; track unit.id) {
+           <tr class="unit-row">
+             <td>{{ unit.id }}</td>
+             <td [title]="unit.unitName" class="unit-name-cell">
+               {{ unit.unitName }}
+             </td>
+             <td>{{ unit.unitType?.typeName || '-' }}</td>
+             <td>{{ unit.parentUnit?.unitName || '-' }}</td>
+             <td>{{ (unit.establishmentDate | date:'dd/MM/yyyy') || '-' }}</td>
+             <td>{{ unit.email || '-' }}</td>
+             <td>{{ unit.phone || '-' }}</td>
+
+             <td class="row-actions">
+               <div class="actions-menu">
+                 <button class="menu-button" (click)="toggleMenu(unit.id)">⋮</button>
+
+                 @if (selectedMenuId === unit.id) {
+                 <div class="dropdown-menu">
+                   <button (click)="onEditUnit(unit)">Sửa</button>
+                   <button (click)="onDeleteUnit(unit)">Xóa</button>
+                 </div>
+                 }
+               </div>
+             </td>
+           </tr>
+           }
+         </tbody>
+       </table>
+    } @else {
+    <p>Chưa có dữ liệu đơn vị.</p>
+    }
   </div>
-
 </div>
+
+<p-confirmdialog />
+<app-unit-create [isOpen]="isUnitCreateOpen" (close)="isUnitCreateOpen = false" (createdSuccessfully)="refetchUnits()"/>
+@if(unitUpdateSelected){
+  <app-unit-update [unit]="unitUpdateSelected" [isOpen]="isUnitUpdateOpen" (close)="onCloseUpdateForm()" (updatedSuccessfully)="refetchUnits()"/>
+}
+

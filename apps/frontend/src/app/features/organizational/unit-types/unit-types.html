@@ -51,16 +51,16 @@
         </tr>
         }
       </tbody>
-
-
     </table>
     } @else {
     <p>Chưa có dữ liệu loại đơn vị.</p>
     }
   </div>
-
 </div>
 
 
 <app-unit-type-create [isOpen]="isUnitTypeCreateOpen" (close)="isUnitTypeCreateOpen = false" (createdSuccessfully)="refetchUnitTypes()"></app-unit-type-create>
+@if(unitTypeUpdateSelected){
+<app-unit-type-update [unitType]="unitTypeUpdateSelected" [isOpen]="isUnitTypeUpdateOpen " (close)="isUnitTypeUpdateOpen = false" (updatedSuccessfully)="refetchUnitTypes()"></app-unit-type-update>
+  }
 <p-confirmdialog />

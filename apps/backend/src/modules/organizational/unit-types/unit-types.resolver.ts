@@ -51,6 +51,7 @@ export class UnitTypesResolver {
   @Mutation(() => UpdateUnitTypeResponse)
   @Roles(Role.SUPER_ADMIN)
   async updateUnitType(@Args('updateUnitTypeInput') updateUnitTypeInput: UpdateUnitTypeInput): Promise<UpdateUnitTypeResponse> {
+    console.log(updateUnitTypeInput)
     return {
       metadata: createResponseMetadata(HttpStatus.ACCEPTED, "Cập nhật thành công"),
       data: await this.unitTypesService.update(updateUnitTypeInput.id, updateUnitTypeInput)

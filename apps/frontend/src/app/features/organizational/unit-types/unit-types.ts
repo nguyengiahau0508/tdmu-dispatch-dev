@@ -11,11 +11,12 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { ErrorHandlerService } from '../../../core/services/error-handler.service';
 import { GraphQLResponseError } from '../../../shared/models/graphql-error.model';
+import { UnitTypeUpdate } from './components/unit-type-update/unit-type-update';
 
 
 @Component({
   selector: 'app-unit-types',
-  imports: [UnitTypeCreate, Pagination, ConfirmDialogModule],
+  imports: [UnitTypeCreate, UnitTypeUpdate, Pagination, ConfirmDialogModule],
   templateUrl: './unit-types.html',
   styleUrl: './unit-types.css',
   providers: [ConfirmationService]
@@ -24,7 +25,10 @@ export class UnitTypes {
   unitTypes: IUnitType[] = [];
   totalCount = 0;
   selectedMenuId: number | null = null;
+
   isUnitTypeCreateOpen = false;
+  isUnitTypeUpdateOpen = false;
+  unitTypeUpdateSelected: null | IUnitType = null
 
   pageOptions: IGetUnitTypesPaginatedInput = {
     page: 1,
@@ -87,7 +91,8 @@ export class UnitTypes {
   }
 
   onEditUnitType(type: IUnitType) {
-    // TODO: Xử lý chỉnh sửa
+    this.unitTypeUpdateSelected = type
+    this.isUnitTypeUpdateOpen = true
   }
 
   onDeleteUnitType(type: IUnitType) {

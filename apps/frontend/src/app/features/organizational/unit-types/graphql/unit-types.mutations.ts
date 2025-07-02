@@ -37,3 +37,21 @@ export const REMOVE_UNIT_TYPE = gql`
     }
   }
 `;
+
+export const UPDATE_UNIT_TYPE = gql`
+mutation UpdateUnitType($updateUnitTypeInput: UpdateUnitTypeInput!) {
+    updateUnitType(updateUnitTypeInput: $updateUnitTypeInput) {
+      metadata {
+        message
+        statusCode
+      }
+      data {
+        unitType {
+          id
+          typeName
+          description
+        }
+      }
+    }
+  }
+`

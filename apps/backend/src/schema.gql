@@ -162,11 +162,6 @@ type getCurrentUserDataReponse {
   metadata: Metadata!
 }
 
-type Unit {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
 type UnitType {
   """ID của loại đơn vị"""
   id: Int!
@@ -178,6 +173,38 @@ type UnitType {
   description: String
 }
 
+type Unit {
+  """ID của đơn vị"""
+  id: Int!
+
+  """Tên đơn vị"""
+  unitName: String!
+
+  """ID loại đơn vị"""
+  unitTypeId: Int
+
+  """Loại đơn vị"""
+  unitType: UnitType
+
+  """ID đơn vị cha"""
+  parentUnitId: Int
+
+  """Ngày thành lập"""
+  establishmentDate: DateTime
+
+  """Email đơn vị"""
+  email: String
+
+  """Số điện thoại đơn vị"""
+  phone: String
+
+  """Các đơn vị con"""
+  childUnits: [Unit!]!
+
+  """Đơn vị cha"""
+  parentUnit: Unit
+}
+
 type PageMetaDto {
   page: Int!
   take: Int!
@@ -185,6 +212,77 @@ type PageMetaDto {
   pageCount: Int!
   hasPreviousPage: Boolean!
   hasNextPage: Boolean!
+}
+
+type CreateUnitOutput {
+  """Đơn vị đã tạo"""
+  unit: Unit!
+}
+
+type CreateUnitResponse {
+  """Dữ liệu trả về"""
+  data: CreateUnitOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type UpdateUnitOutput {
+  """Đơn vị đã cập nhật"""
+  unit: Unit!
+}
+
+type UpdateUnitResponse {
+  """Dữ liệu trả về"""
+  data: UpdateUnitOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type RemoveUnitOutput {
+  """Kết quả xóa"""
+  success: Boolean!
+}
+
+type RemoveUnitResponse {
+  """Dữ liệu trả về"""
+  data: RemoveUnitOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type GetUnitOutput {
+  """Thông tin đơn vị"""
+  unit: Unit!
+}
+
+type GetUnitResponse {
+  """Dữ liệu trả về"""
+  data: GetUnitOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type GetUnitsPaginatedResponse {
+  """Dữ liệu trả về (danh sách)"""
+  data: [Unit!]
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+
+  """Tổng số mục (cho phân trang)"""
+  totalCount: Int
+
+  """Còn trang tiếp theo không (cho phân trang)"""
+  hasNextPage: Boolean
+}
+
+type GetAllUnitsResponse {
+  data: [Unit!]
+  metadata: Metadata!
 }
 
 type CreateUnitTypeOutput {
@@ -252,10 +350,37 @@ type GetUnitTypesPaginatedResponse {
 type Query {
   users: [User!]!
   user(id: Int!): User
-  units: [Unit!]!
-  unit(id: Int!): Unit!
+  units(input: GetUnitsPaginatedInput!): GetUnitsPaginatedResponse!
+  unit(id: Int!): GetUnitResponse!
+  allUnits: GetAllUnitsResponse!
   unitTypes(input: GetUnitTypesPaginatedInput!): GetUnitTypesPaginatedResponse!
   unitType(id: Int!): GetUnitTypeResponse!
+}
+
+input GetUnitsPaginatedInput {
+  """Thứ tự sắp xếp"""
+  order: Order = ASC
+
+  """Số trang hiện tại"""
+  page: Int = 1
+
+  """Số lượng item trên mỗi trang"""
+  take: Int = 10
+
+  """Từ khóa tìm kiếm"""
+  search: String
+
+  """ID loại đơn vị để lọc"""
+  unitTypeId: Int
+
+  """ID đơn vị cha để lọc"""
+  parentUnitId: Int
+}
+
+"""Thứ tự sắp xếp"""
+enum Order {
+  ASC
+  DESC
 }
 
 input GetUnitTypesPaginatedInput {
@@ -272,12 +397,6 @@ input GetUnitTypesPaginatedInput {
   search: String
 }
 
-"""Thứ tự sắp xếp"""
-enum Order {
-  ASC
-  DESC
-}
-
 type Mutation {
   signIn(input: SignInInput!): SignInResponse!
   signInWithOtp(input: SignInOtpInput!): SignInOtpResponse!
@@ -289,9 +408,9 @@ type Mutation {
   getCurrentUserData: getCurrentUserDataReponse!
   updateUser(updateUserInput: UpdateUserInput!): User!
   removeUser(id: Int!): User!
-  createUnit(createUnitInput: CreateUnitInput!): Unit!
-  updateUnit(updateUnitInput: UpdateUnitInput!): Unit!
-  removeUnit(id: Int!): Unit!
+  createUnit(createUnitInput: CreateUnitInput!): CreateUnitResponse!
+  updateUnit(updateUnitInput: UpdateUnitInput!): UpdateUnitResponse!
+  removeUnit(id: Int!): RemoveUnitResponse!
   createUnitType(createUnitTypeInput: CreateUnitTypeInput!): CreateUnitTypeResponse!
   updateUnitType(updateUnitTypeInput: UpdateUnitTypeInput!): UpdateUnitTypeResponse!
   removeUnitType(id: Int!): RemoveUnitTypeResponse!
@@ -361,14 +480,46 @@ input UpdateUserInput {
 }
 
 input CreateUnitInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  """Tên đơn vị"""
+  unitName: String!
+
+  """ID loại đơn vị"""
+  unitTypeId: Int
+
+  """ID đơn vị cha"""
+  parentUnitId: Int
+
+  """Ngày thành lập (YYYY-MM-DD)"""
+  establishmentDate: String
+
+  """Email đơn vị"""
+  email: String
+
+  """Số điện thoại đơn vị"""
+  phone: String
 }
 
 input UpdateUnitInput {
-  """Example field (placeholder)"""
-  exampleField: Int
+  """ID đơn vị cần cập nhật"""
   id: Int!
+
+  """Tên đơn vị"""
+  unitName: String
+
+  """ID loại đơn vị"""
+  unitTypeId: Int
+
+  """ID đơn vị cha"""
+  parentUnitId: Int
+
+  """Ngày thành lập (YYYY-MM-DD)"""
+  establishmentDate: String
+
+  """Email đơn vị"""
+  email: String
+
+  """Số điện thoại đơn vị"""
+  phone: String
 }
 
 input CreateUnitTypeInput {

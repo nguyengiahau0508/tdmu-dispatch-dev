@@ -1,1 +1,28 @@
-<p>unit-type-update works!</p>
+@if(isOpen){
+<!-- Backdrop phủ mờ -->
+<div class="unit-type-update__backdrop">
+  <div class="unit-type-update">
+    <form class="unit-type-form" [formGroup]="unitTypeUpdateForm" (ngSubmit)="onSubmit()">
+      <h2 class="unit-type-form__title">Cập nhật kiểu đơn vị</h2>
+      <p class="unit-type-form__subtitle">Cập nhật kiểu đơn vị ID là: {{unitType.id}}</p>
+
+      <div class="form-group">
+        <label for="typeName" class="form-group__label">Tên kiểu đơn vị</label>
+        <input type="text" id="typeName" class="form-group__input" formControlName="typeName"
+          placeholder="Hội đồng trường" />
+      </div>
+
+      <div class="form-group">
+        <label for="description" class="form-group__label">Mô tả</label>
+        <textarea id="description" class="form-group__input form-group__textarea" formControlName="description" rows="4"
+          placeholder="Nhập mô tả"></textarea>
+      </div>
+
+      <div class="unit-type-form__actions">
+        <button type="submit" class="unit-type-form__submit-button">Cập nhật</button>
+        <button type="button" class="unit-type-form__cancel-button" (click)="onFormClose()">Hủy</button>
+      </div>
+    </form>
+  </div>
+</div>
+}

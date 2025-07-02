@@ -1,5 +1,5 @@
 /* ===== Backdrop (Warp ngoài) ===== */
-.unit-type-update__backdrop {
+.unit-type-create__backdrop {
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.4);
@@ -12,20 +12,23 @@
   box-sizing: border-box;
 }
 
-
-
 /* ===== Container chính ===== */
-.unit-type-update {
+.unit-type-create {
   background-color: var(--color-background-primary);
   padding: 2.5rem;
   border-radius: 12px;
   box-shadow: var(--shadow-default);
   width: 100%;
   max-width: 480px;
+  height: 600px; /* Chiều cao cố định */
+  max-height: 90vh;
+  min-height: 400px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   animation: fadeIn 0.25s ease-in-out;
+  overflow-y: auto; /* Hiện thanh trượt dọc nếu vượt quá */
+  overflow-x: hidden;
 }
 
 @keyframes fadeIn {
@@ -144,7 +147,7 @@
 
 /* ===== Responsive nhỏ gọn ===== */
 @media (max-width: 480px) {
-  .unit-type-update {
+  .unit-type-create {
     padding: 1.5rem;
   }
 

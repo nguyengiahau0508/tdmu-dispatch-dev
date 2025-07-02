@@ -1,0 +1,93 @@
+
+@if (isOpen) {
+  <!-- Backdrop phủ mờ -->
+  <div class="unit-type-create__backdrop">
+    <div class="unit-type-create">
+      <form class="unit-type-form" [formGroup]="unitCreateForm" (ngSubmit)="onSubmit()">
+        <h2 class="unit-type-form__title">Tạo đơn vị</h2>
+        <p class="unit-type-form__subtitle">Thêm một đơn vị mới cho trường của bạn</p>
+
+        <div class="form-group">
+          <label for="unitName" class="form-group__label">Tên đơn vị</label>
+          <input
+            type="text"
+            id="unitName"
+            class="form-group__input"
+            formControlName="unitName"
+            placeholder="Nhập tên đơn vị"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="unitTypeId" class="form-group__label">Loại đơn vị</label>
+          <select id="unitTypeId" class="form-group__input" formControlName="unitTypeId">
+            <option [ngValue]="null">-- Chọn loại đơn vị --</option>
+            @for (type of unitTypes; track type.id) {
+              <option [ngValue]="type.id">{{ type.typeName }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="parentUnitId" class="form-group__label">Đơn vị cha</label>
+          <select id="parentUnitId" class="form-group__input" formControlName="parentUnitId">
+            <option [ngValue]="null">-- Không có --</option>
+            @for (unit of parentUnits; track unit.id) {
+              <option [ngValue]="unit.id">{{ unit.unitName }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="establishmentDate" class="form-group__label">Ngày thành lập</label>
+          <input
+            type="date"
+            id="establishmentDate"
+            class="form-group__input"
+            formControlName="establishmentDate"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email" class="form-group__label">Email</label>
+          <input
+            type="email"
+            id="email"
+            class="form-group__input"
+            formControlName="email"
+            placeholder="Nhập email (nếu có)"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="phone" class="form-group__label">Số điện thoại</label>
+          <input
+            type="text"
+            id="phone"
+            class="form-group__input"
+            formControlName="phone"
+            placeholder="Nhập số điện thoại (nếu có)"
+          />
+        </div>
+
+        <div class="unit-type-form__actions">
+          <button
+            type="submit"
+            class="unit-type-form__submit-button"
+            [disabled]="isLoading"
+          >
+            Thêm
+          </button>
+          <button
+            type="button"
+            class="unit-type-form__cancel-button"
+            (click)="onFormClose()"
+          >
+            Hủy
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+

@@ -53,7 +53,6 @@ export class UnitTypeCreate {
       error: (errorResponse: GraphQLResponseError) => {
         const { message, code } = this.errorHandlerService.extractGraphQLError(errorResponse);
         this.toarst.error("Có lổi xảy ra vui lòng thử lại")
-        console.log(errorResponse)
       }
     })
   }

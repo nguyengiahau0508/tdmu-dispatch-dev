@@ -1,3 +1,4 @@
+
 export interface IUnitType {
   id: number;
   typeName: string;
@@ -7,10 +8,10 @@ export interface IUnitType {
 export interface IUnit {
   id: number;
   unitName: string;
-  unitType: IUnitType;
-  parentUnitId: number | null;
+  unitType: IUnitType | null;
+  parentUnit: IUnit | null;
   establishmentDate: Date;
-  email: string;
-  phoneNumber: string;
+  email: string | null;
+  phone: string | null;
   childUnits: IUnit[]
 }
