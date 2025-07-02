@@ -1,0 +1,64 @@
+<div class="positions">
+  <div class="positions__header">
+    <div class="header__group">
+      <div class="header__search">
+        <input type="text" placeholder="Tìm chức vụ..." />
+      </div>
+      <div class="header__add">
+        <button (click)="togglePositionCreate()">
+          <img src="/icons/add.svg" alt="Thêm" />
+          Thêm
+        </button>
+      </div>
+    </div>
+    <div class="header__group header__group--block">
+      <app-pagination [totalCount]="totalCount || 0" [pageOptions]="pageOptions" (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)" (orderChange)="onOrderChange($event)"></app-pagination>
+    </div>
+  </div>
+
+  <div class="positions__main">
+    @if (positions.length > 0) {
+        <table class="positions__table">
+          <thead>
+           <tr>
+             <th>ID</th>
+             <th>Tên chức vụ</th>
+             <th></th>
+           </tr>
+         </thead>
+
+         <tbody>
+           @for (position of positions; track position.id) {
+           <tr class="position-row">
+             <td>{{ position.id }}</td>
+             <td [title]="position.positionName" class="position-name-cell">
+               {{ position.positionName }}
+             </td>
+             <td class="row-actions">
+               <div class="actions-menu">
+                 <button class="menu-button" (click)="toggleMenu(position.id)">⋮</button>
+
+                 @if (selectedMenuId === position.id) {
+                 <div class="dropdown-menu">
+                   <button (click)="onEditPosition(position)">Sửa</button>
+                   <button (click)="onDeletePosition(position)">Xóa</button>
+                 </div>
+                 }
+               </div>
+             </td>
+           </tr>
+           }
+         </tbody>
+       </table>
+    } @else {
+    <p>Chưa có dữ liệu chức vụ.</p>
+    }
+  </div>
+</div>
+
+<p-confirmdialog />
+<app-position-create [isOpen]="isPositionCreateOpen" (close)="isPositionCreateOpen = false" (createdSuccessfully)="refetchPositions()"/>
+@if(positionUpdateSelected){
+  <app-position-update [position]="positionUpdateSelected" [isOpen]="isPositionUpdateOpen" (close)="onCloseUpdateForm()" (updatedSuccessfully)="refetchPositions()"/>
+}

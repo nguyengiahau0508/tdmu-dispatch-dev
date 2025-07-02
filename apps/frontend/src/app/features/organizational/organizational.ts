@@ -35,4 +35,8 @@ export class Organizational {
   onGoToUnitType() {
     this.router.navigate(['admin', 'organizational', 'unit-types'])
   }
+
+  onGoToPoisitions() {
+    this.router.navigate(['admin', 'organizational', 'positions'])
+  }
 }

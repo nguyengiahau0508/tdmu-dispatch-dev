@@ -3,12 +3,16 @@
     <div class="sidebar__menu">
       <div class="sidebar__menu-item" (click)="onGoToUnitType()"
         [class.active]="isActive('/admin/organizational/unit-types')">
-        <img src="/icons/room.svg" alt="" title="Loại đơn vị" />
+        <img src="/icons/subheader.svg" alt="" title="Loại đơn vị" />
         <span>Loại đơn vị</span>
       </div>
       <div class="sidebar__menu-item" (click)="onGoToUnits()" [class.active]="isActive('/admin/organizational/units')">
         <img src="/icons/moving_ministry.svg" alt="" title="Đơn vị" />
         <span>Đơn vị</span>
+      </div>
+      <div class="sidebar__menu-item" (click)="onGoToPoisitions()" [class.active]="isActive('/admin/organizational/positions')">
+        <img src="/icons/airline_seat.svg" alt="" title="Chức vụ" />
+        <span>Chức vụ</span>
       </div>
     </div>
   </div>

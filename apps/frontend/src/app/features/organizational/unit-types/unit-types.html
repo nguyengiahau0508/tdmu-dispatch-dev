@@ -7,7 +7,7 @@
       <div class="header__add">
         <button (click)="toggleUnitTypeCreate()">
           <img src="/icons/add.svg" alt="Thêm" />
-          Thêm loại đơn vị
+          Thêm
         </button>
       </div>
     </div>
@@ -61,6 +61,6 @@
 
 <app-unit-type-create [isOpen]="isUnitTypeCreateOpen" (close)="isUnitTypeCreateOpen = false" (createdSuccessfully)="refetchUnitTypes()"></app-unit-type-create>
 @if(unitTypeUpdateSelected){
-<app-unit-type-update [unitType]="unitTypeUpdateSelected" [isOpen]="isUnitTypeUpdateOpen " (close)="isUnitTypeUpdateOpen = false" (updatedSuccessfully)="refetchUnitTypes()"></app-unit-type-update>
-  }
+  <app-unit-type-update [unitType]="unitTypeUpdateSelected" [isOpen]="isUnitTypeUpdateOpen " (close)="isUnitTypeUpdateOpen = false" (updatedSuccessfully)="refetchUnitTypes()"></app-unit-type-update>
+}
 <p-confirmdialog />

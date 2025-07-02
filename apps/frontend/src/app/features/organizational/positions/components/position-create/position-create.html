@@ -1,0 +1,39 @@
+@if (isOpen) {
+  <!-- Backdrop phủ mờ -->
+  <div class="position-create__backdrop">
+    <div class="position-create">
+      <form class="position-form" [formGroup]="positionCreateForm" (ngSubmit)="onSubmit()">
+        <h2 class="position-form__title">Tạo chức vụ</h2>
+        <p class="position-form__subtitle">Thêm một chức vụ mới cho hệ thống</p>
+
+        <div class="form-group">
+          <label for="positionName" class="form-group__label">Tên chức vụ</label>
+          <input
+            type="text"
+            id="positionName"
+            class="form-group__input"
+            formControlName="positionName"
+            placeholder="Nhập tên chức vụ"
+          />
+        </div>
+
+        <div class="position-form__actions">
+          <button
+            type="submit"
+            class="position-form__submit-button"
+            [disabled]="isLoading"
+          >
+            Thêm
+          </button>
+          <button
+            type="button"
+            class="position-form__cancel-button"
+            (click)="onFormClose()"
+          >
+            Hủy
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
