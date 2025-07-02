@@ -347,6 +347,80 @@ type GetUnitTypesPaginatedResponse {
   hasNextPage: Boolean
 }
 
+type Position {
+  """ID chức vụ"""
+  id: Int!
+
+  """Tên chức vụ"""
+  positionName: String!
+}
+
+type CreatePositionOutput {
+  """Chức vụ đã tạo"""
+  position: Position!
+}
+
+type CreatePositionResponse {
+  """Dữ liệu trả về"""
+  data: CreatePositionOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type UpdatePositionOutput {
+  """Chức vụ đã cập nhật"""
+  position: Position!
+}
+
+type UpdatePositionResponse {
+  """Dữ liệu trả về"""
+  data: UpdatePositionOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type RemovePositionOutput {
+  """Kết quả xóa"""
+  success: Boolean!
+}
+
+type RemovePositionResponse {
+  """Dữ liệu trả về"""
+  data: RemovePositionOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type GetPositionOutput {
+  """Thông tin chức vụ"""
+  position: Position!
+}
+
+type GetPositionResponse {
+  """Dữ liệu trả về"""
+  data: GetPositionOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type GetPositionsPaginatedResponse {
+  """Dữ liệu trả về (danh sách)"""
+  data: [Position!]
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+
+  """Tổng số mục (cho phân trang)"""
+  totalCount: Int
+
+  """Còn trang tiếp theo không (cho phân trang)"""
+  hasNextPage: Boolean
+}
+
 type Query {
   users: [User!]!
   user(id: Int!): User
@@ -355,6 +429,8 @@ type Query {
   allUnits: GetAllUnitsResponse!
   unitTypes(input: GetUnitTypesPaginatedInput!): GetUnitTypesPaginatedResponse!
   unitType(id: Int!): GetUnitTypeResponse!
+  positions(input: GetPositionsPaginatedInput!): GetPositionsPaginatedResponse!
+  position(id: Int!): GetPositionResponse!
 }
 
 input GetUnitsPaginatedInput {
@@ -397,6 +473,20 @@ input GetUnitTypesPaginatedInput {
   search: String
 }
 
+input GetPositionsPaginatedInput {
+  """Thứ tự sắp xếp"""
+  order: Order = ASC
+
+  """Số trang hiện tại"""
+  page: Int = 1
+
+  """Số lượng item trên mỗi trang"""
+  take: Int = 10
+
+  """Từ khóa tìm kiếm"""
+  search: String
+}
+
 type Mutation {
   signIn(input: SignInInput!): SignInResponse!
   signInWithOtp(input: SignInOtpInput!): SignInOtpResponse!
@@ -414,6 +504,9 @@ type Mutation {
   createUnitType(createUnitTypeInput: CreateUnitTypeInput!): CreateUnitTypeResponse!
   updateUnitType(updateUnitTypeInput: UpdateUnitTypeInput!): UpdateUnitTypeResponse!
   removeUnitType(id: Int!): RemoveUnitTypeResponse!
+  createPosition(createPositionInput: CreatePositionInput!): CreatePositionResponse!
+  updatePosition(updatePositionInput: UpdatePositionInput!): UpdatePositionResponse!
+  removePosition(id: Int!): RemovePositionResponse!
 }
 
 input SignInInput {
@@ -539,4 +632,15 @@ input UpdateUnitTypeInput {
 
   """Mô tả của loại đơn vị"""
   description: String
+}
+
+input CreatePositionInput {
+  """Tên chức vụ"""
+  positionName: String!
+}
+
+input UpdatePositionInput {
+  """Tên chức vụ"""
+  positionName: String
+  id: Int!
 }

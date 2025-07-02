@@ -5,7 +5,7 @@ import { OraganizationalModule } from "./organizational/oraganizational.module";
 @Module({
   imports: [
     UsersModule,
-    OraganizationalModule
+    OraganizationalModule,
   ],
   providers: []
 })
