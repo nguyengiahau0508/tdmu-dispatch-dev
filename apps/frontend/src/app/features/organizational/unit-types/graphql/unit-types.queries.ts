@@ -1,6 +1,6 @@
 import { gql } from 'apollo-angular';
 
-export const GET_UNIT_TYPES = gql`
+export const GET_UNIT_TYPES_QUERY = gql`
   query GetUnitTypes($input: GetUnitTypesPaginatedInput!) {
     unitTypes(input: $input) {
       metadata {

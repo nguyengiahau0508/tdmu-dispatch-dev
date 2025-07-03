@@ -1,6 +1,6 @@
 import { gql } from 'apollo-angular';
 
-export const GET_POSITIONS = gql`
+export const GET_POSITIONS_QUERY = gql`
   query GetPositions($input: GetPositionsPaginatedInput!) {
     positions(input: $input) {
       metadata {
@@ -17,7 +17,7 @@ export const GET_POSITIONS = gql`
   }
 `;
 
-export const GET_ALL_POSITIONS = gql`
+export const GET_ALL_POSITIONS_QUERY = gql`
   query GetAllPositions {
     allPositions {
       metadata {

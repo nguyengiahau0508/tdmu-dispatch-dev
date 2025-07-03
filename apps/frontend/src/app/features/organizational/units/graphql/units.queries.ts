@@ -1,6 +1,6 @@
 import { gql } from 'apollo-angular';
 
-export const GET_UNITS = gql`
+export const GET_UNITS_QUERY = gql`
   query GetUnits($input: GetUnitsPaginatedInput!) {
     units(input: $input) {
       metadata {
@@ -32,7 +32,7 @@ export const GET_UNITS = gql`
   }
 `;
 
-export const GET_UNIT = gql`
+export const GET_UNIT_QUERY = gql`
   query GetUnit($id: Int!) {
     unit(id: $id) {
       metadata {
@@ -64,7 +64,7 @@ export const GET_UNIT = gql`
   }
 `;
 
-export const GET_ALL_UNIT = gql`
+export const GET_ALL_UNIT_QUERY = gql`
 query {
   allUnits {
     metadata {
