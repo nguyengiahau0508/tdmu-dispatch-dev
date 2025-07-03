@@ -1,11 +1,13 @@
 import { ObjectType, Field, Int, registerEnumType } from '@nestjs/graphql';
 import { Role } from 'src/common/enums/role.enums';
+import { Assignment } from 'src/modules/organizational/assignments/entities/assignment.entity';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 
@@ -52,14 +54,16 @@ export class User {
   @Field(() => String, { description: "Ảnh đại diện của người dùng" })
   avatar: string
 
-  // Thêm trường role
   @Column({
-    type: 'enum',
+    type: 'set',
     enum: Role,
-    default: Role.UNASSIGNED_TASK_HANDLER, // Gán vai trò mặc định khi tạo mới, ví dụ
+    default: [Role.BASIC_USER],
   })
-  @Field(() => Role, { description: 'Vai trò của người dùng' })
-  role: Role;
+  @Field(() => [Role], { description: 'Danh sách vai trò của người dùng' })
+  roles: Role[];
+
+  @OneToMany(() => Assignment, assignment => assignment.user)
+  assignments: Assignment[];
 
   @CreateDateColumn()
   @Field(() => Date, { description: 'Thời gian tạo tài khoản' })

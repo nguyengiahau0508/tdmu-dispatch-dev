@@ -31,13 +31,13 @@ export class CreateUserInput {
   @IsNotEmpty({ message: 'Tên không được để trống' })
   firstName: string;
 
-  @Field(() => Role, {
-    description: 'Vai trò của người dùng. Nếu không cung cấp, sẽ dùng vai trò mặc định.',
-    nullable: true, // Cho phép không truyền giá trị này, khi đó service sẽ xử lý gán default
-  })
-  @IsOptional() // Đánh dấu trường này là tùy chọn
-  @IsEnum(Role, { message: 'Vai trò không hợp lệ' }) // Validate giá trị phải thuộc UserRole enum
-  role?: Role; // Dùng dấu ? để chỉ ra đây là trường tùy chọn
+  // @Field(() => Role, {
+  //   description: 'Vai trò của người dùng. Nếu không cung cấp, sẽ dùng vai trò mặc định.',
+  //   nullable: true, // Cho phép không truyền giá trị này, khi đó service sẽ xử lý gán default
+  // })
+  // @IsOptional() // Đánh dấu trường này là tùy chọn
+  // @IsEnum(Role, { message: 'Vai trò không hợp lệ' }) // Validate giá trị phải thuộc UserRole enum
+  // roles?: Role[]; // Dùng dấu ? để chỉ ra đây là trường tùy chọn
 
   @Field(() => Boolean, {
     description: 'Trạng thái kích hoạt tài khoản (mặc định là true).',

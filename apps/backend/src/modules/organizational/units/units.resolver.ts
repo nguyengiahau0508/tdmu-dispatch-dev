@@ -20,7 +20,7 @@ export class UnitsResolver {
   constructor(private readonly unitsService: UnitsService) { }
 
   @Mutation(() => CreateUnitResponse)
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SYSTEM_ADMIN)
   async createUnit(@Args('createUnitInput') createUnitInput: CreateUnitInput): Promise<CreateUnitResponse> {
     return {
       metadata: createResponseMetadata(HttpStatus.ACCEPTED, "Tạo đơn vị thành công"),
@@ -48,7 +48,7 @@ export class UnitsResolver {
   }
 
   @Mutation(() => UpdateUnitResponse)
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SYSTEM_ADMIN)
   async updateUnit(@Args('updateUnitInput') updateUnitInput: UpdateUnitInput): Promise<UpdateUnitResponse> {
     return {
       metadata: createResponseMetadata(HttpStatus.ACCEPTED, "Cập nhật đơn vị thành công"),
@@ -57,7 +57,7 @@ export class UnitsResolver {
   }
 
   @Mutation(() => RemoveUnitResponse)
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SYSTEM_ADMIN)
   async removeUnit(@Args('id', { type: () => Int }) id: number): Promise<RemoveUnitResponse> {
     const data = await this.unitsService.remove(id)
     return {

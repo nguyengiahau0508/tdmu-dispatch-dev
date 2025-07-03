@@ -124,9 +124,6 @@ type User {
 
 """Các vai trò của người dùng trong hệ thống"""
 enum UserRole {
-  DEGREE_CERTIFICATE_MANAGER
-  UNASSIGNED_TASK_HANDLER
-  SUPER_ADMIN
   SYSTEM_ADMIN
   UNIVERSITY_LEADER
   DEPARTMENT_HEAD
@@ -558,9 +555,6 @@ input CreateUserInput {
   """Tên của người dùng"""
   firstName: String!
 
-  """Vai trò của người dùng. Nếu không cung cấp, sẽ dùng vai trò mặc định."""
-  role: UserRole
-
   """Trạng thái kích hoạt tài khoản (mặc định là true)."""
   isActive: Boolean = true
 }
@@ -582,9 +576,6 @@ input UpdateUserInput {
 
   """Tên của người dùng"""
   firstName: String
-
-  """Vai trò của người dùng. Nếu không cung cấp, sẽ dùng vai trò mặc định."""
-  role: UserRole
 
   """Trạng thái kích hoạt tài khoản (mặc định là true)."""
   isActive: Boolean = true

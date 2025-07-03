@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Int, ObjectType } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { BadRequestException, HttpStatus, Req } from '@nestjs/common';
@@ -11,7 +11,6 @@ import { UpdateUserInput } from './dto/update-user/update-user.input';
 import { ChangePasswordResponse } from './dto/change-password/change-password.response';
 import { ChangePasswordInput } from './dto/change-password/change-password.input';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
-import { GetCurrentUserDataOutput } from './dto/get-current-user-data/get-current-user-data.output';
 import { getCurrentUserDataReponse } from './dto/get-current-user-data/get-current-user-data.response';
 
 @Resolver(() => User)
@@ -19,7 +18,7 @@ export class UsersResolver {
   constructor(private readonly usersService: UsersService) { }
 
   @Mutation(() => UserResponse)
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SYSTEM_ADMIN)
   async createUser(@Args('createUserInput') createUserInput: CreateUserInput): Promise<UserResponse> {
     const newUser = await this.usersService.create(createUserInput)
     return {

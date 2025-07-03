@@ -5,7 +5,7 @@ import { CacheAppModule } from "./cache/cache.module";
 @Module({
   imports: [
     MailModule,
-    CacheAppModule
+    CacheAppModule,
   ]
 })
 export class IntegrationsModule { }

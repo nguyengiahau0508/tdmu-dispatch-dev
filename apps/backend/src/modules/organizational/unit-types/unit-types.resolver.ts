@@ -20,7 +20,7 @@ export class UnitTypesResolver {
   constructor(private readonly unitTypesService: UnitTypesService) { }
 
   @Mutation(() => CreateUnitTypeResponse)
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SYSTEM_ADMIN)
   async createUnitType(@Args('createUnitTypeInput') createUnitTypeInput: CreateUnitTypeInput): Promise<CreateUnitTypeResponse> {
     return {
       metadata: createResponseMetadata(HttpStatus.ACCEPTED, "Tạo thành công"),
@@ -29,7 +29,6 @@ export class UnitTypesResolver {
   }
 
   @Query(() => GetUnitTypesPaginatedResponse, { name: 'unitTypes' })
-  @Public()
   async findAll(@Args('input') input: GetUnitTypesPaginatedInput): Promise<GetUnitTypesPaginatedResponse> {
     const pageData = await this.unitTypesService.findAll(input);
     return {
@@ -49,7 +48,7 @@ export class UnitTypesResolver {
   }
 
   @Mutation(() => UpdateUnitTypeResponse)
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SYSTEM_ADMIN)
   async updateUnitType(@Args('updateUnitTypeInput') updateUnitTypeInput: UpdateUnitTypeInput): Promise<UpdateUnitTypeResponse> {
     console.log(updateUnitTypeInput)
     return {
@@ -59,7 +58,7 @@ export class UnitTypesResolver {
   }
 
   @Mutation(() => RemoveUnitTypeResponse)
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SYSTEM_ADMIN)
   async removeUnitType(@Args('id', { type: () => Int }) id: number): Promise<RemoveUnitTypeResponse> {
     const data = await this.unitTypesService.remove(id)
     return {

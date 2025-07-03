@@ -19,7 +19,7 @@ export class PositionsResolver {
   constructor(private readonly positionsService: PositionsService) { }
 
   @Mutation(() => CreatePositionResponse)
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SYSTEM_ADMIN)
   async createPosition(@Args('createPositionInput') createPositionInput: CreatePositionInput): Promise<CreatePositionResponse> {
     const position = await this.positionsService.create(createPositionInput)
     console.log(position)
@@ -50,7 +50,7 @@ export class PositionsResolver {
   }
 
   @Mutation(() => UpdatePositionResponse)
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SYSTEM_ADMIN)
   async updatePosition(@Args('updatePositionInput') updatePositionInput: UpdatePositionInput): Promise<UpdatePositionResponse> {
     const position = await this.positionsService.update(updatePositionInput.id, updatePositionInput);
     return {
@@ -60,7 +60,7 @@ export class PositionsResolver {
   }
 
   @Mutation(() => RemovePositionResponse)
-  @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SYSTEM_ADMIN)
   async removePosition(@Args('id', { type: () => Int }) id: number): Promise<RemovePositionResponse> {
     const result = await this.positionsService.remove(id);
     return {
