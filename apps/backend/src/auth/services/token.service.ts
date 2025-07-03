@@ -13,7 +13,7 @@ export interface ITokenPayload {
   sub: number;
   email: string;
   type: 'access' | 'refresh' | 'onetime';
-  role: Role;
+  role: Role[];
   tokenId: string;
 }
 
@@ -39,7 +39,7 @@ export class TokenService {
   /**
    * Generates an access token and stores it in cache for validation/revocation.
    */
-  async generateAccessToken(payload: { sub: number; email: string; role: Role }): Promise<string> {
+  async generateAccessToken(payload: { sub: number; email: string; role: Role[] }): Promise<string> {
     const tokenId = generateUniqueKey();
     const tokenPayload: ITokenPayload = { ...payload, type: 'access', tokenId };
 
@@ -57,7 +57,7 @@ export class TokenService {
   /**
    * Generates a one-time token (revocable via cache).
    */
-  async generateAccessOneTimeToken(payload: { sub: number; email: string, role: Role }): Promise<string> {
+  async generateAccessOneTimeToken(payload: { sub: number; email: string, role: Role[] }): Promise<string> {
     const tokenId = generateUniqueKey();
     const tokenPayload: ITokenPayload = { ...payload, type: 'onetime', tokenId };
 
@@ -75,7 +75,7 @@ export class TokenService {
   /**
    * Generates a refresh token and stores it in cache for validation/revocation.
    */
-  async generateRefreshToken(payload: { sub: number; email: string, role: Role }): Promise<string> {
+  async generateRefreshToken(payload: { sub: number; email: string, role: Role[] }): Promise<string> {
     const tokenId = generateUniqueKey();
     const tokenPayload: ITokenPayload = { ...payload, type: 'refresh', tokenId };
 

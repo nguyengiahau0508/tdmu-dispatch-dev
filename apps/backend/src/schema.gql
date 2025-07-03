@@ -17,6 +17,76 @@ type Metadata {
   path: String
 }
 
+type Position {
+  """ID chức vụ"""
+  id: Int!
+
+  """Tên chức vụ"""
+  positionName: String!
+}
+
+type UnitType {
+  """ID của loại đơn vị"""
+  id: Int!
+
+  """Tên của loại đơn vị"""
+  typeName: String!
+
+  """Mô tả của loại đơn vị"""
+  description: String
+}
+
+type Unit {
+  """ID của đơn vị"""
+  id: Int!
+
+  """Tên đơn vị"""
+  unitName: String!
+
+  """ID loại đơn vị"""
+  unitTypeId: Int
+
+  """Loại đơn vị"""
+  unitType: UnitType
+
+  """ID đơn vị cha"""
+  parentUnitId: Int
+
+  """Ngày thành lập"""
+  establishmentDate: DateTime
+
+  """Email đơn vị"""
+  email: String
+
+  """Số điện thoại đơn vị"""
+  phone: String
+
+  """Các đơn vị con"""
+  childUnits: [Unit!]!
+
+  """Đơn vị cha"""
+  parentUnit: Unit
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Assignment {
+  """ID của assignment"""
+  id: Int!
+
+  """Người dùng được phân công"""
+  user: User!
+
+  """Chức vụ của assignment"""
+  position: Position!
+
+  """Đơn vị tổ chức của assignment"""
+  unit: Unit!
+}
+
 type User {
   """ID của người dùng"""
   id: Int!
@@ -39,8 +109,8 @@ type User {
   """Ảnh đại diện của người dùng"""
   avatar: String!
 
-  """Vai trò của người dùng"""
-  role: UserRole!
+  """Danh sách vai trò của người dùng"""
+  roles: [UserRole!]!
 
   """Thời gian tạo tài khoản"""
   createdAt: DateTime!
@@ -54,20 +124,17 @@ type User {
 
 """Các vai trò của người dùng trong hệ thống"""
 enum UserRole {
-  CLERK
-  OFFICE_MANAGER
-  UNIVERSITY_LEADER
-  DEPARTMENT_HEAD
-  DEPARTMENT_STAFF
   DEGREE_CERTIFICATE_MANAGER
   UNASSIGNED_TASK_HANDLER
   SUPER_ADMIN
+  SYSTEM_ADMIN
+  UNIVERSITY_LEADER
+  DEPARTMENT_HEAD
+  DEPARTMENT_STAFF
+  CLERK
+  DEGREE_MANAGER
+  BASIC_USER
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type SignInOutput {
   accessToken: String!
@@ -160,49 +227,6 @@ type getCurrentUserDataReponse {
 
   """Thông tin metadata của response"""
   metadata: Metadata!
-}
-
-type UnitType {
-  """ID của loại đơn vị"""
-  id: Int!
-
-  """Tên của loại đơn vị"""
-  typeName: String!
-
-  """Mô tả của loại đơn vị"""
-  description: String
-}
-
-type Unit {
-  """ID của đơn vị"""
-  id: Int!
-
-  """Tên đơn vị"""
-  unitName: String!
-
-  """ID loại đơn vị"""
-  unitTypeId: Int
-
-  """Loại đơn vị"""
-  unitType: UnitType
-
-  """ID đơn vị cha"""
-  parentUnitId: Int
-
-  """Ngày thành lập"""
-  establishmentDate: DateTime
-
-  """Email đơn vị"""
-  email: String
-
-  """Số điện thoại đơn vị"""
-  phone: String
-
-  """Các đơn vị con"""
-  childUnits: [Unit!]!
-
-  """Đơn vị cha"""
-  parentUnit: Unit
 }
 
 type PageMetaDto {
@@ -347,14 +371,6 @@ type GetUnitTypesPaginatedResponse {
   hasNextPage: Boolean
 }
 
-type Position {
-  """ID chức vụ"""
-  id: Int!
-
-  """Tên chức vụ"""
-  positionName: String!
-}
-
 type CreatePositionOutput {
   """Chức vụ đã tạo"""
   position: Position!
@@ -431,6 +447,8 @@ type Query {
   unitType(id: Int!): GetUnitTypeResponse!
   positions(input: GetPositionsPaginatedInput!): GetPositionsPaginatedResponse!
   position(id: Int!): GetPositionResponse!
+  assignments: [Assignment!]!
+  assignment(id: Int!): Assignment!
 }
 
 input GetUnitsPaginatedInput {
@@ -507,6 +525,9 @@ type Mutation {
   createPosition(createPositionInput: CreatePositionInput!): CreatePositionResponse!
   updatePosition(updatePositionInput: UpdatePositionInput!): UpdatePositionResponse!
   removePosition(id: Int!): RemovePositionResponse!
+  createAssignment(createAssignmentInput: CreateAssignmentInput!): Assignment!
+  updateAssignment(updateAssignmentInput: UpdateAssignmentInput!): Assignment!
+  removeAssignment(id: Int!): Assignment!
 }
 
 input SignInInput {
@@ -642,5 +663,16 @@ input CreatePositionInput {
 input UpdatePositionInput {
   """Tên chức vụ"""
   positionName: String
+  id: Int!
+}
+
+input CreateAssignmentInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateAssignmentInput {
+  """Example field (placeholder)"""
+  exampleField: Int
   id: Int!
 }

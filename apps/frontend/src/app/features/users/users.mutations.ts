@@ -12,7 +12,7 @@ mutation {
         lastName
         firstName
         email
-        role
+        roles
         fullName
         avatar
       }

@@ -61,7 +61,7 @@ export class AuthService {
       });
     }
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    const payload = { sub: user.id, email: user.email, role: user.roles };
 
     // Generate both access and refresh tokens in parallel
     const [accessToken, refreshToken] = await Promise.all([
@@ -104,7 +104,7 @@ export class AuthService {
 
     await this.otpService.clearOTP(user.id)
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    const payload = { sub: user.id, email: user.email, role: user.roles };
 
     // Generate both access and refresh tokens in parallel
     const [accessToken] = await Promise.all([

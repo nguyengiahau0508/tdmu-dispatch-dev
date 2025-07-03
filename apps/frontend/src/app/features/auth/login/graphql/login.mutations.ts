@@ -18,7 +18,7 @@ export const LOGIN_MUTATION = gql`
               lastName
               firstName
               email
-              role
+              roles
               avatar
             }
           }

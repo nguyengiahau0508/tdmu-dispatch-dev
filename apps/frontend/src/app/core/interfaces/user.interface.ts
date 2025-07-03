@@ -8,7 +8,7 @@ export interface IUser {
   firstName: string;
   isActive: boolean;
   isFirstLogin: boolean;
-  role: Role;
+  roles: Role[];
   avatar?: string
   createdAt: Date;
   updatedAt: Date;
