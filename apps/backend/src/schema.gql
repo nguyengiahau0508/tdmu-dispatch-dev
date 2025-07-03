@@ -226,6 +226,13 @@ type getCurrentUserDataReponse {
   metadata: Metadata!
 }
 
+type GetUsersPaginatedResponse {
+  data: [User!]
+  metadata: Metadata!
+  totalCount: Int!
+  hasNextPage: Boolean!
+}
+
 type PageMetaDto {
   page: Int!
   take: Int!
@@ -437,6 +444,10 @@ type GetPositionsPaginatedResponse {
 type Query {
   users: [User!]!
   user(id: Int!): User
+  usersPaginated(input: GetUsersPaginatedInput!): GetUsersPaginatedResponse!
+  usersByRole(role: UserRole!): [User!]!
+  checkEmailExists(email: String!): Boolean!
+  userStatistics: String!
   units(input: GetUnitsPaginatedInput!): GetUnitsPaginatedResponse!
   unit(id: Int!): GetUnitResponse!
   allUnits: GetAllUnitsResponse!
@@ -446,6 +457,32 @@ type Query {
   position(id: Int!): GetPositionResponse!
   assignments: [Assignment!]!
   assignment(id: Int!): Assignment!
+}
+
+input GetUsersPaginatedInput {
+  """Thứ tự sắp xếp"""
+  order: Order = ASC
+
+  """Số trang hiện tại"""
+  page: Int = 1
+
+  """Số lượng item trên mỗi trang"""
+  take: Int = 10
+
+  """Tìm kiếm theo tên hoặc email"""
+  search: String
+
+  """Lọc theo vai trò"""
+  role: UserRole
+
+  """Lọc theo trạng thái hoạt động"""
+  isActive: Boolean
+}
+
+"""Thứ tự sắp xếp"""
+enum Order {
+  ASC
+  DESC
 }
 
 input GetUnitsPaginatedInput {
@@ -466,12 +503,6 @@ input GetUnitsPaginatedInput {
 
   """ID đơn vị cha để lọc"""
   parentUnitId: Int
-}
-
-"""Thứ tự sắp xếp"""
-enum Order {
-  ASC
-  DESC
 }
 
 input GetUnitTypesPaginatedInput {
@@ -511,8 +542,12 @@ type Mutation {
   createUser(createUserInput: CreateUserInput!): UserResponse!
   changePassword(input: ChangePasswordInput!): ChangePasswordResponse!
   getCurrentUserData: getCurrentUserDataReponse!
-  updateUser(updateUserInput: UpdateUserInput!): User!
-  removeUser(id: Int!): User!
+  updateUser(updateUserInput: UpdateUserInput!): UserResponse!
+  removeUser(id: Int!): UserResponse!
+  lockUser(id: Int!): UserResponse!
+  unlockUser(id: Int!): UserResponse!
+  resetPassword(id: Int!): UserResponse!
+  changeRoles(id: Int!, roles: [UserRole!]!): UserResponse!
   createUnit(createUnitInput: CreateUnitInput!): CreateUnitResponse!
   updateUnit(updateUnitInput: UpdateUnitInput!): UpdateUnitResponse!
   removeUnit(id: Int!): RemoveUnitResponse!
@@ -582,6 +617,12 @@ input UpdateUserInput {
 
   """ID của người dùng cần cập nhật"""
   id: Int!
+
+  """Danh sách vai trò mới"""
+  roles: [UserRole!]
+
+  """Ảnh đại diện mới"""
+  avatar: String
 }
 
 input CreateUnitInput {

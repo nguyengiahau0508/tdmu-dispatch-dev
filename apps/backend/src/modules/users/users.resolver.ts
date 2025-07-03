@@ -12,6 +12,8 @@ import { ChangePasswordResponse } from './dto/change-password/change-password.re
 import { ChangePasswordInput } from './dto/change-password/change-password.input';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { getCurrentUserDataReponse } from './dto/get-current-user-data/get-current-user-data.response';
+import { GetUsersPaginatedInput } from './dto/get-users-paginated/get-users-paginated.input';
+import { GetUsersPaginatedResponse } from './dto/get-users-paginated/get-users-paginated.response';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -67,13 +69,87 @@ export class UsersResolver {
     return this.usersService.findOneById(id);
   }
 
-  @Mutation(() => User)
-  updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
-    return this.usersService.update(updateUserInput.id, updateUserInput);
+  @Mutation(() => UserResponse)
+  @Roles(Role.SYSTEM_ADMIN)
+  async updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput): Promise<UserResponse> {
+    const updatedUser = await this.usersService.update(updateUserInput.id, updateUserInput);
+    return {
+      metadata: createResponseMetadata(HttpStatus.ACCEPTED, 'Cập nhật người dùng thành công'),
+      data: updatedUser
+    };
   }
 
-  @Mutation(() => User)
-  removeUser(@Args('id', { type: () => Int }) id: number) {
-    return this.usersService.remove(id);
+  @Mutation(() => UserResponse)
+  @Roles(Role.SYSTEM_ADMIN)
+  async removeUser(@Args('id', { type: () => Int }) id: number): Promise<UserResponse> {
+    const removedUser = await this.usersService.remove(id);
+    return {
+      metadata: createResponseMetadata(HttpStatus.ACCEPTED, 'Khóa tài khoản người dùng thành công'),
+      data: removedUser
+    };
+  }
+
+  @Query(() => GetUsersPaginatedResponse, { name: 'usersPaginated' })
+  async usersPaginated(@Args('input') input: GetUsersPaginatedInput): Promise<GetUsersPaginatedResponse> {
+    return this.usersService.findPaginated(input);
+  }
+
+  @Mutation(() => UserResponse)
+  @Roles(Role.SYSTEM_ADMIN)
+  async lockUser(@Args('id', { type: () => Int }) id: number): Promise<UserResponse> {
+    const user = await this.usersService.update(id, { isActive: false } as any);
+    return {
+      metadata: createResponseMetadata(HttpStatus.ACCEPTED, 'Khóa tài khoản thành công'),
+      data: user
+    };
+  }
+
+  @Mutation(() => UserResponse)
+  @Roles(Role.SYSTEM_ADMIN)
+  async unlockUser(@Args('id', { type: () => Int }) id: number): Promise<UserResponse> {
+    const user = await this.usersService.update(id, { isActive: true } as any);
+    return {
+      metadata: createResponseMetadata(HttpStatus.ACCEPTED, 'Mở khóa tài khoản thành công'),
+      data: user
+    };
+  }
+
+  @Mutation(() => UserResponse)
+  @Roles(Role.SYSTEM_ADMIN)
+  async resetPassword(@Args('id', { type: () => Int }) id: number): Promise<UserResponse> {
+    const user = await this.usersService.resetPassword(id);
+    return {
+      metadata: createResponseMetadata(HttpStatus.ACCEPTED, 'Reset mật khẩu thành công'),
+      data: user
+    };
+  }
+
+  @Mutation(() => UserResponse)
+  @Roles(Role.SYSTEM_ADMIN)
+  async changeRoles(
+    @Args('id', { type: () => Int }) id: number,
+    @Args({ name: 'roles', type: () => [Role] }) roles: Role[]
+  ): Promise<UserResponse> {
+    const user = await this.usersService.changeRoles(id, roles);
+    return {
+      metadata: createResponseMetadata(HttpStatus.ACCEPTED, 'Cập nhật vai trò thành công'),
+      data: user
+    };
+  }
+
+  @Query(() => [User], { name: 'usersByRole' })
+  async usersByRole(@Args('role', { type: () => Role }) role: Role): Promise<User[]> {
+    return this.usersService.findByRole(role);
+  }
+
+  @Query(() => Boolean, { name: 'checkEmailExists' })
+  async checkEmailExists(@Args('email', { type: () => String }) email: string): Promise<boolean> {
+    return this.usersService.checkEmailExists(email);
+  }
+
+  @Query(() => String, { name: 'userStatistics' })
+  async userStatistics(): Promise<string> {
+    const stats = await this.usersService.statistics();
+    return JSON.stringify(stats);
   }
 }
