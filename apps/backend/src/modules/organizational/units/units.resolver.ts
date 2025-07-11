@@ -12,13 +12,14 @@ import { GetUnitsPaginatedInput } from './dto/get-units-paginated/get-units-pagi
 import { Role } from 'src/common/enums/role.enums';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { createResponseMetadata } from 'src/common/helpers/metadata.helper';
-import { HttpStatus } from '@nestjs/common';
+import { HttpStatus, UseGuards } from '@nestjs/common';
 import { GetAllUnitsResponse } from './dto/get-all-units.response';
+import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
 
 @Resolver(() => Unit)
+@UseGuards(GqlAuthGuard)
 export class UnitsResolver {
   constructor(private readonly unitsService: UnitsService) { }
-
   @Mutation(() => CreateUnitResponse)
   @Roles(Role.SYSTEM_ADMIN)
   async createUnit(@Args('createUnitInput') createUnitInput: CreateUnitInput): Promise<CreateUnitResponse> {

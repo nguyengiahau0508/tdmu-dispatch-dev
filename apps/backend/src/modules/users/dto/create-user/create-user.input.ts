@@ -1,5 +1,6 @@
 import { InputType, Field, registerEnumType } from '@nestjs/graphql';
 import { IsEmail, IsNotEmpty, MinLength, IsOptional, IsEnum } from 'class-validator'; // Thêm các validator
+import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 import { Role } from 'src/common/enums/role.enums';
 
 // Đăng ký enum với GraphQL nếu chưa làm ở entity User hoặc module chung
@@ -51,4 +52,8 @@ export class CreateUserInput {
   // @Field(() => Boolean, { description: 'Đánh dấu đăng nhập lần đầu (mặc định là true).', nullable: true })
   // @IsOptional()
   // isFirstLogin?: boolean;
+
+  // @IsOptional() // this one is required due to conflict with validation pipe
+  // @Field(() => GraphQLUpload, { nullable: true })
+  // avatarImageFile: FileUpload;
 }

@@ -51,7 +51,7 @@
                  <button class="menu-button" (click)="toggleMenu(unit.id)">⋮</button>
 
                  @if (selectedMenuId === unit.id) {
-                 <div class="dropdown-menu">
+                 <div class="dropdown-menu" (mouseleave)="toggleMenu(unit.id)">
                    <button (click)="onEditUnit(unit)">Sửa</button>
                    <button (click)="onDeleteUnit(unit)">Xóa</button>
                  </div>

@@ -17,6 +17,15 @@ type Metadata {
   path: String
 }
 
+type File {
+  id: String!
+  driveFileId: String!
+  originalName: String!
+  mimeType: String!
+  allowedUserIds: [Int!]
+  isPublic: Boolean!
+}
+
 type Position {
   """ID chức vụ"""
   id: Int!
@@ -77,11 +86,20 @@ type Assignment {
   """ID của assignment"""
   id: Int!
 
+  """ID người dùng được phân công"""
+  userId: Int!
+
   """Người dùng được phân công"""
   user: User!
 
+  """ID chức vụ của assignment"""
+  positionId: Int!
+
   """Chức vụ của assignment"""
   position: Position!
+
+  """ID đơn vị tổ chức của assignment"""
+  unitId: Int!
 
   """Đơn vị tổ chức của assignment"""
   unit: Unit!
@@ -107,10 +125,11 @@ type User {
   isFirstLogin: Boolean!
 
   """Ảnh đại diện của người dùng"""
-  avatar: String!
+  avatar: String
 
   """Danh sách vai trò của người dùng"""
-  roles: [UserRole!]!
+  roles: [Role!]!
+  assignments: [Assignment!]!
 
   """Thời gian tạo tài khoản"""
   createdAt: DateTime!
@@ -120,10 +139,12 @@ type User {
 
   """Họ và tên đầy đủ của người dùng"""
   fullName: String!
+  avatarFileId: Int
+  avatarFile: File
 }
 
 """Các vai trò của người dùng trong hệ thống"""
-enum UserRole {
+enum Role {
   SYSTEM_ADMIN
   UNIVERSITY_LEADER
   DEPARTMENT_HEAD
@@ -144,6 +165,15 @@ type SignInResponse {
 
   """Thông tin metadata của response"""
   metadata: Metadata!
+}
+
+type PageMetaDto {
+  page: Int!
+  take: Int!
+  itemCount: Int!
+  pageCount: Int!
+  hasPreviousPage: Boolean!
+  hasNextPage: Boolean!
 }
 
 type SignInOtpOutput {
@@ -227,19 +257,64 @@ type getCurrentUserDataReponse {
 }
 
 type GetUsersPaginatedResponse {
+  """Dữ liệu trả về (danh sách)"""
   data: [User!]
+
+  """Thông tin metadata của response"""
   metadata: Metadata!
-  totalCount: Int!
-  hasNextPage: Boolean!
+
+  """Tổng số mục (cho phân trang)"""
+  totalCount: Int
+
+  """Còn trang tiếp theo không (cho phân trang)"""
+  hasNextPage: Boolean
 }
 
-type PageMetaDto {
-  page: Int!
-  take: Int!
-  itemCount: Int!
-  pageCount: Int!
-  hasPreviousPage: Boolean!
-  hasNextPage: Boolean!
+type AddRoleOutput {
+  """User đã được cập nhật role"""
+  user: User!
+}
+
+type AddRoleResponse {
+  """Dữ liệu trả về"""
+  data: AddRoleOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type RemoveRoleOutput {
+  """User đã được cập nhật role"""
+  user: User!
+}
+
+type RemoveRoleResponse {
+  """Dữ liệu trả về"""
+  data: RemoveRoleOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type GetRolesOutput {
+  """Danh sách role của user"""
+  roles: [Role!]!
+}
+
+type GetRolesResponse {
+  """Dữ liệu trả về"""
+  data: GetRolesOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type StreamFileOutput {
+  id: String!
+  originalName: String!
+  mimeType: String!
+  fileData: String!
+  isPublic: Boolean!
 }
 
 type CreateUnitOutput {
@@ -441,22 +516,190 @@ type GetPositionsPaginatedResponse {
   hasNextPage: Boolean
 }
 
+type GetAllPositionsResponse {
+  data: [Position!]
+  metadata: Metadata!
+}
+
+type CreateAssignmentOutput {
+  """ID của assignment"""
+  id: Int!
+
+  """ID người dùng được phân công"""
+  userId: Int!
+
+  """Người dùng được phân công"""
+  user: User!
+
+  """ID chức vụ của assignment"""
+  positionId: Int!
+
+  """Chức vụ của assignment"""
+  position: Position!
+
+  """ID đơn vị tổ chức của assignment"""
+  unitId: Int!
+
+  """Đơn vị tổ chức của assignment"""
+  unit: Unit!
+}
+
+type CreateAssignmentResponse {
+  """Dữ liệu trả về"""
+  data: CreateAssignmentOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type UpdateAssignmentOutput {
+  """ID của assignment"""
+  id: Int!
+
+  """ID người dùng được phân công"""
+  userId: Int!
+
+  """Người dùng được phân công"""
+  user: User!
+
+  """ID chức vụ của assignment"""
+  positionId: Int!
+
+  """Chức vụ của assignment"""
+  position: Position!
+
+  """ID đơn vị tổ chức của assignment"""
+  unitId: Int!
+
+  """Đơn vị tổ chức của assignment"""
+  unit: Unit!
+}
+
+type UpdateAssignmentResponse {
+  """Dữ liệu trả về"""
+  data: UpdateAssignmentOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type RemoveAssignmentOutput {
+  """ID của assignment"""
+  id: Int!
+
+  """ID người dùng được phân công"""
+  userId: Int!
+
+  """Người dùng được phân công"""
+  user: User!
+
+  """ID chức vụ của assignment"""
+  positionId: Int!
+
+  """Chức vụ của assignment"""
+  position: Position!
+
+  """ID đơn vị tổ chức của assignment"""
+  unitId: Int!
+
+  """Đơn vị tổ chức của assignment"""
+  unit: Unit!
+}
+
+type RemoveAssignmentResponse {
+  """Dữ liệu trả về"""
+  data: RemoveAssignmentOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type GetAssignmentOutput {
+  """ID của assignment"""
+  id: Int!
+
+  """ID người dùng được phân công"""
+  userId: Int!
+
+  """Người dùng được phân công"""
+  user: User!
+
+  """ID chức vụ của assignment"""
+  positionId: Int!
+
+  """Chức vụ của assignment"""
+  position: Position!
+
+  """ID đơn vị tổ chức của assignment"""
+  unitId: Int!
+
+  """Đơn vị tổ chức của assignment"""
+  unit: Unit!
+}
+
+type GetAssignmentResponse {
+  """Dữ liệu trả về"""
+  data: GetAssignmentOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type GetAssignmentsPaginatedResponse {
+  """Dữ liệu trả về (danh sách)"""
+  data: [Assignment!]
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+
+  """Tổng số mục (cho phân trang)"""
+  totalCount: Int
+
+  """Còn trang tiếp theo không (cho phân trang)"""
+  hasNextPage: Boolean
+}
+
+type CreateAssignmentsOutput {
+  assignments: [Assignment!]!
+}
+
+type CreateAssignmentsResponse {
+  """Dữ liệu trả về"""
+  data: CreateAssignmentsOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type Document {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
 type Query {
   users: [User!]!
   user(id: Int!): User
   usersPaginated(input: GetUsersPaginatedInput!): GetUsersPaginatedResponse!
-  usersByRole(role: UserRole!): [User!]!
+  usersByRole(role: Role!): [User!]!
   checkEmailExists(email: String!): Boolean!
   userStatistics: String!
+  getUserRoles(userId: Int!): GetRolesResponse!
+  files: [File!]!
+  file(id: Int!): File!
+  streamFile(id: String!): StreamFileOutput!
   units(input: GetUnitsPaginatedInput!): GetUnitsPaginatedResponse!
   unit(id: Int!): GetUnitResponse!
   allUnits: GetAllUnitsResponse!
   unitTypes(input: GetUnitTypesPaginatedInput!): GetUnitTypesPaginatedResponse!
   unitType(id: Int!): GetUnitTypeResponse!
   positions(input: GetPositionsPaginatedInput!): GetPositionsPaginatedResponse!
+  allPositions: GetAllPositionsResponse!
   position(id: Int!): GetPositionResponse!
-  assignments: [Assignment!]!
-  assignment(id: Int!): Assignment!
+  assignments: GetAssignmentsPaginatedResponse!
+  assignmentsByUser(userId: Int!): GetAssignmentsPaginatedResponse!
+  assignment(id: Int!): GetAssignmentResponse!
+  documents: [Document!]!
+  document(id: Int!): Document!
 }
 
 input GetUsersPaginatedInput {
@@ -473,7 +716,7 @@ input GetUsersPaginatedInput {
   search: String
 
   """Lọc theo vai trò"""
-  role: UserRole
+  role: Role
 
   """Lọc theo trạng thái hoạt động"""
   isActive: Boolean
@@ -539,15 +782,20 @@ type Mutation {
   sentOtp(input: SentOtpInput!): SentOtpResponse!
   refreshToken: RefreshTokenReponse!
   logout: LogoutResponse!
-  createUser(createUserInput: CreateUserInput!): UserResponse!
+  createUser(createUserInput: CreateUserInput!, avatarImageFile: Upload): UserResponse!
   changePassword(input: ChangePasswordInput!): ChangePasswordResponse!
   getCurrentUserData: getCurrentUserDataReponse!
-  updateUser(updateUserInput: UpdateUserInput!): UserResponse!
+  updateUser(updateUserInput: UpdateUserInput!, avatarImageFile: Upload): UserResponse!
   removeUser(id: Int!): UserResponse!
   lockUser(id: Int!): UserResponse!
   unlockUser(id: Int!): UserResponse!
   resetPassword(id: Int!): UserResponse!
-  changeRoles(id: Int!, roles: [UserRole!]!): UserResponse!
+  changeRoles(id: Int!, roles: [Role!]!): UserResponse!
+  addRole(input: AddRoleInput!): AddRoleResponse!
+  removeRole(input: RemoveRoleInput!): RemoveRoleResponse!
+  createFile(createFileInput: CreateFileInput!): File!
+  updateFile(updateFileInput: UpdateFileInput!): File!
+  removeFile(id: Int!): File!
   createUnit(createUnitInput: CreateUnitInput!): CreateUnitResponse!
   updateUnit(updateUnitInput: UpdateUnitInput!): UpdateUnitResponse!
   removeUnit(id: Int!): RemoveUnitResponse!
@@ -557,9 +805,13 @@ type Mutation {
   createPosition(createPositionInput: CreatePositionInput!): CreatePositionResponse!
   updatePosition(updatePositionInput: UpdatePositionInput!): UpdatePositionResponse!
   removePosition(id: Int!): RemovePositionResponse!
-  createAssignment(createAssignmentInput: CreateAssignmentInput!): Assignment!
-  updateAssignment(updateAssignmentInput: UpdateAssignmentInput!): Assignment!
-  removeAssignment(id: Int!): Assignment!
+  createAssignment(createAssignmentInput: CreateAssignmentInput!): CreateAssignmentResponse!
+  createAssignments(createAssignmentsInput: [CreateAssignmentInput!]!): CreateAssignmentsResponse!
+  updateAssignment(updateAssignmentInput: UpdateAssignmentInput!): UpdateAssignmentResponse!
+  removeAssignment(id: Int!): RemoveAssignmentResponse!
+  createDocument(createDocumentInput: CreateDocumentInput!): Document!
+  updateDocument(updateDocumentInput: UpdateDocumentInput!): Document!
+  removeDocument(id: Int!): Document!
 }
 
 input SignInInput {
@@ -594,6 +846,9 @@ input CreateUserInput {
   isActive: Boolean = true
 }
 
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
 input ChangePasswordInput {
   newPassword: String!
 }
@@ -619,10 +874,43 @@ input UpdateUserInput {
   id: Int!
 
   """Danh sách vai trò mới"""
-  roles: [UserRole!]
+  roles: [Role!]
 
   """Ảnh đại diện mới"""
   avatar: String
+}
+
+input AddRoleInput {
+  """ID của user cần thêm role"""
+  userId: Int!
+
+  """Role cần thêm cho user"""
+  role: Role!
+}
+
+input RemoveRoleInput {
+  """ID của user cần xóa role"""
+  userId: Int!
+
+  """Role cần xóa khỏi user"""
+  role: Role!
+}
+
+input CreateFileInput {
+  driveFileId: String!
+  originalName: String!
+  mimeType: String!
+  allowedUserIds: [Int!]
+  isPublic: Boolean!
+}
+
+input UpdateFileInput {
+  driveFileId: String
+  originalName: String
+  mimeType: String
+  allowedUserIds: [Int!]
+  isPublic: Boolean
+  id: Int!
 }
 
 input CreateUnitInput {
@@ -699,11 +987,34 @@ input UpdatePositionInput {
 }
 
 input CreateAssignmentInput {
+  """ID người dùng được phân công"""
+  userId: Int!
+
+  """ID chức vụ của assignment"""
+  positionId: Int!
+
+  """ID đơn vị tổ chức của assignment"""
+  unitId: Int!
+}
+
+input UpdateAssignmentInput {
+  """ID người dùng được phân công"""
+  userId: Int
+
+  """ID chức vụ của assignment"""
+  positionId: Int
+
+  """ID đơn vị tổ chức của assignment"""
+  unitId: Int
+  id: Int!
+}
+
+input CreateDocumentInput {
   """Example field (placeholder)"""
   exampleField: Int!
 }
 
-input UpdateAssignmentInput {
+input UpdateDocumentInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!

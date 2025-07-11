@@ -40,6 +40,7 @@
     "cookie-parser": "^1.4.7",
     "googleapis": "^150.0.1",
     "graphql": "^16.11.0",
+    "graphql-upload-ts": "^2.1.2",
     "handlebars": "^4.7.8",
     "joi": "^17.13.3",
     "mysql2": "^3.14.1",

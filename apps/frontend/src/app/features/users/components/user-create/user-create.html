@@ -1,0 +1,107 @@
+
+@if(isOpen) {
+  <!-- Backdrop phủ mờ -->
+  <div class="user-create__backdrop">
+    <div class="user-create">
+      <form class="user-form" [formGroup]="userCreateForm" (ngSubmit)="onSubmit()">
+        <h2 class="user-form__title">Tạo người dùng</h2>
+        <p class="user-form__subtitle">Nhập thông tin người dùng mới</p>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email" class="form-group__label">Email</label>
+          <input
+            type="email"
+            id="email"
+            class="form-group__input"
+            formControlName="email"
+            placeholder="example@email.com"
+          />
+        </div>
+
+        <!-- Password + nút mặc định -->
+        <div class="form-group form-group--password">
+          <label for="password" class="form-group__label">Mật khẩu</label>
+          <div class="form-group__password-wrapper">
+            <input
+              type="text"
+              id="password"
+              class="form-group__input"
+              formControlName="password"
+              placeholder="Nhập mật khẩu"
+            />
+            <button type="button" class="form-group__default-password-button" (click)="useDefaultPassword()">
+              Sử dụng mật khẩu mặc định
+            </button>
+          </div>
+        </div>
+
+        <!-- Họ & Tên nằm ngang -->
+        <div class="form-row">
+          <!-- Họ -->
+          <div class="form-group">
+            <label for="lastName" class="form-group__label">Họ</label>
+            <input
+              type="text"
+              id="lastName"
+              class="form-group__input"
+              formControlName="lastName"
+              placeholder="Nguyễn"
+            />
+          </div>
+
+          <!-- Tên -->
+          <div class="form-group">
+            <label for="firstName" class="form-group__label">Tên</label>
+            <input
+              type="text"
+              id="firstName"
+              class="form-group__input"
+              formControlName="firstName"
+              placeholder="Văn A"
+            />
+          </div>
+        </div>
+
+        <!-- Kích hoạt -->
+        <div class="form-group">
+          <label class="form-group__label">
+            <input type="checkbox" formControlName="isActive" /> Kích hoạt tài khoản
+          </label>
+        </div>
+
+        <!-- Avatar -->
+        <div class="form-group">
+          <label for="avatarImageFile" class="form-group__label">Ảnh đại diện</label>
+          <input
+            type="file"
+            id="avatarImageFile"
+            class="form-group__input"
+            (change)="onFileChange($event)"
+            accept="image/*"
+          />
+
+          <!-- Ảnh preview -->
+          @if(avatarPreviewUrl){
+            <div class="avatar-preview">
+              <img [src]="avatarPreviewUrl" alt="Xem trước ảnh đại diện" />
+              <button type="button" class="avatar-preview__remove" (click)="clearAvatarPreview()">Xóa</button>
+            </div>
+          }
+        </div>
+
+
+        <!-- Actions -->
+        <div class="user-form__actions">
+          <button type="submit" class="user-form__submit-button" [disabled]="isLoading">
+            {{ isLoading ? 'Đang lưu...' : 'Tạo' }}
+          </button>
+          <button type="button" class="user-form__cancel-button" (click)="onFormClose()">
+            Hủy
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+

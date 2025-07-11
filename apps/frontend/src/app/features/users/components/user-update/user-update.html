@@ -1,0 +1,87 @@
+@if(isOpen) {
+  <!-- Backdrop phủ mờ -->
+  <div class="user-update__backdrop">
+    <div class="user-update">
+      <form class="user-form" [formGroup]="userUpdateForm" (ngSubmit)="onSubmit()">
+        <h2 class="user-form__title">Cập nhật người dùng</h2>
+        <p class="user-form__subtitle">Chỉnh sửa thông tin người dùng</p>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email" class="form-group__label">Email</label>
+          <input
+            type="email"
+            id="email"
+            class="form-group__input"
+            formControlName="email"
+            placeholder="example@email.com"
+          />
+        </div>
+
+        <!-- Họ & Tên nằm ngang -->
+        <div class="form-row">
+          <!-- Họ -->
+          <div class="form-group">
+            <label for="lastName" class="form-group__label">Họ</label>
+            <input
+              type="text"
+              id="lastName"
+              class="form-group__input"
+              formControlName="lastName"
+              placeholder="Nguyễn"
+            />
+          </div>
+
+          <!-- Tên -->
+          <div class="form-group">
+            <label for="firstName" class="form-group__label">Tên</label>
+            <input
+              type="text"
+              id="firstName"
+              class="form-group__input"
+              formControlName="firstName"
+              placeholder="Văn A"
+            />
+          </div>
+        </div>
+
+        <!-- Kích hoạt -->
+        <div class="form-group">
+          <label class="form-group__label">
+            <input type="checkbox" formControlName="isActive" /> Kích hoạt tài khoản
+          </label>
+        </div>
+
+        <!-- Avatar -->
+        <div class="form-group">
+          <label for="avatarImageFile" class="form-group__label">Ảnh đại diện</label>
+          <input
+            type="file"
+            id="avatarImageFile"
+            class="form-group__input"
+            (change)="onFileChange($event)"
+            accept="image/*"
+          />
+
+          <!-- Ảnh preview -->
+          @if(avatarPreviewUrl){
+            <div class="avatar-preview">
+              <img [src]="avatarPreviewUrl" alt="Xem trước ảnh đại diện" />
+              <button type="button" class="avatar-preview__remove" (click)="clearAvatarPreview()">Xóa</button>
+            </div>
+          }
+        </div>
+
+        <!-- Actions -->
+        <div class="user-form__actions">
+          <button type="submit" class="user-form__submit-button" [disabled]="isLoading">
+            {{ isLoading ? 'Đang cập nhật...' : 'Cập nhật' }}
+          </button>
+          <button type="button" class="user-form__cancel-button" (click)="onFormClose()">
+            Hủy
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

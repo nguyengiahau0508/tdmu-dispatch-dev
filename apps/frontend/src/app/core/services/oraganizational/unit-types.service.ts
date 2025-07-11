@@ -6,7 +6,7 @@ import { IApiResponse, IPaginatedResponse } from "../../../shared/models/api-res
 import { CREATE_UNIT_TYPE_MUTATION, REMOVE_UNIT_TYPE, UPDATE_UNIT_TYPE } from "../../../features/organizational/unit-types/graphql/unit-types.mutations";
 import { IGetUnitTypesPaginatedInput } from "../../../features/organizational/unit-types/interfaces/get-unit-types-paginated.interface";
 import { IUnitType } from "../../interfaces/oraganizational.interface";
-import { GET_UNIT_TYPES } from "../../../features/organizational/unit-types/graphql/unit-types.queries";
+import { GET_UNIT_TYPES_QUERY } from "../../../features/organizational/unit-types/graphql/unit-types.queries";
 import { IUpdateUnitTypeInput, IUpdateUnitTypeOuput } from "../../../features/organizational/unit-types/interfaces/unit-type-update.interface";
 
 
@@ -26,7 +26,7 @@ export class UnitTypesService {
     }, {
       input: IGetUnitTypesPaginatedInput;
     }>({
-      query: GET_UNIT_TYPES,
+      query: GET_UNIT_TYPES_QUERY,
       variables: { input },
       fetchPolicy: 'network-only'
     });
@@ -57,7 +57,7 @@ export class UnitTypesService {
     return this.apollo.query<{
       unitTypes: IPaginatedResponse<IUnitType>
     }>({
-      query: GET_UNIT_TYPES,
+      query: GET_UNIT_TYPES_QUERY,
       variables: { input }
     }).pipe(
       map((response) => response.data.unitTypes)
@@ -81,7 +81,7 @@ export class UnitTypesService {
     }>({
       mutation: UPDATE_UNIT_TYPE,
       variables: {
-        updateUnitTypeInput:input 
+        updateUnitTypeInput: input
       }
     }).pipe(
       map(response => response.data!.updateUnitType)

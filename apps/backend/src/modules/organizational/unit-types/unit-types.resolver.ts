@@ -13,7 +13,6 @@ import { Role } from 'src/common/enums/role.enums';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { createResponseMetadata } from 'src/common/helpers/metadata.helper';
 import { HttpStatus } from '@nestjs/common';
-import { Public } from 'src/common/decorators/public.decorator';
 
 @Resolver(() => UnitType)
 export class UnitTypesResolver {

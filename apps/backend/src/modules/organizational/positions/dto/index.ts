@@ -18,4 +18,7 @@ export * from './get-position/get-position.response';
 
 // Get Positions Paginated DTOs
 export * from './get-positions-paginated/get-positions-paginated.input';
-export * from './get-positions-paginated/get-positions-paginated.response'; 
+export * from './get-positions-paginated/get-positions-paginated.response';
+
+// Get All Positions DTOs
+export * from './get-all-positions.response'; 

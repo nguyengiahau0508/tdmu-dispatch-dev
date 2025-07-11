@@ -1,0 +1,140 @@
+.user-detail__backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.user-detail__modal {
+  background-color: var(--color-background-primary, #fff);
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-default, 0 2px 8px rgba(0,0,0,0.15));
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.user-detail__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--color-text-primary, #222);
+}
+
+.user-detail__content {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.user-detail__avatar {
+  flex-shrink: 0;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f3f3f3;
+  margin-right: 1rem;
+}
+
+.avatar__img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.user-detail__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.label {
+  font-weight: 500;
+  color: var(--color-text-secondary, #666);
+  min-width: 120px;
+  display: inline-block;
+}
+
+.role-badge {
+  display: inline-block;
+  background: #e0e7ff;
+  color: #3730a3;
+  border-radius: 6px;
+  padding: 0.15em 0.7em;
+  font-size: 0.95em;
+  margin-right: 0.3em;
+  margin-bottom: 0.2em;
+}
+
+.assignment-list {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.assignment-list li {
+  margin-bottom: 0.2em;
+}
+
+.unit {
+  font-weight: 500;
+  color: #2563eb;
+}
+
+.position {
+  color: #374151;
+}
+
+.user-detail__actions {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.close-btn {
+  background: #e5e7eb;
+  color: #222;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6em 1.5em;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.close-btn:hover {
+  background: #d1d5db;
+}

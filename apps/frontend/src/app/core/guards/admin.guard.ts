@@ -16,7 +16,6 @@ export class AdminGuard implements CanActivate {
     return this.userState.user$.pipe(
       take(1), // chỉ lấy giá trị đầu tiên
       map(user => {
-        console.log(user)
         if (!user) {
           this.router.navigate(['/auth']);
           return false;

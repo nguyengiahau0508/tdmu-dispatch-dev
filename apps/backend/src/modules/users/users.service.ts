@@ -5,28 +5,45 @@ import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/create-user/create-user.input';
 import { UpdateUserInput } from './dto/update-user/update-user.input';
-import { Metadata } from 'src/common/graphql/metadata.dto';
 import { Like } from 'typeorm';
 import { Role } from 'src/common/enums/role.enums';
 import { GetUsersPaginatedInput } from './dto/get-users-paginated/get-users-paginated.input';
-import { GetUsersPaginatedResponse } from './dto/get-users-paginated/get-users-paginated.response';
+import { PageMetaDto } from 'src/common/shared/pagination/page-meta.dto';
+import { PageDto } from 'src/common/shared/pagination/page.dto';
+import { GoogleDriveService } from 'src/integrations/google-drive/google-drive.service';
+import { FileUpload } from 'graphql-upload-ts';
+import { FilesService } from '../files/files.service';
 
 const SALT_OR_ROUNDS = 10;
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private readonly repository: Repository<User>
+    @InjectRepository(User) private readonly repository: Repository<User>,
+    private readonly googleDriveService: GoogleDriveService,
+    private filesService: FilesService
   ) { }
 
-  async create(createUserInput: CreateUserInput): Promise<User> {
+  async create(createUserInput: CreateUserInput, avatarImageFile?: FileUpload): Promise<User> {
+    let avatarDriveFileId: string | undefined = undefined
+    if (avatarImageFile) {
+      const fileId = await this.googleDriveService.uploadFile(avatarImageFile)
+      avatarDriveFileId = fileId
+    }
+
     const existing = await this.findOneByEmail(createUserInput.email);
     if (existing) throw new BadRequestException(`Email đã được sử`);
 
     const hash = await bcrypt.hash(createUserInput.password, SALT_OR_ROUNDS);
     const newUser = this.repository.create({
       ...createUserInput,
-      passwordHash: hash
+      passwordHash: hash,
+      avatarFile: avatarDriveFileId ? {
+        driveFileId: avatarDriveFileId,
+        isPublic: true,
+        mimeType: avatarImageFile?.mimetype,
+        originalName: avatarImageFile?.filename
+      } : undefined
     })
     const savedNewUser = await this.repository.save(newUser);
     if (!savedNewUser) throw new InternalServerErrorException()
@@ -58,24 +75,59 @@ export class UsersService {
   findOneById(id: number) {
     return this.repository.findOne({
       where: {
-        id
+        id,
+      },
+      relations: {
+        assignments: true,
       }
     })
   }
 
-  async update(id: number, updateUserInput: UpdateUserInput): Promise<User> {
-    const user = await this.repository.findOne({ where: { id } });
+
+  async update(
+    id: number,
+    updateUserInput: UpdateUserInput,
+    avatarImageFile?: FileUpload
+  ): Promise<User> {
+    const user = await this.repository.findOne({
+      where: { id },
+      relations: { avatarFile: true }, // đảm bảo load avatarFile
+    });
     if (!user) throw new BadRequestException(`User with ID ${id} not found`);
     // Không cho phép cập nhật password qua update này
+
+    // Logic xử lý avatar file mới
+    if (avatarImageFile) {
+      const newDriveFileId = await this.googleDriveService.uploadFile(avatarImageFile);
+
+      // Nếu user đã có file cũ => Xóa file cũ khỏi Drive
+      if (user.avatarFile) {
+        await this.googleDriveService.deleteFile(user.avatarFile.driveFileId);
+      }
+
+      // Tạo File entity mới
+      const newAvatarFile = this.filesService.create({
+        driveFileId: newDriveFileId,
+        isPublic: true,
+        mimeType: avatarImageFile.mimetype,
+        originalName: avatarImageFile.filename,
+        allowedUserIds: [], // hoặc null/undefined tùy thiết kế
+      });
+      user.avatarFile = newAvatarFile;
+    }
+
+    // Update các trường khác
     if (updateUserInput.email !== undefined) user.email = updateUserInput.email;
     if (updateUserInput.firstName !== undefined) user.firstName = updateUserInput.firstName;
     if (updateUserInput.lastName !== undefined) user.lastName = updateUserInput.lastName;
     if (updateUserInput.isActive !== undefined) user.isActive = updateUserInput.isActive;
     if (updateUserInput.avatar !== undefined) user.avatar = updateUserInput.avatar;
     if (updateUserInput.roles !== undefined) user.roles = updateUserInput.roles;
+
     const updated = await this.repository.save(user);
     return updated;
   }
+
 
   async remove(id: number): Promise<User> {
     const user = await this.repository.findOne({ where: { id } });
@@ -85,7 +137,7 @@ export class UsersService {
     return updated;
   }
 
-  async findPaginated(input: GetUsersPaginatedInput): Promise<GetUsersPaginatedResponse> {
+  async findPaginated(input: GetUsersPaginatedInput): Promise<PageDto<User>> {
     const { search, skip, take = 10, role, isActive } = input;
     const where: any = {};
     if (search) {
@@ -98,23 +150,15 @@ export class UsersService {
     if (typeof isActive === 'boolean') {
       where["isActive"] = isActive;
     }
-    const [data, totalCount] = await this.repository.findAndCount({
+    const [data, itemCount] = await this.repository.findAndCount({
       where,
       skip,
       take,
     });
-    const metadata: Metadata = {
-      statusCode: 200,
-      message: 'Lấy danh sách user phân trang thành công',
-      timestamp: new Date().toISOString(),
-      path: '',
-    };
-    return {
-      data,
-      metadata,
-      totalCount,
-      hasNextPage: skip + take < totalCount,
-    };
+
+    // Tạo metadata cho phân trang
+    const pageMetaDto = new PageMetaDto({ pageOptionsDto: input, itemCount });
+    return new PageDto(data, pageMetaDto);
   }
 
   async resetPassword(id: number): Promise<User> {
@@ -132,6 +176,47 @@ export class UsersService {
     const user = await this.repository.findOne({ where: { id } });
     if (!user) throw new BadRequestException(`User with ID ${id} not found`);
     user.roles = roles;
+    const updated = await this.repository.save(user);
+    return updated;
+  }
+
+  async addRole(id: number, role: Role): Promise<User> {
+    const user = await this.repository.findOne({ where: { id } });
+    if (!user) throw new BadRequestException(`User with ID ${id} not found`);
+
+    // Kiểm tra xem role đã tồn tại chưa
+    if (user.roles && user.roles.includes(role)) {
+      throw new BadRequestException(`User đã có role ${role}`);
+    }
+
+    // Thêm role mới vào danh sách
+    user.roles = user.roles ? [...user.roles, role] : [role];
+    const updated = await this.repository.save(user);
+    return updated;
+  }
+
+  async removeRole(id: number, role: Role): Promise<User> {
+    const user = await this.repository.findOne({ where: { id } });
+    if (!user) throw new BadRequestException(`User with ID ${id} not found`);
+
+    // Kiểm tra xem role có tồn tại không
+    if (!user.roles || !user.roles.includes(role)) {
+      throw new BadRequestException(`User không có role ${role}`);
+    }
+
+    // Kiểm tra không cho phép xóa BASIC_USER role (role cơ bản)
+    if (role === Role.BASIC_USER) {
+      throw new BadRequestException(`Không thể xóa role ${Role.BASIC_USER} - đây là role cơ bản`);
+    }
+
+    // Xóa role khỏi danh sách
+    user.roles = user.roles.filter(r => r !== role);
+
+    // Đảm bảo user luôn có ít nhất một role
+    if (user.roles.length === 0) {
+      user.roles = [Role.BASIC_USER];
+    }
+
     const updated = await this.repository.save(user);
     return updated;
   }
@@ -160,5 +245,11 @@ export class UsersService {
       inactive: users.filter(u => !u.isActive).length
     };
     return { byRole, byStatus };
+  }
+
+  async getRoles(id: number): Promise<Role[]> {
+    const user = await this.repository.findOne({ where: { id } });
+    if (!user) throw new BadRequestException(`User with ID ${id} not found`);
+    return user.roles || [];
   }
 }

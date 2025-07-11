@@ -9,6 +9,7 @@ import { RemovePositionResponse } from './dto/remove-position/remove-position.re
 import { GetPositionResponse } from './dto/get-position/get-position.response';
 import { GetPositionsPaginatedInput } from './dto/get-positions-paginated/get-positions-paginated.input';
 import { GetPositionsPaginatedResponse } from './dto/get-positions-paginated/get-positions-paginated.response';
+import { GetAllPositionsResponse } from './dto';
 import { Role } from 'src/common/enums/role.enums';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { createResponseMetadata } from 'src/common/helpers/metadata.helper';
@@ -37,6 +38,15 @@ export class PositionsResolver {
       data: pageData.data,
       totalCount: pageData.totalCount,
       hasNextPage: pageData.hasNextPage,
+    };
+  }
+
+  @Query(() => GetAllPositionsResponse, { name: 'allPositions' })
+  async findAllPositions(): Promise<GetAllPositionsResponse> {
+    const data = await this.positionsService.findAll();
+    return {
+      metadata: createResponseMetadata(HttpStatus.OK, 'Lấy tất cả chức vụ thành công'),
+      data,
     };
   }
 

@@ -1,7 +1,7 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
-import { BadRequestException, HttpStatus, Req } from '@nestjs/common';
+import { BadRequestException, HttpStatus } from '@nestjs/common';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/enums/role.enums';
 import { createResponseMetadata } from 'src/common/helpers/metadata.helper';
@@ -14,6 +14,13 @@ import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { getCurrentUserDataReponse } from './dto/get-current-user-data/get-current-user-data.response';
 import { GetUsersPaginatedInput } from './dto/get-users-paginated/get-users-paginated.input';
 import { GetUsersPaginatedResponse } from './dto/get-users-paginated/get-users-paginated.response';
+import { AddRoleInput } from './dto/add-role/add-role.input';
+import { AddRoleResponse } from './dto/add-role/add-role.response';
+import { RemoveRoleInput } from './dto/remove-role/remove-role.input';
+import { RemoveRoleResponse } from './dto/remove-role/remove-role.response';
+import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
+import { GetRolesOutput } from './dto/get-roles/get-roles.output';
+import { GetRolesResponse } from './dto/get-roles/get-roles.response';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -21,8 +28,12 @@ export class UsersResolver {
 
   @Mutation(() => UserResponse)
   @Roles(Role.SYSTEM_ADMIN)
-  async createUser(@Args('createUserInput') createUserInput: CreateUserInput): Promise<UserResponse> {
-    const newUser = await this.usersService.create(createUserInput)
+  async createUser(
+    @Args('createUserInput') createUserInput: CreateUserInput,
+    @Args({ name: 'avatarImageFile', type: () => GraphQLUpload, nullable: true }) avatarImageFile?: FileUpload
+    //@Args('avatarImageFile') avatarImageFile?: FileUpload
+  ): Promise<UserResponse> {
+    const newUser = await this.usersService.create(createUserInput, avatarImageFile)
     return {
       metadata: createResponseMetadata(HttpStatus.CREATED, "Người dùng đã được tạo thành công"),
       data: newUser
@@ -71,8 +82,11 @@ export class UsersResolver {
 
   @Mutation(() => UserResponse)
   @Roles(Role.SYSTEM_ADMIN)
-  async updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput): Promise<UserResponse> {
-    const updatedUser = await this.usersService.update(updateUserInput.id, updateUserInput);
+  async updateUser(
+    @Args('updateUserInput') updateUserInput: UpdateUserInput,
+    @Args({ name: 'avatarImageFile', type: () => GraphQLUpload, nullable: true }) avatarImageFile?: FileUpload
+  ): Promise<UserResponse> {
+    const updatedUser = await this.usersService.update(updateUserInput.id, updateUserInput, avatarImageFile);
     return {
       metadata: createResponseMetadata(HttpStatus.ACCEPTED, 'Cập nhật người dùng thành công'),
       data: updatedUser
@@ -91,7 +105,13 @@ export class UsersResolver {
 
   @Query(() => GetUsersPaginatedResponse, { name: 'usersPaginated' })
   async usersPaginated(@Args('input') input: GetUsersPaginatedInput): Promise<GetUsersPaginatedResponse> {
-    return this.usersService.findPaginated(input);
+    const pageData = await this.usersService.findPaginated(input)
+    return {
+      metadata: createResponseMetadata(HttpStatus.OK, "Lấy danh sách user thành công"),
+      data: pageData.data,
+      totalCount: pageData.meta.itemCount,
+      hasNextPage: pageData.meta.hasNextPage
+    }
   }
 
   @Mutation(() => UserResponse)
@@ -137,6 +157,34 @@ export class UsersResolver {
     };
   }
 
+  @Mutation(() => AddRoleResponse)
+  @Roles(Role.SYSTEM_ADMIN)
+  async addRole(
+    @Args('input') input: AddRoleInput
+  ): Promise<AddRoleResponse> {
+    const user = await this.usersService.addRole(input.userId, input.role);
+    return {
+      metadata: createResponseMetadata(HttpStatus.ACCEPTED, 'Thêm vai trò thành công'),
+      data: {
+        user
+      }
+    };
+  }
+
+  @Mutation(() => RemoveRoleResponse)
+  @Roles(Role.SYSTEM_ADMIN)
+  async removeRole(
+    @Args('input') input: RemoveRoleInput
+  ): Promise<RemoveRoleResponse> {
+    const user = await this.usersService.removeRole(input.userId, input.role);
+    return {
+      metadata: createResponseMetadata(HttpStatus.ACCEPTED, 'Xóa vai trò thành công'),
+      data: {
+        user
+      }
+    };
+  }
+
   @Query(() => [User], { name: 'usersByRole' })
   async usersByRole(@Args('role', { type: () => Role }) role: Role): Promise<User[]> {
     return this.usersService.findByRole(role);
@@ -151,5 +199,16 @@ export class UsersResolver {
   async userStatistics(): Promise<string> {
     const stats = await this.usersService.statistics();
     return JSON.stringify(stats);
+  }
+
+  @Query(() => GetRolesResponse, { name: 'getUserRoles' })
+  async getUserRoles(@Args('userId', { type: () => Int }) userId: number): Promise<GetRolesResponse> {
+    const roles = await this.usersService.getRoles(userId);
+    return {
+      metadata: createResponseMetadata(HttpStatus.OK, 'Lấy danh sách role thành công'),
+      data: {
+        roles
+      }
+    };
   }
 }

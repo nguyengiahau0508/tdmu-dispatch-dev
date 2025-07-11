@@ -1,5 +1,6 @@
 import { ObjectType, Field, Int, registerEnumType } from '@nestjs/graphql';
 import { Role } from 'src/common/enums/role.enums';
+import { File } from 'src/modules/files/entities/file.entity';
 import { Assignment } from 'src/modules/organizational/assignments/entities/assignment.entity';
 import {
   Entity,
@@ -8,12 +9,15 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToOne,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 
 
 // Đăng ký enum với GraphQL
 registerEnumType(Role, {
-  name: 'UserRole', // Tên này sẽ được sử dụng trong GraphQL schema
+  name: 'Role', // Tên này sẽ được sử dụng trong GraphQL schema
   description: 'Các vai trò của người dùng trong hệ thống',
 });
 
@@ -51,7 +55,7 @@ export class User {
   isFirstLogin: boolean;
 
   @Column({ nullable: true, type: 'text' })
-  @Field(() => String, { description: "Ảnh đại diện của người dùng" })
+  @Field(() => String, { nullable: true, description: "Ảnh đại diện của người dùng" })
   avatar: string
 
   @Column({
@@ -63,6 +67,7 @@ export class User {
   roles: Role[];
 
   @OneToMany(() => Assignment, assignment => assignment.user)
+  @Field(() => [Assignment])
   assignments: Assignment[];
 
   @CreateDateColumn()
@@ -80,4 +85,13 @@ export class User {
     const last = this.lastName || '';
     return `${first} ${last}`.trim();
   }
+
+  @Column({ nullable: true })
+  @Field(() => Int, { nullable: true })
+  avatarFileId: number;
+
+  @ManyToOne(() => File, { nullable: true, cascade: true })
+  @JoinColumn({ name: 'avatarFileId' }) // RÀNG BUỘC: Dùng đúng cột avatarFileId bạn tự khai báo
+  @Field(() => File, { nullable: true })
+  avatarFile: File;
 }

@@ -1,1 +1,122 @@
-<p>users works!</p>
+<div class="users">
+  <div class="users__header">
+    <div class="header__group">
+      <div class="header__search">
+        <input type="text" placeholder="Tìm loại đơn vị..." />
+      </div>
+      <div class="header__add">
+        <button (click)="toggleUserCreate()">
+          <img src="/icons/add.svg" alt="Thêm" />
+          Thêm
+        </button>
+      </div>
+    </div>
+    <div class="header__group header__group--block">
+      <app-pagination [totalCount]="totalCount || 0" [pageOptions]="pageOptions" (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)" (orderChange)="onOrderChange($event)"></app-pagination>
+    </div>
+  </div>
+  <div class="users__main">
+    @if (users.length > 0) {
+    <table class="users__table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Ảnh</th>
+          <th>Họ và tên</th>
+          <th>Email</th>
+          <th>Trạng thái</th>
+          <th>Ngày tạo</th>
+          <th><th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (user of users; track user.id) {
+        <tr class="user-row">
+          <td>{{ user.id }}</td>
+
+          <td class="avatar__cell">
+            <div class="avatar__wrapper">
+              @if (user.avatarFileId; as avatarId) {
+                <app-image-preview [fileId]="avatarId" />
+              } @else {
+                <img class="avatar__img" src= '/icons/account_circle.svg'>
+              }
+            </div>
+          </td>
+
+
+          <td>
+            {{user.fullName}}
+          </td>
+          <td  >
+            {{user.email}}
+          </td>
+          <td  >
+            {{user.isActive ? 'Hoạt động': 'Bị khóa'}}
+          </td>
+          <td  >
+            {{ user.createdAt | date:'dd/MM/yyyy' }}
+          </td>
+          <td class="row-actions">
+            <div class="actions-menu">
+              <button class="menu-button" (click)="toggleMenu(user.id)">⋮</button>
+
+              @if (selectedMenuId === user.id) {
+              <div class="dropdown-menu" (mouseleave)="toggleMenu(user.id)">
+                <button (click)="onViewDetailUser(user)">Xem chi tiết</button>
+                <button (click)="onUpdateUser(user)">Cập nhật thông tin</button>
+                <button (click)="onBlockUserAccount(user)">Khóa tài khoản</button>
+                <button (click)="onManageUserRole(user)">Phân quyền</button>
+                <button (click)="onManageUserPosition(user)">Chức danh </button>
+              </div>
+              }
+            </div>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+    } @else {
+    <p>Chưa có dữ liệu loại đơn vị.</p>
+    }
+  </div>
+</div>
+
+<app-user-create [isOpen]="isUserCreateOpen" (close)="isUserCreateOpen = false" (createdSuccessfully)="refreshUsers()"/>
+
+@if(selectedUser){
+<app-user-update
+  [isOpen]="isUserUpdateOpen"
+  [user]="selectedUser"
+  (close)="toggleUserUpdate()"
+  (updatedSuccessfully)="onUserUpdated()"
+/>
+}
+
+@if(selectedUserRoles){
+<app-user-roles
+  [isOpen]="isUserRolesOpen"
+  [user]="selectedUserRoles"
+  (close)="toggleUserRoles()"
+  (updated)="onUserRolesUpdated()"
+/>
+}
+
+@if(selectedUserPoitions){
+<app-user-poitions
+  [isOpen]="isUserPoitionsOpen"
+  [user]="selectedUserPoitions"
+  (close)="toggleUserPoitions()"
+  (updated)="onUserPoitionsUpdated()"
+/>
+}
+
+@if(selectedUserDetailId){
+<app-user-detail
+  [isOpen]="isUserDetailOpen"
+  [userId]="selectedUserDetailId"
+  (close)="toggleUserDetail()"
+/>
+}
+

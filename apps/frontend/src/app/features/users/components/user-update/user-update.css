@@ -1,0 +1,219 @@
+/* ===== Backdrop (Wrapper ngoài) ===== */
+.user-update__backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+/* ===== Container chính ===== */
+.user-update {
+  background-color: var(--color-background-primary);
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-default);
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===== Form ===== */
+.user-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-form__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.user-form__subtitle {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+/* ===== Group Input ===== */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group__label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.35rem;
+}
+
+.form-group__input,
+.form-group__textarea {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.95rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  box-sizing: border-box;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group__input:focus,
+.form-group__textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
+.form-group__textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* ===== Họ & Tên ngang ===== */
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+/* ===== Checkbox Kích hoạt ===== */
+.form-group input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+/* ===== Actions ===== */
+.user-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.user-form__submit-button,
+.user-form__cancel-button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+/* Nút "Cập nhật" */
+.user-form__submit-button {
+  background-color: var(--color-primary);
+  color: var(--color-text-on-primary);
+}
+
+.user-form__submit-button:hover {
+  opacity: 0.9;
+}
+
+.user-form__submit-button:active {
+  transform: scale(0.98);
+}
+
+/* Nút "Hủy" */
+.user-form__cancel-button {
+  background-color: #e0e0e0;
+  color: var(--color-text-secondary);
+}
+
+.user-form__cancel-button:hover {
+  opacity: 0.85;
+}
+
+/* ===== Thanh cuộn mềm ===== */
+.user-update::-webkit-scrollbar {
+  width: 8px;
+}
+
+.user-update::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+.user-update::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* ===== Responsive nhỏ gọn ===== */
+@media (max-width: 640px) {
+  .user-update {
+    padding: 1.5rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .user-form__actions {
+    flex-direction: column;
+  }
+
+  .user-form__submit-button,
+  .user-form__cancel-button {
+    width: 100%;
+  }
+}
+
+/* ===== Avatar Preview ===== */
+.avatar-preview {
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.avatar-preview img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-border);
+}
+
+.avatar-preview__remove {
+  padding: 0.25rem 0.5rem;
+  background-color: #ff4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.avatar-preview__remove:hover {
+  background-color: #cc3333;
+}

@@ -53,9 +53,9 @@
           <img src="/icons/apps.svg" alt="Ứng dụng" title="Ứng dụng">
         </button>
         <div class="avatar">
-          @if(currentUser){
-          <img class="avatar__img" [src]="currentUser.avatar? currentUser.avatar: '/icons/account_circle.svg'"
-            [alt]="currentUser.fullName" [title]="currentUser!.fullName">
+          @if(currentUser) {
+          <img class="avatar__img" [src]="currentUser.avatarFileId ? avatarUrl : '/icons/account_circle.svg'"
+            [alt]="currentUser.fullName" [title]="currentUser.fullName">
           }
         </div>
       </div>

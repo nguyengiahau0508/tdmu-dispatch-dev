@@ -5,6 +5,7 @@ import { IUser } from '../../core/interfaces/user.interface';
 import { Subscription } from 'rxjs';
 import { AppsLauncher } from '../components/apps-launcher/apps-launcher';
 import { AuthService } from '../../core/services/auth.service';
+import { FileService } from '../../core/services/file.service';
 
 @Component({
   selector: 'app-main-layout',
@@ -19,20 +20,29 @@ export class MainLayout {
 
   isAppsLauncherOpen = false
 
+  avatarUrl: string | null = null
   private subscriptions = new Subscription();
   constructor(
     private renderer: Renderer2,
     private userState: UserState,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private fileService: FileService
   ) {
     const storedTheme = localStorage.getItem('theme');
     this.isDarkMode = storedTheme === 'dark';
     this.updateThemeClass();
 
     this.subscriptions.add(
-      this.userState.user$.subscribe(user => {
+      this.userState.user$.subscribe(async user => {
         this.currentUser = user;
+
+        if (user && user.avatarFileId) {
+          this.avatarUrl = await this.fileService.getFileUrl(user.avatarFileId);
+          console.log(this.avatarUrl)
+        } else {
+          this.avatarUrl = null;
+        }
       })
     );
   }

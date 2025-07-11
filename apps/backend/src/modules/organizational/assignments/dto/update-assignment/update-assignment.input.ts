@@ -1,4 +1,4 @@
-import { CreateAssignmentInput } from './create-assignment.input';
+import { CreateAssignmentInput } from '../create-assignment/create-assignment.input';
 import { InputType, Field, Int, PartialType } from '@nestjs/graphql';
 
 @InputType()

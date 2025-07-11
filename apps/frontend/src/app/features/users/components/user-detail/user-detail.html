@@ -1,0 +1,59 @@
+@if(isOpen) {
+  <div class="user-detail__backdrop">
+    <div class="user-detail__modal">
+      <h2 class="user-detail__title">Thông tin chi tiết người dùng</h2>
+      @if(loading) {
+        <div>Đang tải dữ liệu...</div>
+      } @else if(error) {
+        <div class="error">{{ error }}</div>
+      } @else if(user) {
+        <div class="user-detail__content">
+          <div class="user-detail__avatar">
+            @if(user.avatarFileId) {
+              <app-image-preview [fileId]="user.avatarFileId" alt="Avatar" />
+            } @else {
+              <img class="avatar__img" src="/icons/account_circle.svg" alt="Avatar">
+            }
+          </div>
+          <div class="user-detail__info">
+            <div class="info-row"><span class="label">ID:</span> <span>{{ user.id }}</span></div>
+            <div class="info-row"><span class="label">Họ và tên:</span> <span>{{ user.fullName || (user.lastName + ' ' + user.firstName) }}</span></div>
+            <div class="info-row"><span class="label">Email:</span> <span>{{ user.email }}</span></div>
+            <div class="info-row"><span class="label">Trạng thái:</span> <span>{{ user.isActive ? 'Hoạt động' : 'Bị khóa' }}</span></div>
+            <div class="info-row"><span class="label">Ngày tạo:</span> <span>{{ user.createdAt | date:'dd/MM/yyyy HH:mm' }}</span></div>
+            <div class="info-row"><span class="label">Vai trò:</span>
+              <span>
+                @if(roles.length > 0) {
+                  @for(role of roles; track role) {
+                    <span class="role-badge">{{ role }}</span>
+                  }
+                } @else {
+                  <span>Chưa có vai trò</span>
+                }
+              </span>
+            </div>
+            <div class="info-row">
+              <span class="label">Chức vụ/Đơn vị:</span>
+              <span>
+                @if(assignments.length > 0) {
+                  <ul class="assignment-list">
+                    @for(assignment of assignments; track assignment.id) {
+                      <li>
+                        <span class="unit">{{ assignment.unit.unitName }}</span> - <span class="position">{{ assignment.position.positionName }}</span>
+                      </li>
+                    }
+                  </ul>
+                } @else {
+                  <span>Chưa có chức vụ</span>
+                }
+              </span>
+            </div>
+          </div>
+        </div>
+      }
+      <div class="user-detail__actions">
+        <button type="button" class="close-btn" (click)="onClose()">Đóng</button>
+      </div>
+    </div>
+  </div>
+}

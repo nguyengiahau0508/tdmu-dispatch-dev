@@ -1,14 +1,15 @@
-import { ApplicationConfig, provideAppInitializer, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, LOCALE_ID, provideAppInitializer, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideToastr } from 'ngx-toastr';
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideApollo } from 'apollo-angular';
 import { apolloOptionsFactory } from './core/config/apollo-options.factory';
-import { provideHttpClient } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient } from '@angular/common/http';
 import { appInitializerFactory } from './core/init/app.init';
 import { providePrimeNG } from 'primeng/config';
 import { Tdmu } from '../theme/tdmu';
+import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(),
@@ -23,6 +24,11 @@ export const appConfig: ApplicationConfig = {
       theme: {
         preset: Tdmu
       }
-    })
+    }),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
   ]
 };

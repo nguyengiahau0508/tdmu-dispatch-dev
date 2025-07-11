@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { UserState } from '../../core/state/user.state';
 import { AuthService } from '../../core/services/auth.service';
 import { routeAnimations } from '../../shared/animations/route-animations';
+import { FileService } from '../../core/services/file.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -20,13 +21,14 @@ export class AdminLayout {
   currentUrl = ''
 
   isAppsLauncherOpen = false
-
+  avatarUrl: string | null = null
   private subscriptions = new Subscription();
   constructor(
     private renderer: Renderer2,
     private userState: UserState,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private fileService: FileService
   ) {
     const storedTheme = localStorage.getItem('theme');
     this.isDarkMode = storedTheme === 'dark';
@@ -39,8 +41,15 @@ export class AdminLayout {
     })
 
     this.subscriptions.add(
-      this.userState.user$.subscribe(user => {
+      this.userState.user$.subscribe(async user => {
         this.currentUser = user;
+
+        if (user && user.avatarFileId) {
+          this.avatarUrl = await this.fileService.getFileUrl(user.avatarFileId);
+          console.log(this.avatarUrl)
+        } else {
+          this.avatarUrl = null;
+        }
       })
     );
   }

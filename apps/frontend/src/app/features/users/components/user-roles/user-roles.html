@@ -1,0 +1,35 @@
+@if(isOpen) {
+  <div class="user-roles__backdrop">
+    <div class="user-roles">
+      <form class="roles-form" [formGroup]="rolesForm" (ngSubmit)="onSubmit()">
+        <h2 class="roles-form__title">Phân quyền người dùng</h2>
+        <p class="roles-form__subtitle">Chọn vai trò cho người dùng <b>{{ user.fullName }}</b></p>
+
+        <div class="form-group">
+          <label class="form-group__label">Danh sách vai trò</label>
+          <div class="roles-list">
+            @for (role of allRoles; track role) {
+              <label class="role-item">
+                <input
+                  type="checkbox"
+                  [checked]="selectedRoles.includes(role)"
+                  (change)="onRoleChange(role, $any($event.target).checked)"
+                />
+                <span>{{ role }}</span>
+              </label>
+            }
+          </div>
+        </div>
+
+        <div class="roles-form__actions">
+          <button type="submit" class="roles-form__submit-button" [disabled]="isLoading">
+            {{ isLoading ? 'Đang lưu...' : 'Lưu' }}
+          </button>
+          <button type="button" class="roles-form__cancel-button" (click)="onClose()">
+            Hủy
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

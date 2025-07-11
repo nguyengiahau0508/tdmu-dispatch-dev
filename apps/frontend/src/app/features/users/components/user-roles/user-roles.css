@@ -1,0 +1,146 @@
+/* ===== Backdrop (Wrapper ngoài) ===== */
+.user-roles__backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+/* ===== Container chính ===== */
+.user-roles {
+  background-color: var(--color-background-primary);
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-default);
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===== Form ===== */
+.roles-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.roles-form__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.roles-form__subtitle {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group__label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.roles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.role-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: var(--color-text-primary);
+}
+
+.role-item input[type="checkbox"] {
+  accent-color: var(--color-primary);
+  width: 18px;
+  height: 18px;
+}
+
+/* ===== Actions ===== */
+.roles-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.roles-form__submit-button,
+.roles-form__cancel-button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.roles-form__submit-button {
+  background-color: var(--color-primary);
+  color: var(--color-text-on-primary);
+}
+
+.roles-form__submit-button:hover {
+  opacity: 0.9;
+}
+
+.roles-form__submit-button:active {
+  transform: scale(0.98);
+}
+
+.roles-form__cancel-button {
+  background-color: #e0e0e0;
+  color: var(--color-text-secondary);
+}
+
+.roles-form__cancel-button:hover {
+  opacity: 0.85;
+}
+
+/* ===== Responsive nhỏ gọn ===== */
+@media (max-width: 640px) {
+  .user-roles {
+    padding: 1.5rem;
+  }
+  .roles-form__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .roles-form__submit-button,
+  .roles-form__cancel-button {
+    width: 100%;
+  }
+}

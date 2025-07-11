@@ -1,18 +1,7 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { Metadata } from 'src/common/graphql/metadata.dto';
 import { User } from '../../entities/user.entity';
+import { PaginatedResponse } from 'src/common/graphql/api-response.dto';
 
 @ObjectType()
-export class GetUsersPaginatedResponse {
-  @Field(() => [User], { nullable: true })
-  data?: User[];
-
-  @Field(() => Metadata)
-  metadata: Metadata;
-
-  @Field(() => Int)
-  totalCount: number;
-
-  @Field(() => Boolean)
-  hasNextPage: boolean;
-} 
+export class GetUsersPaginatedResponse extends PaginatedResponse(User) { } 

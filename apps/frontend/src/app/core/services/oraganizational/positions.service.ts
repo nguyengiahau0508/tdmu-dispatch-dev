@@ -1,8 +1,8 @@
 import { inject, Injectable } from "@angular/core";
 import { Apollo, QueryRef } from "apollo-angular";
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
-import { GET_POSITIONS, GET_ALL_POSITIONS } from '../../../features/organizational/positions/graphql/positions.queries';
+import { map, tap } from "rxjs/operators";
+import { GET_POSITIONS_QUERY, GET_ALL_POSITIONS_QUERY } from '../../../features/organizational/positions/graphql/positions.queries';
 import { CREATE_POSITION_MUTATION, UPDATE_POSITION_MUTATION, REMOVE_POSITION_MUTATION } from '../../../features/organizational/positions/graphql/positions.mutations';
 import { IPosition } from '../../interfaces/oraganizational.interface';
 import { IGetPositionsPaginatedInput } from '../../../features/organizational/positions/interfaces/get-positions-paginated.interface';
@@ -26,7 +26,7 @@ export class PositionsService {
     }, {
       input: IGetPositionsPaginatedInput;
     }>({
-      query: GET_POSITIONS,
+      query: GET_POSITIONS_QUERY,
       variables: { input },
       fetchPolicy: 'network-only'
     });
@@ -40,7 +40,7 @@ export class PositionsService {
     return this.apollo.query<{
       allPositions: IApiResponse<IPosition[]>
     }>({
-      query: GET_ALL_POSITIONS
+      query: GET_ALL_POSITIONS_QUERY
     }).pipe(
       map(response => response.data.allPositions)
     );

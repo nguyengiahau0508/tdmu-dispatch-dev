@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Apollo, QueryRef } from 'apollo-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { GET_UNITS, GET_UNIT, GET_ALL_UNIT } from '../../../features/organizational/units/graphql/units.queries';
+import { GET_UNITS_QUERY, GET_UNIT_QUERY, GET_ALL_UNIT_QUERY } from '../../../features/organizational/units/graphql/units.queries';
 import { CREATE_UNIT_MUTATION, UPDATE_UNIT_MUTATION, REMOVE_UNIT_MUTATION } from '../../../features/organizational/units/graphql/units.mutations';
 import { IUnit } from '../../interfaces/oraganizational.interface';
 import { IGetUnitsPaginatedInput } from '../../../features/organizational/units/interfaces/get-units-paginated.interface';
@@ -28,7 +28,7 @@ export class UnitsService {
     }, {
       input: IGetUnitsPaginatedInput;
     }>({
-      query: GET_UNITS,
+      query: GET_UNITS_QUERY,
       variables: { input },
       fetchPolicy: 'network-only'
     });
@@ -46,7 +46,7 @@ export class UnitsService {
         IUnit[]
       >
     }>({
-      query: GET_ALL_UNIT
+      query: GET_ALL_UNIT_QUERY
     }).pipe(
       map(response => response.data.allUnits)
     )
@@ -58,7 +58,7 @@ export class UnitsService {
 
   getUnit(id: number): Observable<IApiResponse<{ unit: IUnit }>> {
     return this.apollo.query<{ unit: IApiResponse<{ unit: IUnit }> }>({
-      query: GET_UNIT,
+      query: GET_UNIT_QUERY,
       variables: { id }
     }).pipe(
       map(result => result.data.unit)

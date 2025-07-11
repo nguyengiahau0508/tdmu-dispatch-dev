@@ -7,7 +7,7 @@
       <div class="header__add">
         <button (click)="togglePositionCreate()">
           <img src="/icons/add.svg" alt="Thêm" />
-          Thêm
+          Thêm chức vụ
         </button>
       </div>
     </div>
@@ -40,7 +40,7 @@
                  <button class="menu-button" (click)="toggleMenu(position.id)">⋮</button>
 
                  @if (selectedMenuId === position.id) {
-                 <div class="dropdown-menu">
+                 <div class="dropdown-menu" (mouseleave)="toggleMenu(position.id)">
                    <button (click)="onEditPosition(position)">Sửa</button>
                    <button (click)="onDeletePosition(position)">Xóa</button>
                  </div>

@@ -1,0 +1,7 @@
+<div class="image-preview-wrapper">
+  @if (imageUrl; as url) {
+  <img [src]="url" [alt]="alt" class="image-preview" />
+  } @else {
+  <div class="image-placeholder">Loading image...</div>
+  }
+</div>

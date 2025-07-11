@@ -12,6 +12,7 @@ export const GET_USERS_QUERY = gql` query {
     fullName
     avatar
     isActive
+
   }
 }`;
 
@@ -19,14 +20,16 @@ export const GET_USERS_QUERY = gql` query {
 export const GET_USER_BY_ID_QUERY = gql`
 query($id: Int!) {
   user(id: $id) {
-    id
-    lastName
-    firstName
-    email
-    roles
-    fullName
-    avatar
-    isActive
+      id
+      lastName
+      firstName
+      email
+      roles
+      fullName
+      avatar
+      isActive
+      createdAt
+      avatarFileId
   }
 }
 `;
@@ -66,11 +69,8 @@ export const GET_USERS_PAGINATED_QUERY = gql`
 query($input: GetUsersPaginatedInput!) {
   usersPaginated(input: $input) {
     metadata {
-      totalItems
-      itemCount
-      itemsPerPage
-      totalPages
-      currentPage
+      message
+      timestamp
     }
     data {
       id
@@ -81,54 +81,16 @@ query($input: GetUsersPaginatedInput!) {
       fullName
       avatar
       isActive
+      createdAt
+      avatarFileId
     }
+    totalCount
+    hasNextPage
   }
 }
 `;
 
-// Tạo user mới
-export const CREATE_USER_MUTATION = gql`
-mutation($createUserInput: CreateUserInput!) {
-  createUser(createUserInput: $createUserInput) {
-    metadata {
-      statusCode
-      message
-    }
-    data {
-      id
-      lastName
-      firstName
-      email
-      roles
-      fullName
-      avatar
-      isActive
-    }
-  }
-}
-`;
 
-// Cập nhật user
-export const UPDATE_USER_MUTATION = gql`
-mutation($updateUserInput: UpdateUserInput!) {
-  updateUser(updateUserInput: $updateUserInput) {
-    metadata {
-      statusCode
-      message
-    }
-    data {
-      id
-      lastName
-      firstName
-      email
-      roles
-      fullName
-      avatar
-      isActive
-    }
-  }
-}
-`;
 
 // Xóa (khóa) user
 export const REMOVE_USER_MUTATION = gql`
@@ -248,3 +210,16 @@ mutation {
 }
 `;
 
+export const GET_USER_ROLES = gql`
+query GetUserRoles($userId: Int!) {
+  getUserRoles(userId: $userId) {
+    metadata {
+      statusCode
+      message
+    }
+    data {
+      roles
+    }
+  }
+}
+`

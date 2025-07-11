@@ -1,15 +1,4 @@
 export enum Role {
-  // Vai trò Quản lý Văn bằng Chứng chỉ: Xử lý các quy trình liên quan đến phôi bằng,
-  // in ấn, cấp phát, lưu trữ, chỉnh sửa, xác minh văn bằng và chứng chỉ.
-  DEGREE_CERTIFICATE_MANAGER = 'DEGREE_CERTIFICATE_MANAGER',
-
-  // Vai trò cho các nhiệm vụ/văn bản chưa được phân công cụ thể cho một vai trò xử lý.
-  // Hoặc dùng cho người dùng/tài khoản mới tạo, đang chờ gán vai trò chính thức.
-  UNASSIGNED_TASK_HANDLER = 'UNASSIGNED_TASK_HANDLER', // Hoặc PENDING_ASSIGNMENT, GENERAL_QUEUE
-
-  // (Tùy chọn) Vai trò Quản trị viên Hệ thống Tối cao: Quản lý người dùng, phân quyền, cấu hình hệ thống.
-  SUPER_ADMIN = 'SUPER_ADMIN',
-
   /**
    * @description Quyền của Quản trị viên hệ thống.
    * Có toàn quyền trên hệ thống: quản lý người dùng, phân quyền, cấu hình.

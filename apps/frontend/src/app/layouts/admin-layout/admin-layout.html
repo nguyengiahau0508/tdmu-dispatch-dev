@@ -36,7 +36,7 @@
 
     <!-- Cài đặt -->
     <div class="sidebar__footer">
-      <div class="sidebar__menu-item" title="Đăng xuất">
+      <div class="sidebar__menu-item" title="Đăng xuất" (click)="onLogout()">
         <img src="/icons/exit_to_app.svg" alt="" />
         <span class="sidebar__tooltip">Đăng xuất</span>
       </div>
@@ -62,10 +62,11 @@
         <button class="tool-btn" (click)="toggleAppsLauncher()">
           <img src="/icons/apps.svg" alt="Ứng dụng" title="Ứng dụng">
         </button>
+
         <div class="avatar">
-          @if(currentUser){
-          <img class="avatar__img" [src]="currentUser.avatar? currentUser.avatar: '/icons/account_circle.svg'"
-            [alt]="currentUser.fullName" [title]="currentUser!.fullName">
+          @if(currentUser) {
+          <img class="avatar__img" [src]="currentUser.avatarFileId ? avatarUrl : '/icons/account_circle.svg'"
+            [alt]="currentUser.fullName" [title]="currentUser.fullName">
           }
         </div>
       </div>
