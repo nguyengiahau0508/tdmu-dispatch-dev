@@ -23,7 +23,6 @@ export class PositionsResolver {
   @Roles(Role.SYSTEM_ADMIN)
   async createPosition(@Args('createPositionInput') createPositionInput: CreatePositionInput): Promise<CreatePositionResponse> {
     const position = await this.positionsService.create(createPositionInput)
-    console.log(position)
     return {
       metadata: createResponseMetadata(HttpStatus.CREATED, 'Tạo chức vụ thành công'),
       data: { position },
