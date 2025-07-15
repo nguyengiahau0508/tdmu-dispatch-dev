@@ -9,7 +9,8 @@ import { Organizational } from './features/organizational/organizational';
 import { Users } from './features/users/users';
 import { organizationalRoutes } from './features/organizational/organizational.routes';
 import { DocumentCatalog } from './features/document-catalog/document-catalog';
-import { documentCatalogRoutes } from './features/document-catalog/document-catalog.routes';
+import { DocumentCategory } from './features/document-catalog/document-category/document-category';
+import {  documentCatalogRoutes } from './features/document-catalog/document-catalog.routes';
 
 export const routes: Routes = [
   { path: 'auth', component: AuthLayout, children: authRoutes },

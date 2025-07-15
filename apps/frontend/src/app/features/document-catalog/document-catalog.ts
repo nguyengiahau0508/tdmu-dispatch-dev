@@ -1,15 +1,14 @@
 import { Component } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { routeAnimations } from '../../shared/animations/route-animations';
 
 @Component({
-  selector: 'app-organizational',
+  selector: 'app-document-catalog',
   imports: [RouterOutlet],
-  templateUrl: './organizational.html',
-  styleUrl: './organizational.css',
+  templateUrl: './document-catalog.html',
+  styleUrl: './document-catalog.css'
 })
-export class Organizational {
-  currentUrl = ''
+export class DocumentCatalog {
+    currentUrl = ''
 
   constructor(private router: Router) {
     this.router.events.subscribe(event => {
@@ -27,15 +26,11 @@ export class Organizational {
     return location.pathname;
   }
 
-  onGoToUnits() {
-    this.router.navigate(['admin', 'organizational', 'units'])
+  onGoToDocumentType() {
+    this.router.navigate(['admin', 'document-catalog', 'document-type'])
   }
 
-  onGoToUnitType() {
-    this.router.navigate(['admin', 'organizational', 'unit-types'])
-  }
-
-  onGoToPoisitions() {
-    this.router.navigate(['admin', 'organizational', 'positions'])
+  onGoToDocumentCategory() {
+    this.router.navigate(['admin', 'document-catalog', 'document-category'])
   }
 }
