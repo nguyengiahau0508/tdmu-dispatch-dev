@@ -23,7 +23,9 @@
         <span class="sidebar__tooltip">Quản lí cơ cấu tổ chức</span>
       </div>
 
-      <div class="sidebar__menu-item" title="Danh mục">
+      <div class="sidebar__menu-item" title="Danh mục" [class.active]="isActive('/admin/document-catalog')"
+        (click)="onGoToDocumentCatalog()"
+      >
         <img src="/icons/category.svg" alt="" />
         <span class="sidebar__tooltip">Danh mục</span>
       </div>

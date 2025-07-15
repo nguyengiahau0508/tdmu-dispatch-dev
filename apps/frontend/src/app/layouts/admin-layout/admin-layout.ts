@@ -95,4 +95,8 @@ export class AdminLayout {
   onGoToOrganizational() {
     this.router.navigate(['admin', 'organizational'])
   }
+
+  onGoToDocumentCatalog(){
+    this.router.navigate(['admin', 'document-catalog'])
+  }
 }
