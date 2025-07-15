@@ -137,26 +137,43 @@ export class UsersService {
     return updated;
   }
 
+
   async findPaginated(input: GetUsersPaginatedInput): Promise<PageDto<User>> {
     const { search, skip, take = 10, role, isActive } = input;
-    const where: any = {};
+
+    const where: any[] = [];
+
+    // Nếu có search => OR trên email (có thể mở rộng thêm name)
     if (search) {
-      where["email"] = Like(`%${search}%`);
-      // Có thể mở rộng tìm theo tên
+      const baseCondition: any = {
+        email: Like(`%${search}%`)
+      };
+      if (role) baseCondition.roles = role;
+      if (typeof isActive === 'boolean') baseCondition.isActive = isActive;
+      where.push(baseCondition);
+
+      // Ví dụ mở rộng tìm theo name:
+      const nameCondition: any = {
+        fullName: Like(`%${search}%`)
+      };
+      if (role) nameCondition.roles = role;
+      if (typeof isActive === 'boolean') nameCondition.isActive = isActive;
+      where.push(nameCondition);
+    } else {
+      const condition: any = {};
+      if (role) condition.roles = role;
+      if (typeof isActive === 'boolean') condition.isActive = isActive;
+      if (Object.keys(condition).length > 0) {
+        where.push(condition);
+      }
     }
-    if (role) {
-      where["roles"] = role;
-    }
-    if (typeof isActive === 'boolean') {
-      where["isActive"] = isActive;
-    }
+
     const [data, itemCount] = await this.repository.findAndCount({
-      where,
+      where: where.length > 0 ? where : undefined,
       skip,
       take,
     });
 
-    // Tạo metadata cho phân trang
     const pageMetaDto = new PageMetaDto({ pageOptionsDto: input, itemCount });
     return new PageDto(data, pageMetaDto);
   }

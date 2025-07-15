@@ -3,7 +3,7 @@ import { CreateUnitTypeInput } from './dto/create-unit-type/create-unit-type.inp
 import { UpdateUnitTypeInput } from './dto/update-unit-type/update-unit-type.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UnitType } from './entities/unit-type.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, ILike, Repository } from 'typeorm';
 import { CreateUnitTypeOutput } from './dto/create-unit-type/create-unit-type.output';
 import { UpdateUnitTypeOutput } from './dto/update-unit-type/update-unit-type.output';
 import { RemoveUnitTypeOutput } from './dto/remove-unit-type/remove-unit-type.output';
@@ -30,28 +30,27 @@ export class UnitTypesService {
     }
   }
 
-  async findAll(input: GetUnitTypesPaginatedInput): Promise<PageDto<UnitType>> {
-    const { search, page, take, order } = input;
-    // Tạo query builder với điều kiện tìm kiếm
-    const queryBuilder = this.repository.createQueryBuilder('unitType');
+async findAll(input: GetUnitTypesPaginatedInput): Promise<PageDto<UnitType>> {
+  const { search, take, order, skip } = input;
 
-    if (search) {
-      queryBuilder.where(
-        'unitType.typeName LIKE :search',
-        { search: `%${search}%` }
-      );
-    }
+  // Xây dựng điều kiện WHERE
+  const where: FindOptionsWhere<UnitType>[] = [];
 
-    // Thêm sắp xếp
-    queryBuilder.orderBy('unitType.id', order);
-    // Thêm phân trang
-    queryBuilder.skip(input.skip).take(take);
-    // Thực hiện query
-    const [data, itemCount] = await queryBuilder.getManyAndCount();
-    // Tạo metadata cho phân trang
-    const pageMetaDto = new PageMetaDto({ pageOptionsDto: input, itemCount });
-    return new PageDto(data, pageMetaDto);
+  if (search) {
+    where.push({ typeName: ILike(`%${search}%`) }); // PostgreSQL: ILike, MySQL: Like
   }
+
+  // Gọi findAndCount thay cho queryBuilder
+  const [data, itemCount] = await this.repository.findAndCount({
+    where: where.length > 0 ? where : undefined,
+    order: { id: order },
+    skip: skip,
+    take: take,
+  });
+
+  const pageMetaDto = new PageMetaDto({ pageOptionsDto: input, itemCount });
+  return new PageDto(data, pageMetaDto);
+}
 
   async findOne(id: number): Promise<GetUnitTypeOutput> {
     const unitType = await this.repository.findOne({ where: { id } });

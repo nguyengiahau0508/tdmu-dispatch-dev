@@ -3,7 +3,7 @@ import { CreateUnitInput } from './dto/create-unit/create-unit.input';
 import { UpdateUnitInput } from './dto/update-unit/update-unit.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Unit } from './entities/unit.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, ILike, Repository } from 'typeorm';
 import { CreateUnitOutput } from './dto/create-unit/create-unit.output';
 import { UpdateUnitOutput } from './dto/update-unit/update-unit.output';
 import { RemoveUnitOutput } from './dto/remove-unit/remove-unit.output';
@@ -36,45 +36,40 @@ export class UnitsService {
     }
   }
 
-  async findAll(input: GetUnitsPaginatedInput): Promise<PageDto<Unit>> {
-    const { search, page, take, order, unitTypeId, parentUnitId } = input;
+async findAll(input: GetUnitsPaginatedInput): Promise<PageDto<Unit>> {
+  const { search, order, unitTypeId, parentUnitId, skip, take } = input;
 
-    // Tạo query builder với relations
-    const queryBuilder = this.repository.createQueryBuilder('unit')
-      .leftJoinAndSelect('unit.unitType', 'unitType')
-      .leftJoinAndSelect('unit.parentUnit', 'parentUnit')
-      .leftJoinAndSelect('unit.childUnits', 'childUnits');
+  // Gán điều kiện where
+  const where: FindOptionsWhere<Unit>[] = [];
 
-    // Thêm điều kiện tìm kiếm
-    if (search) {
-      queryBuilder.where(
-        'unit.unitName LIKE :search OR unit.email LIKE :search OR unit.phone LIKE :search',
-        { search: `%${search}%` }
-      );
+  // Nếu có search => OR nhiều trường
+  if (search) {
+    where.push(
+      { unitName: ILike(`%${search}%`), ...(unitTypeId && { unitTypeId }), ...(parentUnitId && { parentUnitId }) },
+      { email: ILike(`%${search}%`), ...(unitTypeId && { unitTypeId }), ...(parentUnitId && { parentUnitId }) },
+      { phone: ILike(`%${search}%`), ...(unitTypeId && { unitTypeId }), ...(parentUnitId && { parentUnitId }) },
+    );
+  } else {
+    // Nếu không có search, chỉ lọc theo unitTypeId / parentUnitId
+    const condition: FindOptionsWhere<Unit> = {};
+    if (unitTypeId) condition.unitTypeId = unitTypeId;
+    if (parentUnitId) condition.parentUnitId = parentUnitId;
+    if (Object.keys(condition).length > 0) {
+      where.push(condition);
     }
-
-    // Thêm điều kiện lọc theo loại đơn vị
-    if (unitTypeId) {
-      queryBuilder.andWhere('unit.unitTypeId = :unitTypeId', { unitTypeId });
-    }
-
-    // Thêm điều kiện lọc theo đơn vị cha
-    if (parentUnitId) {
-      queryBuilder.andWhere('unit.parentUnitId = :parentUnitId', { parentUnitId });
-    }
-
-    // Thêm sắp xếp
-    queryBuilder.orderBy('unit.id', order);
-
-    // Thêm phân trang
-    queryBuilder.skip(input.skip).take(take);
-
-    // Thực hiện query
-    const [data, itemCount] = await queryBuilder.getManyAndCount();
-    // Tạo metadata cho phân trang
-    const pageMetaDto = new PageMetaDto({ pageOptionsDto: input, itemCount });
-    return new PageDto(data, pageMetaDto);
   }
+
+  const [data, itemCount] = await this.repository.findAndCount({
+    where: where.length > 0 ? where : undefined,
+    relations: ['unitType', 'parentUnit', 'childUnits'],
+    order: { id: order },
+    skip,
+    take,
+  });
+
+  const pageMetaDto = new PageMetaDto({ pageOptionsDto: input, itemCount });
+  return new PageDto(data, pageMetaDto);
+}
 
   async findOne(id: number): Promise<GetUnitOutput> {
     const unit = await this.repository.findOne({

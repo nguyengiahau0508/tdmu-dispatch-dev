@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { FilesService } from 'src/modules/files/files.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, ILike, Repository } from 'typeorm';
 import { Document } from './entities/document.entity';
 import { CreateDocumentInput } from './dto/create-document.input';
 import { UpdateDocumentInput } from './dto/update-document.input';
@@ -36,18 +36,28 @@ export class DocumentsService {
     return this.documentRepository.save(entity);
   }
 
-  async findPaginated(input: GetDocumentsPaginatedInput): Promise<PageDto<Document>> {
-    const { search, page, take, order } = input;
-    const queryBuilder = this.documentRepository.createQueryBuilder('document');
-    if (search) {
-      queryBuilder.where('document.title LIKE :search', { search: `%${search}%` });
-    }
-    queryBuilder.orderBy('document.id', order);
-    queryBuilder.skip(input.skip).take(take);
-    const [data, itemCount] = await queryBuilder.getManyAndCount();
-    const meta = new PageMetaDto({ pageOptionsDto: input, itemCount });
-    return new PageDto(data, meta);
+async findPaginated(input: GetDocumentsPaginatedInput): Promise<PageDto<Document>> {
+  const { search, page, take, order, skip } = input;
+
+  // Xây dựng điều kiện WHERE
+  const where: FindOptionsWhere<Document>[] = [];
+
+  if (search) {
+    // Nếu có search, dùng ILike (PostgreSQL) hoặc Like (MySQL)
+    where.push({ title: ILike(`%${search}%`) });
   }
+
+  const [data, itemCount] = await this.documentRepository.findAndCount({
+    where: where.length > 0 ? where : undefined,
+    order: { id: order },
+    skip: skip,
+    take: take,
+  });
+
+  const meta = new PageMetaDto({ pageOptionsDto: input, itemCount });
+  return new PageDto(data, meta);
+}
+
 
   async findOne(id: number): Promise<Document> {
     const entity = await this.documentRepository.findOne({ where: { id } });
