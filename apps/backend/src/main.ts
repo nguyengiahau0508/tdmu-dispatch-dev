@@ -17,7 +17,7 @@ async function bootstrap(): Promise<void> {
   })
   app.use(
     graphqlUploadExpress({
-      maxFileSize: 1000000,
+      maxFileSize: 10 * 1024 * 1024,
       maxFiles: 5,
       overrideSendResponse: false, // This is necessary for nest.js/koa.js
     }),
