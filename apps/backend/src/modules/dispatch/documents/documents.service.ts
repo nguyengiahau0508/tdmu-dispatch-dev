@@ -1,4 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
+import { FilesService } from 'src/modules/files/files.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Document } from './entities/document.entity';
@@ -8,16 +9,30 @@ import { GetDocumentsPaginatedInput } from './dto/get-documents-paginated/get-do
 import { PageDto } from 'src/common/shared/pagination/page.dto';
 import { PageMetaDto } from 'src/common/shared/pagination/page-meta.dto';
 import { RemoveDocumentOutput } from './dto/remove-document/remove-document.output';
+import { GoogleDriveService } from 'src/integrations/google-drive/google-drive.service';
+import { FileUpload } from 'graphql-upload-ts';
 
 @Injectable()
 export class DocumentsService {
   constructor(
     @InjectRepository(Document)
-    private readonly documentRepository: Repository<Document>
-  ) {}
+    private readonly documentRepository: Repository<Document>,
+    private readonly googleDriveService: GoogleDriveService
+  ) { }
 
-  async create(createDocumentInput: CreateDocumentInput): Promise<Document> {
-    const entity = this.documentRepository.create(createDocumentInput);
+  async create(createDocumentInput: CreateDocumentInput, file?: FileUpload): Promise<Document> {
+    let driveFileId: string | undefined = undefined;
+    if (file) {
+      const uploadedId = await this.googleDriveService.uploadFile(file);
+      driveFileId = uploadedId;
+    }
+    const entity = this.documentRepository.create({
+      ...createDocumentInput,
+      file: driveFileId ? {
+        driveFileId: driveFileId,
+        isPublic: false,
+      } : undefined
+    });
     return this.documentRepository.save(entity);
   }
 

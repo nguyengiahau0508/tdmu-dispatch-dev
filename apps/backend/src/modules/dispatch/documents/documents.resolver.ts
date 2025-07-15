@@ -1,4 +1,5 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 import { DocumentsService } from './documents.service';
 import { Document } from './entities/document.entity';
 import { CreateDocumentInput } from './dto/create-document.input';
@@ -15,8 +16,11 @@ export class DocumentsResolver {
   constructor(private readonly documentsService: DocumentsService) {}
 
   @Mutation(() => GetDocumentResponse)
-  async createDocument(@Args('createDocumentInput') createDocumentInput: CreateDocumentInput): Promise<GetDocumentResponse> {
-    const document = await this.documentsService.create(createDocumentInput);
+  async createDocument(
+    @Args('createDocumentInput') createDocumentInput: CreateDocumentInput,
+    @Args({ name: 'file', type: () => GraphQLUpload, nullable: true }) file?: FileUpload
+  ): Promise<GetDocumentResponse> {
+    const document = await this.documentsService.create(createDocumentInput, file);
     return {
       metadata: createResponseMetadata(HttpStatus.ACCEPTED, "Tạo văn bản thành công"),
       data: { document },

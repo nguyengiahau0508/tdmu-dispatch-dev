@@ -1057,7 +1057,7 @@ type Mutation {
   createApprovalStep(createApprovalStepInput: CreateApprovalStepInput!): ApprovalStep!
   updateApprovalStep(updateApprovalStepInput: UpdateApprovalStepInput!): ApprovalStep!
   removeApprovalStep(id: Int!): ApprovalStep!
-  createDocument(createDocumentInput: CreateDocumentInput!): GetDocumentResponse!
+  createDocument(createDocumentInput: CreateDocumentInput!, file: Upload): GetDocumentResponse!
   updateDocument(updateDocumentInput: UpdateDocumentInput!): GetDocumentResponse!
   removeDocument(id: Int!): RemoveDocumentResponse!
   createDocumentType(createDocumentTypeInput: CreateDocumentTypeInput!): CreateDocumentTypeResponse!
