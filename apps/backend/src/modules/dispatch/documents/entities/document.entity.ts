@@ -1,8 +1,18 @@
-import { ObjectType, Field, Int } from '@nestjs/graphql';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { ObjectType, Field, Int, registerEnumType } from '@nestjs/graphql';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToOne } from 'typeorm';
 import { File } from 'src/modules/files/entities/file.entity';
 import { DocumentCategory } from '../../document-category/entities/document-category.entity';
-import { DocumentType } from '../../document-types/entities/document-type.entity';
+
+export enum DocumentTypeEnum {
+  OUTGOING = 'OUTGOING', // Công văn đi
+  INCOMING = 'INCOMING', // Công văn đến
+  INTERNAL = 'INTERNAL', // Nội bộ
+}
+registerEnumType(DocumentTypeEnum, {
+  name: 'DocumentTypeEnum',
+  description: 'Type of document: OUTGOING (sent), INCOMING (received), INTERNAL (internal document)',
+});
+
 @ObjectType()
 @Entity('document')
 export class Document {
@@ -18,14 +28,9 @@ export class Document {
   @Column({ type: 'text', nullable: true })
   content?: string;
 
-  @Field(() => Int)
-  @Column()
-  documentTypeId: number;
-
-  @Field(() => DocumentType)
-  @ManyToOne(() => DocumentType)
-  @JoinColumn({ name: 'documentTypeId' })
-  documentType: DocumentType;
+  @Field(() => DocumentTypeEnum)
+  @Column({ type: 'enum', enum: DocumentTypeEnum })
+  documentType: DocumentTypeEnum;
 
   @Field(() => Int)
   @Column()

@@ -3,33 +3,61 @@ import { DocumentsService } from './documents.service';
 import { Document } from './entities/document.entity';
 import { CreateDocumentInput } from './dto/create-document.input';
 import { UpdateDocumentInput } from './dto/update-document.input';
+import { GetDocumentsPaginatedInput } from './dto/get-documents-paginated/get-documents-paginated.input';
+import { GetDocumentsPaginatedResponse } from './dto/get-documents-paginated/get-documents-paginated.response';
+import { GetDocumentResponse } from './dto/get-document/get-document.response';
+import { RemoveDocumentResponse } from './dto/remove-document/remove-document.response';
+import { createResponseMetadata } from 'src/common/helpers/metadata.helper';
+import { HttpStatus } from '@nestjs/common';
 
 @Resolver(() => Document)
 export class DocumentsResolver {
   constructor(private readonly documentsService: DocumentsService) {}
 
-  @Mutation(() => Document)
-  createDocument(@Args('createDocumentInput') createDocumentInput: CreateDocumentInput) {
-    return this.documentsService.create(createDocumentInput);
+  @Mutation(() => GetDocumentResponse)
+  async createDocument(@Args('createDocumentInput') createDocumentInput: CreateDocumentInput): Promise<GetDocumentResponse> {
+    const document = await this.documentsService.create(createDocumentInput);
+    return {
+      metadata: createResponseMetadata(HttpStatus.ACCEPTED, "Tạo văn bản thành công"),
+      data: { document },
+    };
   }
 
-  @Query(() => [Document], { name: 'documents' })
-  findAll() {
-    return this.documentsService.findAll();
+  @Query(() => GetDocumentsPaginatedResponse, { name: 'documents' })
+  async findPaginated(@Args('input') input: GetDocumentsPaginatedInput): Promise<GetDocumentsPaginatedResponse> {
+    const pageData = await this.documentsService.findPaginated(input);
+    return {
+      metadata: createResponseMetadata(HttpStatus.OK, "Lấy danh sách văn bản thành công"),
+      data: pageData.data,
+      totalCount: pageData.meta.itemCount,
+      hasNextPage: pageData.meta.hasNextPage,
+    };
   }
 
-  @Query(() => Document, { name: 'document' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.documentsService.findOne(id);
+  @Query(() => GetDocumentResponse, { name: 'document' })
+  async findOne(@Args('id', { type: () => Int }) id: number): Promise<GetDocumentResponse> {
+    const document = await this.documentsService.findOne(id);
+    return {
+      metadata: createResponseMetadata(HttpStatus.OK, "Lấy văn bản thành công"),
+      data: { document },
+    };
   }
 
-  @Mutation(() => Document)
-  updateDocument(@Args('updateDocumentInput') updateDocumentInput: UpdateDocumentInput) {
-    return this.documentsService.update(updateDocumentInput.id, updateDocumentInput);
+  @Mutation(() => GetDocumentResponse)
+  async updateDocument(@Args('updateDocumentInput') updateDocumentInput: UpdateDocumentInput): Promise<GetDocumentResponse> {
+    const document = await this.documentsService.update(updateDocumentInput.id, updateDocumentInput);
+    return {
+      metadata: createResponseMetadata(HttpStatus.OK, "Cập nhật văn bản thành công"),
+      data: { document },
+    };
   }
 
-  @Mutation(() => Document)
-  removeDocument(@Args('id', { type: () => Int }) id: number) {
-    return this.documentsService.remove(id);
+  @Mutation(() => RemoveDocumentResponse)
+  async removeDocument(@Args('id', { type: () => Int }) id: number): Promise<RemoveDocumentResponse> {
+    const result = await this.documentsService.remove(id);
+    return {
+      metadata: createResponseMetadata(HttpStatus.OK, result.success ? "Xóa văn bản thành công" : "Không tìm thấy văn bản để xóa"),
+      data: result,
+    };
   }
 }

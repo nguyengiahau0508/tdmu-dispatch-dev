@@ -686,26 +686,17 @@ type ApprovalStep {
   exampleField: Int!
 }
 
-type DocumentType {
-  id: Int!
-  name: String!
-  description: String
-}
-
 type DocumentCategory {
   id: Int!
   name: String!
   description: String
-  documentTypeId: Int!
-  documentType: DocumentType!
 }
 
 type Document {
   id: Int!
   title: String!
   content: String
-  documentTypeId: Int!
-  documentType: DocumentType!
+  documentType: DocumentTypeEnum!
   documentCategoryId: Int!
   documentCategory: DocumentCategory!
   file: File
@@ -713,6 +704,165 @@ type Document {
   status: String
   createdAt: DateTime
   updatedAt: DateTime
+}
+
+"""
+Type of document: OUTGOING (sent), INCOMING (received), INTERNAL (internal document)
+"""
+enum DocumentTypeEnum {
+  OUTGOING
+  INCOMING
+  INTERNAL
+}
+
+type GetDocumentsPaginatedResponse {
+  """Dữ liệu trả về (danh sách)"""
+  data: [Document!]
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+
+  """Tổng số mục (cho phân trang)"""
+  totalCount: Int
+
+  """Còn trang tiếp theo không (cho phân trang)"""
+  hasNextPage: Boolean
+}
+
+type GetDocumentOutput {
+  """Thông tin văn bản"""
+  document: Document!
+}
+
+type GetDocumentResponse {
+  """Dữ liệu trả về"""
+  data: GetDocumentOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type RemoveDocumentOutput {
+  """Kết quả xóa"""
+  success: Boolean!
+}
+
+type RemoveDocumentResponse {
+  """Dữ liệu trả về"""
+  data: RemoveDocumentOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type GetDocumentCategoriesPaginatedResponse {
+  """Dữ liệu trả về (danh sách)"""
+  data: [DocumentCategory!]
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+
+  """Tổng số mục (cho phân trang)"""
+  totalCount: Int
+
+  """Còn trang tiếp theo không (cho phân trang)"""
+  hasNextPage: Boolean
+}
+
+type GetDocumentCategoryOutput {
+  """Thông tin nhóm văn bản"""
+  documentCategory: DocumentCategory!
+}
+
+type GetDocumentCategoryResponse {
+  """Dữ liệu trả về"""
+  data: GetDocumentCategoryOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type RemoveDocumentCategoryOutput {
+  """Kết quả xóa"""
+  success: Boolean!
+}
+
+type RemoveDocumentCategoryResponse {
+  """Dữ liệu trả về"""
+  data: RemoveDocumentCategoryOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type DocumentType {
+  id: Int!
+  name: String!
+  description: String
+}
+
+type CreateDocumentTypeOutput {
+  documentType: DocumentType!
+}
+
+type CreateDocumentTypeResponse {
+  """Dữ liệu trả về"""
+  data: CreateDocumentTypeOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type GetDocumentTypesPaginatedResponse {
+  """Dữ liệu trả về (danh sách)"""
+  data: [DocumentType!]
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+
+  """Tổng số mục (cho phân trang)"""
+  totalCount: Int
+
+  """Còn trang tiếp theo không (cho phân trang)"""
+  hasNextPage: Boolean
+}
+
+type GetDocumentTypeOutput {
+  """Thông tin loại văn bản"""
+  documentType: DocumentType!
+}
+
+type GetDocumentTypeResponse {
+  """Dữ liệu trả về"""
+  data: GetDocumentTypeOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type RemoveDocumentTypeOutput {
+  """Kết quả xóa"""
+  success: Boolean!
+}
+
+type RemoveDocumentTypeResponse {
+  """Dữ liệu trả về"""
+  data: RemoveDocumentTypeOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type UpdateDocumentTypeOutput {
+  documentType: DocumentType!
+}
+
+type UpdateDocumentTypeResponse {
+  """Dữ liệu trả về"""
+  data: UpdateDocumentTypeOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
 }
 
 type Query {
@@ -740,11 +890,13 @@ type Query {
   approvalHistory(id: Int!): ApprovalHistory!
   approvalProcess(id: Int!): ApprovalProcess!
   approvalStep(id: Int!): ApprovalStep!
-  documents: [Document!]!
-  document(id: Int!): Document!
-  documentTypes: [DocumentType!]!
-  documentType(id: Int!): DocumentType!
-  documentCategory(id: Int!): DocumentCategory!
+  documents(input: GetDocumentsPaginatedInput!): GetDocumentsPaginatedResponse!
+  document(id: Int!): GetDocumentResponse!
+  documentTypes(input: GetDocumentTypesPaginatedInput!): GetDocumentTypesPaginatedResponse!
+  documentType(id: Int!): GetDocumentTypeResponse!
+  documentCategories(input: GetDocumentCategoriesPaginatedInput!): GetDocumentCategoriesPaginatedResponse!
+  documentCategory(id: Int!): GetDocumentCategoryResponse!
+  allDocumentCategories: [DocumentCategory!]!
 }
 
 input GetUsersPaginatedInput {
@@ -821,6 +973,48 @@ input GetPositionsPaginatedInput {
   search: String
 }
 
+input GetDocumentsPaginatedInput {
+  """Thứ tự sắp xếp"""
+  order: Order = ASC
+
+  """Số trang hiện tại"""
+  page: Int = 1
+
+  """Số lượng item trên mỗi trang"""
+  take: Int = 10
+
+  """Từ khóa tìm kiếm"""
+  search: String
+}
+
+input GetDocumentTypesPaginatedInput {
+  """Thứ tự sắp xếp"""
+  order: Order = ASC
+
+  """Số trang hiện tại"""
+  page: Int = 1
+
+  """Số lượng item trên mỗi trang"""
+  take: Int = 10
+
+  """Từ khóa tìm kiếm"""
+  search: String
+}
+
+input GetDocumentCategoriesPaginatedInput {
+  """Thứ tự sắp xếp"""
+  order: Order = ASC
+
+  """Số trang hiện tại"""
+  page: Int = 1
+
+  """Số lượng item trên mỗi trang"""
+  take: Int = 10
+
+  """Từ khóa tìm kiếm"""
+  search: String
+}
+
 type Mutation {
   signIn(input: SignInInput!): SignInResponse!
   signInWithOtp(input: SignInOtpInput!): SignInOtpResponse!
@@ -863,15 +1057,15 @@ type Mutation {
   createApprovalStep(createApprovalStepInput: CreateApprovalStepInput!): ApprovalStep!
   updateApprovalStep(updateApprovalStepInput: UpdateApprovalStepInput!): ApprovalStep!
   removeApprovalStep(id: Int!): ApprovalStep!
-  createDocument(createDocumentInput: CreateDocumentInput!): Document!
-  updateDocument(updateDocumentInput: UpdateDocumentInput!): Document!
-  removeDocument(id: Int!): Document!
-  createDocumentType(createDocumentTypeInput: CreateDocumentTypeInput!): DocumentType!
-  updateDocumentType(updateDocumentTypeInput: UpdateDocumentTypeInput!): DocumentType!
-  removeDocumentType(id: Int!): DocumentType!
-  createDocumentCategory(createDocumentCategoryInput: CreateDocumentCategoryInput!): DocumentCategory!
-  updateDocumentCategory(updateDocumentCategoryInput: UpdateDocumentCategoryInput!): DocumentCategory!
-  removeDocumentCategory(id: Int!): DocumentCategory!
+  createDocument(createDocumentInput: CreateDocumentInput!): GetDocumentResponse!
+  updateDocument(updateDocumentInput: UpdateDocumentInput!): GetDocumentResponse!
+  removeDocument(id: Int!): RemoveDocumentResponse!
+  createDocumentType(createDocumentTypeInput: CreateDocumentTypeInput!): CreateDocumentTypeResponse!
+  updateDocumentType(updateDocumentTypeInput: UpdateDocumentTypeInput!): UpdateDocumentTypeResponse!
+  removeDocumentType(id: Int!): RemoveDocumentTypeResponse!
+  createDocumentCategory(createDocumentCategoryInput: CreateDocumentCategoryInput!): GetDocumentCategoryResponse!
+  updateDocumentCategory(updateDocumentCategoryInput: UpdateDocumentCategoryInput!): GetDocumentCategoryResponse!
+  removeDocumentCategory(id: Int!): RemoveDocumentCategoryResponse!
 }
 
 input SignInInput {
@@ -1103,34 +1297,70 @@ input UpdateApprovalStepInput {
 }
 
 input CreateDocumentInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  """Tiêu đề văn bản"""
+  title: String!
+
+  """Nội dung"""
+  content: String
+
+  """Loại văn bản"""
+  documentType: DocumentTypeEnum!
+
+  """ID nhóm văn bản"""
+  documentCategoryId: Int!
+
+  """ID file đính kèm"""
+  fileId: Int
+
+  """Trạng thái"""
+  status: String
 }
 
 input UpdateDocumentInput {
-  """Example field (placeholder)"""
-  exampleField: Int
+  """Tiêu đề văn bản"""
+  title: String
+
+  """Nội dung"""
+  content: String
+
+  """Loại văn bản"""
+  documentType: DocumentTypeEnum
+
+  """ID nhóm văn bản"""
+  documentCategoryId: Int
+
+  """ID file đính kèm"""
+  fileId: Int
+
+  """Trạng thái"""
+  status: String
   id: Int!
 }
 
 input CreateDocumentTypeInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  name: String!
+  description: String
 }
 
 input UpdateDocumentTypeInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  id: Float!
+  name: String
+  description: String
 }
 
 input CreateDocumentCategoryInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  """Tên nhóm văn bản"""
+  name: String!
+
+  """Mô tả"""
+  description: String
 }
 
 input UpdateDocumentCategoryInput {
-  """Example field (placeholder)"""
-  exampleField: Int
+  """Tên nhóm văn bản"""
+  name: String
+
+  """Mô tả"""
+  description: String
   id: Int!
 }

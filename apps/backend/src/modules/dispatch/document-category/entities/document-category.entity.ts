@@ -1,6 +1,6 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { DocumentType } from '../../document-types/entities/document-type.entity';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+
 @ObjectType()
 @Entity()
 export class DocumentCategory {
@@ -15,13 +15,4 @@ export class DocumentCategory {
   @Field({ nullable: true })
   @Column({ type: 'text', nullable: true })
   description?: string;
-
-  @Field(() => Int)
-  @Column()
-  documentTypeId: number;
-
-  @Field(() => DocumentType)
-  @ManyToOne(() => DocumentType)
-  @JoinColumn({ name: 'documentTypeId' })
-  documentType: DocumentType;
 }
