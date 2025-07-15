@@ -1,0 +1,29 @@
+@if (isOpen && category) {
+  <!-- Backdrop phủ mờ -->
+  <div class="document-category-update__backdrop">
+    <div class="document-category-update">
+      <form class="document-category-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <h2 class="document-category-form__title">Cập nhật nhóm văn bản</h2>
+        <p class="document-category-form__subtitle">Chỉnh sửa thông tin nhóm văn bản</p>
+
+        <div class="form-group">
+          <label for="name" class="form-group__label">Tên nhóm văn bản</label>
+          <input type="text" id="name" class="form-group__input" formControlName="name" placeholder="Nhập tên nhóm văn bản" />
+          <div *ngIf="form.get('name')?.invalid && form.get('name')?.touched" class="form-error">
+            Tên nhóm văn bản là bắt buộc và tối đa 256 ký tự.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description" class="form-group__label">Mô tả</label>
+          <textarea id="description" class="form-group__input form-group__textarea" formControlName="description" rows="3" placeholder="Nhập mô tả"></textarea>
+        </div>
+
+        <div class="document-category-form__actions">
+          <button type="submit" class="document-category-form__submit-button" [disabled]="isLoading">Cập nhật</button>
+          <button type="button" class="document-category-form__cancel-button" (click)="onFormClose()">Hủy</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

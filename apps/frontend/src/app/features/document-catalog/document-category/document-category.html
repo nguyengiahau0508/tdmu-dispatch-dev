@@ -1,1 +1,60 @@
-<p>document-category works!</p>
+<div class="document-categories">
+  <div class="document-categories__header">
+    <div class="header__group">
+      <div class="header__search">
+        <input type="text" placeholder="Tìm nhóm văn bản..." />
+      </div>
+      <div class="header__add">
+        <button (click)="toggleCreate()">
+          <img src="/icons/add.svg" alt="Thêm" />
+          Thêm nhóm văn bản
+        </button>
+      </div>
+    </div>
+    <div class="header__group header__group--block">
+      <app-pagination [totalCount]="totalCount || 0" [pageOptions]="pageOptions" (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"></app-pagination>
+    </div>
+  </div>
+
+  <div class="document-categories__main">
+    @if (documentCategories.length > 0) {
+    <table class="document-categories__table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Tên nhóm văn bản</th>
+          <th>Mô tả</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (category of documentCategories; track category.id) {
+        <tr class="document-category-row">
+          <td>{{ category.id }}</td>
+          <td>{{ category.name }}</td>
+          <td>{{ category.description }}</td>
+          <td class="row-actions">
+            <div class="actions-menu">
+              <button class="menu-button" (click)="toggleMenu(category.id)">⋮</button>
+              @if (selectedMenuId === category.id) {
+              <div class="dropdown-menu" (mouseleave)="toggleMenu(category.id)">
+                <button (click)="onEdit(category)">Sửa</button>
+                <button (click)="onDelete(category)">Xóa</button>
+              </div>
+              }
+            </div>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+    } @else {
+    <p>Chưa có dữ liệu nhóm văn bản.</p>
+    }
+  </div>
+</div>
+
+<app-document-category-create [isOpen]="isCreateOpen" (close)="toggleCreate()" (createdSuccessfully)="refetch()"></app-document-category-create>
+<app-document-category-update [isOpen]="isUpdateOpen" [category]="updateSelected" (close)="toggleUpdate()" (updatedSuccessfully)="refetch()"></app-document-category-update>
+<p-confirmdialog />
