@@ -671,9 +671,48 @@ type CreateAssignmentsResponse {
   metadata: Metadata!
 }
 
-type Document {
+type ApprovalHistory {
   """Example field (placeholder)"""
   exampleField: Int!
+}
+
+type ApprovalProcess {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+type ApprovalStep {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+type DocumentType {
+  id: Int!
+  name: String!
+  description: String
+}
+
+type DocumentCategory {
+  id: Int!
+  name: String!
+  description: String
+  documentTypeId: Int!
+  documentType: DocumentType!
+}
+
+type Document {
+  id: Int!
+  title: String!
+  content: String
+  documentTypeId: Int!
+  documentType: DocumentType!
+  documentCategoryId: Int!
+  documentCategory: DocumentCategory!
+  file: File
+  fileId: Int
+  status: String
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
 type Query {
@@ -698,8 +737,14 @@ type Query {
   assignments: GetAssignmentsPaginatedResponse!
   assignmentsByUser(userId: Int!): GetAssignmentsPaginatedResponse!
   assignment(id: Int!): GetAssignmentResponse!
+  approvalHistory(id: Int!): ApprovalHistory!
+  approvalProcess(id: Int!): ApprovalProcess!
+  approvalStep(id: Int!): ApprovalStep!
   documents: [Document!]!
   document(id: Int!): Document!
+  documentTypes: [DocumentType!]!
+  documentType(id: Int!): DocumentType!
+  documentCategory(id: Int!): DocumentCategory!
 }
 
 input GetUsersPaginatedInput {
@@ -809,9 +854,24 @@ type Mutation {
   createAssignments(createAssignmentsInput: [CreateAssignmentInput!]!): CreateAssignmentsResponse!
   updateAssignment(updateAssignmentInput: UpdateAssignmentInput!): UpdateAssignmentResponse!
   removeAssignment(id: Int!): RemoveAssignmentResponse!
+  createApprovalHistory(createApprovalHistoryInput: CreateApprovalHistoryInput!): ApprovalHistory!
+  updateApprovalHistory(updateApprovalHistoryInput: UpdateApprovalHistoryInput!): ApprovalHistory!
+  removeApprovalHistory(id: Int!): ApprovalHistory!
+  createApprovalProcess(createApprovalProcessInput: CreateApprovalProcessInput!): ApprovalProcess!
+  updateApprovalProcess(updateApprovalProcessInput: UpdateApprovalProcessInput!): ApprovalProcess!
+  removeApprovalProcess(id: Int!): ApprovalProcess!
+  createApprovalStep(createApprovalStepInput: CreateApprovalStepInput!): ApprovalStep!
+  updateApprovalStep(updateApprovalStepInput: UpdateApprovalStepInput!): ApprovalStep!
+  removeApprovalStep(id: Int!): ApprovalStep!
   createDocument(createDocumentInput: CreateDocumentInput!): Document!
   updateDocument(updateDocumentInput: UpdateDocumentInput!): Document!
   removeDocument(id: Int!): Document!
+  createDocumentType(createDocumentTypeInput: CreateDocumentTypeInput!): DocumentType!
+  updateDocumentType(updateDocumentTypeInput: UpdateDocumentTypeInput!): DocumentType!
+  removeDocumentType(id: Int!): DocumentType!
+  createDocumentCategory(createDocumentCategoryInput: CreateDocumentCategoryInput!): DocumentCategory!
+  updateDocumentCategory(updateDocumentCategoryInput: UpdateDocumentCategoryInput!): DocumentCategory!
+  removeDocumentCategory(id: Int!): DocumentCategory!
 }
 
 input SignInInput {
@@ -1009,12 +1069,67 @@ input UpdateAssignmentInput {
   id: Int!
 }
 
+input CreateApprovalHistoryInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateApprovalHistoryInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateApprovalProcessInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateApprovalProcessInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateApprovalStepInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateApprovalStepInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
 input CreateDocumentInput {
   """Example field (placeholder)"""
   exampleField: Int!
 }
 
 input UpdateDocumentInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateDocumentTypeInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateDocumentTypeInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateDocumentCategoryInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateDocumentCategoryInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!
