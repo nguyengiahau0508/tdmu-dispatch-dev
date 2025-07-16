@@ -74,4 +74,5 @@
   flex: 1;
   position: relative;
   background-color: var(--color-background-layout);
+  overflow: hidden;
 }

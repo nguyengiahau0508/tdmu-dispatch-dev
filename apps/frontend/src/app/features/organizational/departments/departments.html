@@ -1,0 +1,67 @@
+<div class="departments">
+  <div class="departments__header">
+    <div class="header__group">
+      <div class="header__search">
+        <input type="text" placeholder="Tìm phòng ban..." />
+      </div>
+      <div class="header__add">
+        <button (click)="toggleCreateDepartment()">
+          <img src="/icons/add.svg" alt="Thêm" />
+          Thêm
+        </button>
+      </div>
+    </div>
+    <div class="header__group header__group--block">
+      <app-pagination [totalCount]="totalCount || 0" [pageOptions]="pageOptions" (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)" (orderChange)="onOrderChange($event)"></app-pagination>
+    </div>
+  </div>
+
+  <div class="departments__main">
+    @if (departments.length > 0) {
+        <table class="departments__table">
+          <thead>
+           <tr>
+             <th>ID</th>
+             <th>Tên phòng ban</th>
+             <th>Phòng ban cha</th>
+             <th></th>
+           </tr>
+         </thead>
+
+         <tbody>
+           @for (department of departments; track department.id) {
+           <tr class="department-row">
+             <td>{{ department.id }}</td>
+             <td [title]="department.name" class="department-name-cell">
+               {{ department.name }}
+             </td>
+             <td>{{ department.parentDepartment?.name || '-' }}</td>
+
+             <td class="row-actions">
+               <div class="actions-menu">
+                 <button class="menu-button" (click)="toggleMenu(department.id)">⋮</button>
+
+                 @if (selectedMenuId === department.id) {
+                 <div class="dropdown-menu" (mouseleave)="toggleMenu(department.id)">
+                   <button (click)="onEditDepartment(department)">Sửa</button>
+                   <button (click)="onDeleteDepartment(department)">Xóa</button>
+                 </div>
+                 }
+               </div>
+             </td>
+           </tr>
+           }
+         </tbody>
+       </table>
+    } @else {
+    <p>Chưa có dữ liệu phòng ban.</p>
+    }
+  </div>
+</div>
+
+<p-confirmdialog />
+<app-department-create [isOpen]="isDepartmentCreateOpen" (close)="isDepartmentCreateOpen = false" (createdSuccessfully)="refetchDepartments()"/>
+@if(departmentUpdateSelected){
+  <app-department-update [department]="departmentUpdateSelected" [isOpen]="isDepartmentUpdateOpen" (close)="onCloseUpdate()" (updatedSuccessfully)="refetchDepartments()"/>
+}

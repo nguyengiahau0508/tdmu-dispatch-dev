@@ -14,7 +14,11 @@
         <img src="/icons/airline_seat.svg" alt="" title="Chức vụ" />
         <span>Chức vụ</span>
       </div>
-    </div>
+      <div class="sidebar__menu-item" (click)="onGoToDepartments()" [class.active]="isActive('/admin/organizational/departments')">
+        <img src="/icons/airline_seat.svg" alt="" title="Phòng ban" />
+        <span>Phòng ban</span>
+      </div>
+    </div>  
   </div>
   <div class="organizational__main" [@routeAnimations]="getAnimationData()">
     <router-outlet></router-outlet>

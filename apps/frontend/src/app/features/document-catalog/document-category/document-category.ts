@@ -78,6 +78,10 @@ export class DocumentCategory {
   onDelete(category: IDocumentCategory) {
     this.confirmationService.confirm({
       message: `Bạn có chắc muốn xóa nhóm văn bản "${category.name}"?`,
+      header: 'Xác nhận xóa',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Xóa',
+      rejectLabel: 'Hủy',
       accept: () => {
         this.documentCategoryService.removeDocumentCategory(category.id).subscribe({
           next: (res: any) => {

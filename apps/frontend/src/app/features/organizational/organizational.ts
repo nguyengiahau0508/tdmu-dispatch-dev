@@ -38,4 +38,8 @@ export class Organizational {
   onGoToPoisitions() {
     this.router.navigate(['admin', 'organizational', 'positions'])
   }
+
+  onGoToDepartments() {
+    this.router.navigate(['admin', 'organizational', 'departments'])
+  }
 }

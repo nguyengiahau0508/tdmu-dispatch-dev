@@ -1,0 +1,58 @@
+@if (isOpen) {
+  <div class="department-create__backdrop">
+    <div class="department-create">
+      <form class="department-form" [formGroup]="departmentCreateForm" (ngSubmit)="onSubmit()">
+        <h2 class="department-form__title">Tạo phòng ban</h2>
+        <p class="department-form__subtitle">Thêm một phòng ban mới cho tổ chức của bạn</p>
+
+        <div class="form-group">
+          <label for="name" class="form-group__label">Tên phòng ban</label>
+          <input
+            type="text"
+            id="name"
+            class="form-group__input"
+            formControlName="name"
+            placeholder="Nhập tên phòng ban"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="description" class="form-group__label">Mô tả</label>
+          <textarea
+            id="description"
+            class="form-group__textarea"
+            formControlName="description"
+            placeholder="Nhập mô tả (nếu có)"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="parentDepartmentId" class="form-group__label">Phòng ban cha</label>
+          <select id="parentDepartmentId" class="form-group__input" formControlName="parentDepartmentId">
+            <option [ngValue]="null">-- Không có --</option>
+            @for (dep of parentDepartments; track dep.id) {
+              <option [ngValue]="dep.id">{{ dep.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="department-form__actions">
+          <button
+            type="submit"
+            class="department-form__submit-button"
+            [disabled]="isLoading"
+          >
+            Thêm
+          </button>
+          <button
+            type="button"
+            class="department-form__cancel-button"
+            (click)="onFormClose()"
+          >
+            Hủy
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

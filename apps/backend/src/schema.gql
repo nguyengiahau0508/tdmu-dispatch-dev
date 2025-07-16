@@ -671,6 +671,81 @@ type CreateAssignmentsResponse {
   metadata: Metadata!
 }
 
+type Department {
+  id: Int!
+  name: String!
+  description: String
+  parentDepartmentId: Int
+  parentDepartment: Department
+  children: [Department!]
+}
+
+type CreateDepartmentOutput {
+  """Phòng ban đã tạo"""
+  department: Department!
+}
+
+type CreateDepartmentResponse {
+  """Dữ liệu trả về"""
+  data: CreateDepartmentOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type UpdateDepartmentOutput {
+  """Phòng ban đã cập nhật"""
+  department: Department!
+}
+
+type UpdateDepartmentResponse {
+  """Dữ liệu trả về"""
+  data: UpdateDepartmentOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type RemoveDepartmentOutput {
+  """Kết quả xóa"""
+  success: Boolean!
+}
+
+type GetDepartmentOutput {
+  """Thông tin phòng ban"""
+  department: Department!
+}
+
+type GetDepartmentsPaginatedResponse {
+  """Dữ liệu trả về (danh sách)"""
+  data: [Department!]
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+
+  """Tổng số mục (cho phân trang)"""
+  totalCount: Int
+
+  """Còn trang tiếp theo không (cho phân trang)"""
+  hasNextPage: Boolean
+}
+
+type GetDepartmentResponse {
+  """Dữ liệu trả về"""
+  data: GetDepartmentOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type RemoveDepartmentResponse {
+  """Dữ liệu trả về"""
+  data: RemoveDepartmentOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
 type ApprovalHistory {
   """Example field (placeholder)"""
   exampleField: Int!
@@ -887,6 +962,8 @@ type Query {
   assignments: GetAssignmentsPaginatedResponse!
   assignmentsByUser(userId: Int!): GetAssignmentsPaginatedResponse!
   assignment(id: Int!): GetAssignmentResponse!
+  departmentsPaginated(input: GetDepartmentsPaginatedInput!): GetDepartmentsPaginatedResponse!
+  department(input: GetDepartmentInput!): GetDepartmentResponse!
   approvalHistory(id: Int!): ApprovalHistory!
   approvalProcess(id: Int!): ApprovalProcess!
   approvalStep(id: Int!): ApprovalStep!
@@ -973,6 +1050,28 @@ input GetPositionsPaginatedInput {
   search: String
 }
 
+input GetDepartmentsPaginatedInput {
+  """Thứ tự sắp xếp"""
+  order: Order = ASC
+
+  """Số trang hiện tại"""
+  page: Int = 1
+
+  """Số lượng item trên mỗi trang"""
+  take: Int = 10
+
+  """Từ khóa tìm kiếm"""
+  search: String
+
+  """ID phòng ban cha để lọc"""
+  parentDepartmentId: Int
+}
+
+input GetDepartmentInput {
+  """ID phòng ban"""
+  id: Int!
+}
+
 input GetDocumentsPaginatedInput {
   """Thứ tự sắp xếp"""
   order: Order = ASC
@@ -1048,6 +1147,9 @@ type Mutation {
   createAssignments(createAssignmentsInput: [CreateAssignmentInput!]!): CreateAssignmentsResponse!
   updateAssignment(updateAssignmentInput: UpdateAssignmentInput!): UpdateAssignmentResponse!
   removeAssignment(id: Int!): RemoveAssignmentResponse!
+  createDepartment(input: CreateDepartmentInput!): CreateDepartmentResponse!
+  updateDepartment(input: UpdateDepartmentInput!): UpdateDepartmentResponse!
+  removeDepartment(input: RemoveDepartmentInput!): RemoveDepartmentResponse!
   createApprovalHistory(createApprovalHistoryInput: CreateApprovalHistoryInput!): ApprovalHistory!
   updateApprovalHistory(updateApprovalHistoryInput: UpdateApprovalHistoryInput!): ApprovalHistory!
   removeApprovalHistory(id: Int!): ApprovalHistory!
@@ -1260,6 +1362,36 @@ input UpdateAssignmentInput {
 
   """ID đơn vị tổ chức của assignment"""
   unitId: Int
+  id: Int!
+}
+
+input CreateDepartmentInput {
+  """Tên phòng ban"""
+  name: String!
+
+  """Mô tả phòng ban"""
+  description: String
+
+  """ID phòng ban cha"""
+  parentDepartmentId: Int
+}
+
+input UpdateDepartmentInput {
+  """Tên phòng ban"""
+  name: String
+
+  """Mô tả phòng ban"""
+  description: String
+
+  """ID phòng ban cha"""
+  parentDepartmentId: Int
+
+  """ID phòng ban"""
+  id: Int!
+}
+
+input RemoveDepartmentInput {
+  """ID phòng ban"""
   id: Int!
 }
 

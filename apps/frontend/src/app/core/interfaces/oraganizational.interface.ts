@@ -28,3 +28,11 @@ export interface IAssignment {
   position: IPosition;
   unit: IUnit;
 }
+
+export interface IDepartment {
+  id: number
+  name: string
+  description: string
+  parentDepartment: IDepartment | null
+  children: IDepartment[] 
+}
