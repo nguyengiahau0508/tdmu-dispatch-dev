@@ -1,6 +1,6 @@
 import { Role } from "../../shared/enums/role.enum";
 import { IFile } from "./file.interface";
-import { IAssignment } from "./oraganizational.interface";
+import { IAssignment, IUserPosition } from "./oraganizational.interface";
 
 export interface IUser {
   id: number;
@@ -18,5 +18,6 @@ export interface IUser {
   assignments: IAssignment[];
   avatarFile?: IFile
   avatarFileId?: number
+  userPositions: IUserPosition[]; // Thêm vào đây để quản lý vị trí người dùng
 }
 
