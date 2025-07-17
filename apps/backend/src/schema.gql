@@ -26,12 +26,42 @@ type File {
   isPublic: Boolean!
 }
 
+type Department {
+  id: Int!
+  name: String!
+  description: String
+  parentDepartmentId: Int
+  parentDepartment: Department
+  children: [Department!]
+  positions: [Position!]
+}
+
+type UserPosition {
+  id: Int!
+  userId: Int!
+  positionId: Int!
+  user: User!
+  position: Position!
+  startDate: String!
+  endDate: String
+}
+
 type Position {
   """ID chức vụ"""
   id: Int!
 
   """Tên chức vụ"""
   positionName: String!
+
+  """ID phòng ban"""
+  departmentId: Int!
+
+  """Phòng ban của chức vụ"""
+  department: Department!
+
+  """Số lượng tối đa người giữ chức vụ này"""
+  maxSlots: Int!
+  userPositions: [UserPosition!]!
 }
 
 type UnitType {
@@ -141,6 +171,7 @@ type User {
   fullName: String!
   avatarFileId: Int
   avatarFile: File
+  userPositions: [UserPosition!]!
 }
 
 """Các vai trò của người dùng trong hệ thống"""
@@ -671,15 +702,6 @@ type CreateAssignmentsResponse {
   metadata: Metadata!
 }
 
-type Department {
-  id: Int!
-  name: String!
-  description: String
-  parentDepartmentId: Int
-  parentDepartment: Department
-  children: [Department!]
-}
-
 type CreateDepartmentOutput {
   """Phòng ban đã tạo"""
   department: Department!
@@ -964,6 +986,8 @@ type Query {
   assignment(id: Int!): GetAssignmentResponse!
   departmentsPaginated(input: GetDepartmentsPaginatedInput!): GetDepartmentsPaginatedResponse!
   department(input: GetDepartmentInput!): GetDepartmentResponse!
+  userPositions: [UserPosition!]!
+  userPosition(id: Int!): UserPosition!
   approvalHistory(id: Int!): ApprovalHistory!
   approvalProcess(id: Int!): ApprovalProcess!
   approvalStep(id: Int!): ApprovalStep!
@@ -1150,6 +1174,9 @@ type Mutation {
   createDepartment(input: CreateDepartmentInput!): CreateDepartmentResponse!
   updateDepartment(input: UpdateDepartmentInput!): UpdateDepartmentResponse!
   removeDepartment(input: RemoveDepartmentInput!): RemoveDepartmentResponse!
+  createUserPosition(createUserPositionInput: CreateUserPositionInput!): UserPosition!
+  updateUserPosition(updateUserPositionInput: UpdateUserPositionInput!): UserPosition!
+  removeUserPosition(id: Int!): UserPosition!
   createApprovalHistory(createApprovalHistoryInput: CreateApprovalHistoryInput!): ApprovalHistory!
   updateApprovalHistory(updateApprovalHistoryInput: UpdateApprovalHistoryInput!): ApprovalHistory!
   removeApprovalHistory(id: Int!): ApprovalHistory!
@@ -1392,6 +1419,17 @@ input UpdateDepartmentInput {
 
 input RemoveDepartmentInput {
   """ID phòng ban"""
+  id: Int!
+}
+
+input CreateUserPositionInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateUserPositionInput {
+  """Example field (placeholder)"""
+  exampleField: Int
   id: Int!
 }
 

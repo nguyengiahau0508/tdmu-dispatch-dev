@@ -4,6 +4,7 @@ import { UnitTypesModule } from "./unit-types/unit-types.module";
 import { PositionsModule } from './positions/positions.module';
 import { AssignmentsModule } from './assignments/assignments.module';
 import { DepartmentsModule } from './departments/departments.module';
+import { UserPositionsModule } from './user-positions/user-positions.module';
 
 @Module({
   imports: [
@@ -11,7 +12,8 @@ import { DepartmentsModule } from './departments/departments.module';
     UnitTypesModule,
     PositionsModule,
     AssignmentsModule,
-    DepartmentsModule
+    DepartmentsModule,
+    UserPositionsModule
   ]
 })
 export class OraganizationalModule { }

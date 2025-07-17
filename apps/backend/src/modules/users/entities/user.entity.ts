@@ -2,6 +2,7 @@ import { ObjectType, Field, Int, registerEnumType } from '@nestjs/graphql';
 import { Role } from 'src/common/enums/role.enums';
 import { File } from 'src/modules/files/entities/file.entity';
 import { Assignment } from 'src/modules/organizational/assignments/entities/assignment.entity';
+import { UserPosition } from 'src/modules/organizational/user-positions/entities/user-position.entity';
 import {
   Entity,
   Column,
@@ -94,4 +95,9 @@ export class User {
   @JoinColumn({ name: 'avatarFileId' }) // RÀNG BUỘC: Dùng đúng cột avatarFileId bạn tự khai báo
   @Field(() => File, { nullable: true })
   avatarFile: File;
+
+  // thêm vào cuối file
+  @OneToMany(() => UserPosition, (up) => up.user)
+  @Field(() => [UserPosition])
+  userPositions: UserPosition[];
 }

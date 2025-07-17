@@ -7,6 +7,7 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
+import { Position } from '../../positions/entities/position.entity';
 
 @ObjectType()
 @Entity() // Đặt tên bảng nếu muốn
@@ -40,4 +41,8 @@ export class Department {
   @OneToMany(() => Department, (department) => department.parentDepartment)
   @Field(() => [Department], { nullable: true })
   children?: Department[];
+
+  @OneToMany(() => Position, (position) => position.department)
+  @Field(() => [Position], { nullable: true })
+  positions?: Position[];
 }

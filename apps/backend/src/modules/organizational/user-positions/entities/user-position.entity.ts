@@ -1,0 +1,44 @@
+import { ObjectType, Field, Int } from '@nestjs/graphql';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  JoinColumn,
+} from 'typeorm';
+import { Position } from '../../positions/entities/position.entity';
+import { User } from 'src/modules/users/entities/user.entity';
+
+@ObjectType()
+@Entity()
+export class UserPosition {
+  @Field(() => Int)
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Field(() => Int)
+  @Column()
+  userId: number;
+
+  @Field(() => Int)
+  @Column()
+  positionId: number;
+
+  @ManyToOne(() => User, (user) => user.userPositions, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  @Field(() => User)
+  user: User;
+
+  @ManyToOne(() => Position, (position) => position.userPositions, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'positionId' })
+  @Field(() => Position)
+  position: Position;
+
+  @Field()
+  @Column({ type: 'date' })
+  startDate: string;
+
+  @Field({ nullable: true })
+  @Column({ type: 'date', nullable: true })
+  endDate?: string;
+}
