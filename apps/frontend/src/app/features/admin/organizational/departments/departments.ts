@@ -26,7 +26,9 @@ export class Departments {
 
   isDepartmentCreateOpen = false;
   isDepartmentUpdateOpen = false;
-  departmentUpdateSelected: null | IDepartment = null;
+  isDepartmentPositionOpen = false;
+  departmentUpdateSelected: null | IDepartment = null; // For updating department information
+  departmentPostionSelected: null | IDepartment = null; // For managing positions in the department
 
   pageOptions: IGetDepartmentsPaginatedInput = {
     page: 1,
@@ -117,5 +119,10 @@ export class Departments {
   onCloseUpdate() {
     this.isDepartmentUpdateOpen = false;
     this.departmentUpdateSelected = null;
+  }
+
+  onManagePositions(department: IDepartment){
+    this.departmentPostionSelected = department;
+    
   }
 }

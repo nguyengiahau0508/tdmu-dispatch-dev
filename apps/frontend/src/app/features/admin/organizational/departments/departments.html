@@ -44,7 +44,8 @@
 
                  @if (selectedMenuId === department.id) {
                  <div class="dropdown-menu" (mouseleave)="toggleMenu(department.id)">
-                   <button (click)="onEditDepartment(department)">Sửa</button>
+                   <button (click)="onEditDepartment(department)">Cập nhật thông tin</button>
+                    <button (click)="onManagePositions(department)">Quản lí chức vụ</button>
                    <button (click)="onDeleteDepartment(department)">Xóa</button>
                  </div>
                  }
