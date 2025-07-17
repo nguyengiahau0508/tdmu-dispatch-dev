@@ -14,6 +14,7 @@ import { Role } from 'src/common/enums/role.enums';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { createResponseMetadata } from 'src/common/helpers/metadata.helper';
 import { HttpStatus } from '@nestjs/common';
+import { GetPositionsResponse } from './dto/get-all-position/get-all-position.response';
 
 @Resolver(() => Position)
 export class PositionsResolver {
@@ -38,6 +39,17 @@ export class PositionsResolver {
       totalCount: pageData.totalCount,
       hasNextPage: pageData.hasNextPage,
     };
+  }
+
+  @Query(()=>GetPositionsResponse, {name: 'allPositionsByDepartmentId'})
+  async findByDepartmentId(@Args('departmentId', {type: ()=>Int}) departmentId:number): Promise<GetPositionsResponse>{
+    const positions = await this.positionsService.findByDepartmentId(departmentId)
+    return {
+      metadata: createResponseMetadata(HttpStatus.OK, "Lấy danh sách chức vụ thành công"),
+      data: {
+        positions 
+      }
+    }
   }
 
   @Query(() => GetAllPositionsResponse, { name: 'allPositions' })

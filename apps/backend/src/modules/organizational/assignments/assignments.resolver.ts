@@ -25,7 +25,6 @@ export class AssignmentsResolver {
     };
   }
 
-
   @Mutation(() => CreateAssignmentsResponse, { name: 'createAssignments' })
   async createAssignments(
     @Args('createAssignmentsInput', { type: () => [CreateAssignmentInput] })
@@ -50,6 +49,8 @@ export class AssignmentsResolver {
       hasNextPage: false // Nếu có phân trang thực sự thì sửa lại
     };
   }
+
+  
 
   @Query(() => GetAssignmentsPaginatedResponse, { name: 'assignmentsByUser' })
   async findByUserId(@Args('userId', { type: () => Int }) userId: number): Promise<GetAssignmentsPaginatedResponse> {

@@ -29,6 +29,14 @@ export class PositionsService {
     return this.repository.find();
   }
 
+  async findByDepartmentId(departmentId: number): Promise<Position[]> {
+    const positions: Position[] = await this.repository.find({ where: { departmentId } });
+    if (!positions || positions.length === 0) {
+      throw new BadRequestException(`No positions found for department ID ${departmentId}`);
+    }
+    return positions;
+  }
+
   async findOne(id: number): Promise<Position> {
     const position = await this.repository.findOne({ where: { id } });
     if (!position) throw new BadRequestException(`Position with ID ${id} not found`);

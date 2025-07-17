@@ -10,6 +10,8 @@ import { appInitializerFactory } from './core/init/app.init';
 import { providePrimeNG } from 'primeng/config';
 import { Tdmu } from '../theme/tdmu';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+import Aura from '@primeuix/themes/aura';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(),
@@ -22,7 +24,7 @@ export const appConfig: ApplicationConfig = {
     provideToastr(),
     providePrimeNG({
       theme: {
-        preset: Tdmu
+        preset: Aura
       }
     }),
     {
