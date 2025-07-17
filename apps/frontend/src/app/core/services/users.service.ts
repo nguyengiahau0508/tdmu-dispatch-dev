@@ -5,18 +5,18 @@ import { map, Observable, tap } from "rxjs";
 import { IApiResponse, IPaginatedResponse } from "../../shared/models/api-response.model";
 import { CHANGE_PASSWORD_MUTATION } from "../../features/auth/reset-password/graphql/reset-password.mutations";
 import { IUser } from "../interfaces/user.interface";
-import { GET_CURRENT_USER_DATA_MUTATIONS } from "../../features/users/graphql/users.mutations";
+import { GET_CURRENT_USER_DATA_MUTATIONS } from "../../features/admin/users/graphql/users.mutations";
 import { UserState } from "../state/user.state";
-import { IGetUsersPaginatedInput } from "../../features/users/interfaces/get-users-paginated.interfaces";
-import { GET_USERS_PAGINATED_QUERY } from "../../features/users/graphql/users.queries";
-import { ICreateUserInput } from "../../features/users/interfaces/create-user.interfaces";
-import { CREATE_USER_MUTATION } from "../../features/users/graphql/users.mutations";
-import { IUpdateUserInput } from "../../features/users/interfaces/update-user.interfaces";
-import { UPDATE_USER_MUTATION } from "../../features/users/graphql/users.mutations";
-import { ADD_ROLE_MUTAION, REMOVE_ROLE_MUTAION } from "../../features/users/graphql/users.mutations";
-import { CHANGE_ROLES_MUTATION, GET_USER_ROLES } from "../../features/users/graphql/users.queries";
+import { IGetUsersPaginatedInput } from "../../features/admin/users/interfaces/get-users-paginated.interfaces";
+import { GET_USERS_PAGINATED_QUERY } from "../../features/admin/users/graphql/users.queries";
+import { ICreateUserInput } from "../../features/admin/users/interfaces/create-user.interfaces";
+import { CREATE_USER_MUTATION } from "../../features/admin/users/graphql/users.mutations";
+import { IUpdateUserInput } from "../../features/admin/users/interfaces/update-user.interfaces";
+import { UPDATE_USER_MUTATION } from "../../features/admin/users/graphql/users.mutations";
+import { ADD_ROLE_MUTAION, REMOVE_ROLE_MUTAION } from "../../features/admin/users/graphql/users.mutations";
+import { CHANGE_ROLES_MUTATION, GET_USER_ROLES } from "../../features/admin/users/graphql/users.queries";
 import { Role } from "../../shared/enums/role.enum";
-import { GET_USER_BY_ID_QUERY } from '../../features/users/graphql/users.queries';
+import { GET_USER_BY_ID_QUERY } from '../../features/admin/users/graphql/users.queries';
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {

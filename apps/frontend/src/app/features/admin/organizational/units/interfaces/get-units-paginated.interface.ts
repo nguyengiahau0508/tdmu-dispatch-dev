@@ -1,4 +1,4 @@
-import { Order } from '../../../../core/interfaces/page-options.interface';
+import { Order } from '../../../../../core/interfaces/page-options.interface';
 
 export interface IGetUnitsPaginatedInput {
   page: number;

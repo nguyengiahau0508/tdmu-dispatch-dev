@@ -1,17 +1,17 @@
 
 import { Component } from '@angular/core';
 import { UnitTypeCreate } from './components/unit-type-create/unit-type-create';
-import { UnitTypesService } from '../../../core/services/oraganizational/unit-types.service';
-import { IUnitType } from '../../../core/interfaces/oraganizational.interface';
 import { ToastrService } from 'ngx-toastr';
-import { Pagination } from '../../../shared/components/pagination/pagination';
 import { IGetUnitTypesPaginatedInput } from './interfaces/get-unit-types-paginated.interface';
-import { Order } from '../../../core/interfaces/page-options.interface';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
-import { ErrorHandlerService } from '../../../core/services/error-handler.service';
-import { GraphQLResponseError } from '../../../shared/models/graphql-error.model';
+import { ConfirmationService } from 'primeng/api'; 
 import { UnitTypeUpdate } from './components/unit-type-update/unit-type-update';
+import { Pagination } from '../../../../shared/components/pagination/pagination';
+import { IUnitType } from '../../../../core/interfaces/oraganizational.interface';
+import { UnitTypesService } from '../../../../core/services/oraganizational/unit-types.service';
+import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
+import { Order } from '../../../../core/interfaces/page-options.interface';
+import { GraphQLResponseError } from '../../../../shared/models/graphql-error.model';
 
 
 @Component({

@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
-import { DepartmentsService } from '../../../core/services/oraganizational/departments.service';
+import { DepartmentsService } from '../../../../core/services/oraganizational/departments.service';
 import { ToastrService } from 'ngx-toastr';
-import { Pagination } from '../../../shared/components/pagination/pagination';
-import { IPageOptions, Order } from '../../../core/interfaces/page-options.interface';
+import { Pagination } from '../../../../shared/components/pagination/pagination';
+import { IPageOptions, Order } from '../../../../core/interfaces/page-options.interface';
 import { IGetDepartmentsPaginatedInput } from './interfaces/get-departments-paginated.interface';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { ErrorHandlerService } from '../../../core/services/error-handler.service';
-import { GraphQLResponseError } from '../../../shared/models/graphql-error.model';
+import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
+import { GraphQLResponseError } from '../../../../shared/models/graphql-error.model';
 import { DepartmentCreate } from './components/department-create/department-create';
 import { DepartmentUpdate } from './components/department-update/department-update';
-import { IDepartment } from '../../../core/interfaces/oraganizational.interface';
+import { IDepartment } from '../../../../core/interfaces/oraganizational.interface';
 
 @Component({
   selector: 'app-departments',

@@ -2,12 +2,12 @@ import { inject, Injectable } from '@angular/core';
 import { Apollo, QueryRef } from 'apollo-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { GET_UNITS_QUERY, GET_UNIT_QUERY, GET_ALL_UNIT_QUERY } from '../../../features/organizational/units/graphql/units.queries';
-import { CREATE_UNIT_MUTATION, UPDATE_UNIT_MUTATION, REMOVE_UNIT_MUTATION } from '../../../features/organizational/units/graphql/units.mutations';
+import { GET_UNITS_QUERY, GET_UNIT_QUERY, GET_ALL_UNIT_QUERY } from '../../../features/admin/organizational/units/graphql/units.queries';
+import { CREATE_UNIT_MUTATION, UPDATE_UNIT_MUTATION, REMOVE_UNIT_MUTATION } from '../../../features/admin/organizational/units/graphql/units.mutations';
 import { IUnit } from '../../interfaces/oraganizational.interface';
-import { IGetUnitsPaginatedInput } from '../../../features/organizational/units/interfaces/get-units-paginated.interface';
-import { ICreateUnitInput } from '../../../features/organizational/units/interfaces/unit-create.interface';
-import { IUpdateUnitInput } from '../../../features/organizational/units/interfaces/unit-update.interface';
+import { IGetUnitsPaginatedInput } from '../../../features/admin/organizational/units/interfaces/get-units-paginated.interface';
+import { ICreateUnitInput } from '../../../features/admin/organizational/units/interfaces/unit-create.interface';
+import { IUpdateUnitInput } from '../../../features/admin/organizational/units/interfaces/unit-update.interface';
 import { IApiResponse, IPaginatedResponse } from '../../../shared/models/api-response.model';
 
 @Injectable({

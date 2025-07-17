@@ -2,10 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
-import { PositionsService } from '../../../../../core/services/oraganizational/positions.service';
+import { ErrorHandlerService } from '../../../../../../core/services/error-handler.service';
+import { PositionsService } from '../../../../../../core/services/oraganizational/positions.service';
 import { IUpdatePositionInput } from '../../interfaces/position-update.interface';
-import { IPosition } from '../../../../../core/interfaces/oraganizational.interface';
+import { IPosition } from '../../../../../../core/interfaces/oraganizational.interface';
 import { finalize } from 'rxjs';
 
 @Component({

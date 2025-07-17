@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
-import { PositionsService } from '../../../../../core/services/oraganizational/positions.service';
+import { ErrorHandlerService } from '../../../../../../core/services/error-handler.service';
+import { PositionsService } from '../../../../../../core/services/oraganizational/positions.service';
 import { ICreatePositionInput } from '../../interfaces/position-create.interface';
 import { finalize } from 'rxjs';
 

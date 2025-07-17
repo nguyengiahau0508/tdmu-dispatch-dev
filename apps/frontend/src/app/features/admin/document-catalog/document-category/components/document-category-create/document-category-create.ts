@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
-import { DocumentCategoryService } from '../../../../../core/services/dispatch/document-category.service';
+import { ErrorHandlerService } from '../../../../../../core/services/error-handler.service';
+import { DocumentCategoryService } from '../../../../../../core/services/dispatch/document-category.service';
 import { finalize } from 'rxjs';
 
 @Component({

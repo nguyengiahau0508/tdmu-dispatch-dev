@@ -2,11 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
-import { UnitTypesService } from '../../../../../core/services/oraganizational/unit-types.service';
+
 import { ICreateUnitTypeInput } from '../../interfaces/unit-type-create.interfaces';
-import { GraphQLResponseError } from '../../../../../shared/models/graphql-error.model';
+
 import { finalize } from 'rxjs';
+import { ErrorHandlerService } from '../../../../../../core/services/error-handler.service';
+import { UnitTypesService } from '../../../../../../core/services/oraganizational/unit-types.service';
+import { GraphQLResponseError } from '../../../../../../shared/models/graphql-error.model';
 
 @Component({
   selector: 'app-unit-type-create',

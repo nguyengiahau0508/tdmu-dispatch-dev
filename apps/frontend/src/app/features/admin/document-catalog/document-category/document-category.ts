@@ -1,13 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { DocumentCategoryCreate } from './components/document-category-create/document-category-create';
 import { DocumentCategoryUpdate } from './components/document-category-update/document-category-update';
-import { Pagination } from '../../../shared/components/pagination/pagination';
+import { Pagination } from '../../../../shared/components/pagination/pagination';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { DocumentCategoryService } from '../../../core/services/dispatch/document-category.service';
-import { IDocumentCategory } from '../../../core/interfaces/dispatch.interface';
+import { DocumentCategoryService } from '../../../../core/services/dispatch/document-category.service';
+import { IDocumentCategory } from '../../../../core/interfaces/dispatch.interface';
 import { ToastrService } from 'ngx-toastr';
 import { ConfirmationService } from 'primeng/api';
-import { ErrorHandlerService } from '../../../core/services/error-handler.service';
+import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
 
 @Component({
   selector: 'app-document-category',

@@ -2,11 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
-import { UsersService } from '../../../../core/services/users.service';
+import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
+import { UsersService } from '../../../../../core/services/users.service';
 import { ICreateUserInput } from '../../interfaces/create-user.interfaces';
 import { finalize } from 'rxjs';
-import { GraphQLResponseError } from '../../../../shared/models/graphql-error.model';
+import { GraphQLResponseError } from '../../../../../shared/models/graphql-error.model';
 
 @Component({
   selector: 'app-user-create',

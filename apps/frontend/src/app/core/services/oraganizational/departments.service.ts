@@ -5,16 +5,16 @@ import { map } from 'rxjs/operators';
 import {
   GET_DEPARTMENTS_PAGINATED_QUERY,
   GET_DEPARTMENT_QUERY
-} from '../../../features/organizational/departments/graphql/department.queries';
+} from '../../../features/admin/organizational/departments/graphql/department.queries';
 import {
   CREATE_DEPARTMENT_MUTATION,
   UPDATE_DEPARTMENT_MUTATION,
   REMOVE_DEPARTMENT_MUTATION
-} from '../../../features/organizational/departments/graphql/department.mutations';
+} from '../../../features/admin/organizational/departments/graphql/department.mutations';
 import { IApiResponse, IPaginatedResponse } from '../../../shared/models/api-response.model';
-import { ICreateDepartmentInput } from '../../../features/organizational/departments/interfaces/create-department.interfaces';
-import { IUpdateDepartmentInput } from '../../../features/organizational/departments/interfaces/update-department.interfaces';
-import { IGetDepartmentsPaginatedInput } from '../../../features/organizational/departments/interfaces/get-departments-paginated.interface';
+import { ICreateDepartmentInput } from '../../../features/admin/organizational/departments/interfaces/create-department.interfaces';
+import { IUpdateDepartmentInput } from '../../../features/admin/organizational/departments/interfaces/update-department.interfaces';
+import { IGetDepartmentsPaginatedInput } from '../../../features/admin/organizational/departments/interfaces/get-departments-paginated.interface';
 import { IDepartment } from '../../interfaces/oraganizational.interface';
 
 @Injectable({

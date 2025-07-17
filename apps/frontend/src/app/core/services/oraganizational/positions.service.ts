@@ -2,12 +2,12 @@ import { inject, Injectable } from "@angular/core";
 import { Apollo, QueryRef } from "apollo-angular";
 import { Observable } from "rxjs";
 import { map, tap } from "rxjs/operators";
-import { GET_POSITIONS_QUERY, GET_ALL_POSITIONS_QUERY } from '../../../features/organizational/positions/graphql/positions.queries';
-import { CREATE_POSITION_MUTATION, UPDATE_POSITION_MUTATION, REMOVE_POSITION_MUTATION } from '../../../features/organizational/positions/graphql/positions.mutations';
+import { GET_POSITIONS_QUERY, GET_ALL_POSITIONS_QUERY } from '../../../features/admin/organizational/positions/graphql/positions.queries';
+import { CREATE_POSITION_MUTATION, UPDATE_POSITION_MUTATION, REMOVE_POSITION_MUTATION } from '../../../features/admin/organizational/positions/graphql/positions.mutations';
 import { IPosition } from '../../interfaces/oraganizational.interface';
-import { IGetPositionsPaginatedInput } from '../../../features/organizational/positions/interfaces/get-positions-paginated.interface';
-import { ICreatePositionInput } from '../../../features/organizational/positions/interfaces/position-create.interface';
-import { IUpdatePositionInput } from '../../../features/organizational/positions/interfaces/position-update.interface';
+import { IGetPositionsPaginatedInput } from '../../../features/admin/organizational/positions/interfaces/get-positions-paginated.interface';
+import { ICreatePositionInput } from '../../../features/admin/organizational/positions/interfaces/position-create.interface';
+import { IUpdatePositionInput } from '../../../features/admin/organizational/positions/interfaces/position-update.interface';
 import { IApiResponse, IPaginatedResponse } from '../../../shared/models/api-response.model';
 
 @Injectable({ providedIn: 'root' })

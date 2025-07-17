@@ -2,12 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
-import { DepartmentsService } from '../../../../../core/services/oraganizational/departments.service';
+import { ErrorHandlerService } from '../../../../../../core/services/error-handler.service';
+import { DepartmentsService } from '../../../../../../core/services/oraganizational/departments.service';
 import { ICreateDepartmentInput } from '../../interfaces/create-department.interfaces';
 import { finalize } from 'rxjs';
-import { Order } from '../../../../../core/interfaces/page-options.interface';
-import { IDepartment } from '../../../../../core/interfaces/oraganizational.interface';
+import { Order } from '../../../../../../core/interfaces/page-options.interface';
+import { IDepartment } from '../../../../../../core/interfaces/oraganizational.interface';
 
 @Component({
   selector: 'app-department-create',

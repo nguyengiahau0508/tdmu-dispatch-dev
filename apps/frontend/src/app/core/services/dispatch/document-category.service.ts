@@ -10,7 +10,7 @@ import {
   CREATE_DOCUMENT_CATEGORY_MUTATION,
   UPDATE_DOCUMENT_CATEGORY_MUTATION,
   REMOVE_DOCUMENT_CATEGORY_MUTATION
-} from '../../../features/document-catalog/document-category/graphql/document-category.gql';
+} from '../../../features/admin/document-catalog/document-category/graphql/document-category.gql';
 
 @Injectable({ providedIn: 'root' })
 export class DocumentCategoryService {

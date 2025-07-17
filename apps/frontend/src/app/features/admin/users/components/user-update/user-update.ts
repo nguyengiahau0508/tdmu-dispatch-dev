@@ -2,13 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
-import { UsersService } from '../../../../core/services/users.service';
-import { FileService } from '../../../../core/services/file.service';
-import { IUser } from '../../../../core/interfaces/user.interface';
+import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
+import { UsersService } from '../../../../../core/services/users.service';
+import { FileService } from '../../../../../core/services/file.service';
+import { IUser } from '../../../../../core/interfaces/user.interface';
 import { IUpdateUserInput } from '../../interfaces/update-user.interfaces';
 import { finalize } from 'rxjs';
-import { GraphQLResponseError } from '../../../../shared/models/graphql-error.model';
+import { GraphQLResponseError } from '../../../../../shared/models/graphql-error.model';
 
 @Component({
   selector: 'app-user-update',

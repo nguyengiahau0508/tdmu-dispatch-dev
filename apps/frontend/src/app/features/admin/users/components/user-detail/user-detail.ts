@@ -1,11 +1,11 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
-import { IUser } from '../../../../core/interfaces/user.interface';
-import { ImagePreview } from '../../../../shared/components/image-preview/image-preview';
+import { IUser } from '../../../../../core/interfaces/user.interface';
+import { ImagePreview } from '../../../../../shared/components/image-preview/image-preview';
 import { DatePipe } from '@angular/common';
-import { UsersService } from '../../../../core/services/users.service';
-import { AssignmentsService } from '../../../../core/services/oraganizational/assignments.service';
-import { IAssignment } from '../../../../core/interfaces/oraganizational.interface';
-import { Role } from '../../../../shared/enums/role.enum';
+import { UsersService } from '../../../../../core/services/users.service';
+import { AssignmentsService } from '../../../../../core/services/oraganizational/assignments.service';
+import { IAssignment } from '../../../../../core/interfaces/oraganizational.interface';
+import { Role } from '../../../../../shared/enums/role.enum';
 import { take } from 'rxjs';
 
 @Component({

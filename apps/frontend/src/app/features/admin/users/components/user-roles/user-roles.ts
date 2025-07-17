@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
-import { UsersService } from '../../../../core/services/users.service';
-import { Role } from '../../../../shared/enums/role.enum';
-import { IUser } from '../../../../core/interfaces/user.interface';
+import { UsersService } from '../../../../../core/services/users.service';
+import { Role } from '../../../../../shared/enums/role.enum';
+import { IUser } from '../../../../../core/interfaces/user.interface';
 import { ToastrService } from 'ngx-toastr';
 import { finalize } from 'rxjs';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';

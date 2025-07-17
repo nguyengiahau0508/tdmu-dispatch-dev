@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { routeAnimations } from '../../shared/animations/route-animations';
+import { routeAnimations } from '../../../shared/animations/route-animations';
 
 @Component({
   selector: 'app-organizational',

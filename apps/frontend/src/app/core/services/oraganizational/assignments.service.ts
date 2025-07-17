@@ -2,14 +2,14 @@ import { inject, Injectable } from "@angular/core";
 import { Apollo, QueryRef } from "apollo-angular";
 import { IApiResponse, IPaginatedResponse } from "../../../shared/models/api-response.model";
 import { IAssignment } from "../../interfaces/oraganizational.interface";
-import { IGetAssignmentsPaginatedInput } from "../../../features/organizational/assignments/interfaces/get-assignments-paginated.interfaces";
+import { IGetAssignmentsPaginatedInput } from "../../../features/admin/organizational/assignments/interfaces/get-assignments-paginated.interfaces";
 import { Observable } from "rxjs";
 import { map, tap } from 'rxjs/operators';
-import { GET_ASSIGNMENTS_BY_USER_QUERY } from "../../../features/organizational/assignments/graphql/assignments.queries";
-import { CREATE_ASSIGNMENT_MUTATION, CREATE_ASSIGNMENTS_MUTATION, REMOVE_ASSIGNMENT_MUTATION, UPDATE_ASSIGNMENT_MUTAION } from '../../../features/organizational/assignments/graphql/assignments.mutations';
-import { GET_ASSIGNMENT_QUERY, GET_ASSIGNMENTS_QUERY } from '../../../features/organizational/assignments/graphql/assignments.queries';
-import { ICreateAssignmentInput } from '../../../features/organizational/assignments/interfaces/create-assignment.interfaces';
-import { IUpdateAssignmentInput } from '../../../features/organizational/assignments/interfaces/update-assignment.interfaces';
+import { GET_ASSIGNMENTS_BY_USER_QUERY } from "../../../features/admin/organizational/assignments/graphql/assignments.queries";
+import { CREATE_ASSIGNMENT_MUTATION, CREATE_ASSIGNMENTS_MUTATION, REMOVE_ASSIGNMENT_MUTATION, UPDATE_ASSIGNMENT_MUTAION } from '../../../features/admin/organizational/assignments/graphql/assignments.mutations';
+import { GET_ASSIGNMENT_QUERY, GET_ASSIGNMENTS_QUERY } from '../../../features/admin/organizational/assignments/graphql/assignments.queries';
+import { ICreateAssignmentInput } from '../../../features/admin/organizational/assignments/interfaces/create-assignment.interfaces';
+import { IUpdateAssignmentInput } from '../../../features/admin/organizational/assignments/interfaces/update-assignment.interfaces';
 
 @Injectable({
   providedIn: 'root'

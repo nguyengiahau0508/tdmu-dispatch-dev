@@ -5,12 +5,12 @@ import { MainLayout } from './layouts/main-layout/main-layout';
 import { AdminLayout } from './layouts/admin-layout/admin-layout';
 import { AdminGuard } from './core/guards/admin.guard';
 import { AuthGuard } from './core/guards/auth.guard';
-import { Organizational } from './features/organizational/organizational';
-import { Users } from './features/users/users';
-import { organizationalRoutes } from './features/organizational/organizational.routes';
-import { DocumentCatalog } from './features/document-catalog/document-catalog';
-import { DocumentCategory } from './features/document-catalog/document-category/document-category';
-import {  documentCatalogRoutes } from './features/document-catalog/document-catalog.routes';
+import { Organizational } from './features/admin/organizational/organizational';
+import { Users } from './features/admin/users/users';
+import { organizationalRoutes } from './features/admin/organizational/organizational.routes';
+import { DocumentCatalog } from './features/admin/document-catalog/document-catalog';
+import { DocumentCategory } from './features/admin/document-catalog/document-category/document-category';
+import {  documentCatalogRoutes } from './features/admin/document-catalog/document-catalog.routes';
 
 export const routes: Routes = [
   { path: 'auth', component: AuthLayout, children: authRoutes },

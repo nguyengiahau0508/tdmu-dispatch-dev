@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
-import { PositionsService } from '../../../core/services/oraganizational/positions.service';
-import { IPosition } from '../../../core/interfaces/oraganizational.interface';
+import { PositionsService } from '../../../../core/services/oraganizational/positions.service';
+import { IPosition } from '../../../../core/interfaces/oraganizational.interface';
 import { ToastrService } from 'ngx-toastr';
-import { Pagination } from '../../../shared/components/pagination/pagination';
+import { Pagination } from '../../../../shared/components/pagination/pagination';
 import { IGetPositionsPaginatedInput } from './interfaces/get-positions-paginated.interface';
-import { Order } from '../../../core/interfaces/page-options.interface';
+import { Order } from '../../../../core/interfaces/page-options.interface';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { ErrorHandlerService } from '../../../core/services/error-handler.service';
-import { GraphQLResponseError } from '../../../shared/models/graphql-error.model';
+import { ErrorHandlerService } from '../../../../core/services/error-handler.service';
+import { GraphQLResponseError } from '../../../../shared/models/graphql-error.model';
 import { PositionCreate } from './components/position-create/position-create';
 import { PositionUpdate } from './components/position-update/position-update';
 

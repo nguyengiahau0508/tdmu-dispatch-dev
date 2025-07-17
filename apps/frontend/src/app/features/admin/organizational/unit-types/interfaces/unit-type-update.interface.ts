@@ -1,4 +1,4 @@
-import { IUnitType } from "../../../../core/interfaces/oraganizational.interface"
+import { IUnitType } from "../../../../../core/interfaces/oraganizational.interface"
 
 export interface IUpdateUnitTypeInput {
   id: number

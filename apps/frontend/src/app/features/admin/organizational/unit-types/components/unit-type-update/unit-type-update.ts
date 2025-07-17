@@ -1,13 +1,13 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { UnitTypesService } from '../../../../../core/services/oraganizational/unit-types.service';
+import { UnitTypesService } from '../../../../../../core/services/oraganizational/unit-types.service';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
-import { IUnitType } from '../../../../../core/interfaces/oraganizational.interface';
+import { IUnitType } from '../../../../../../core/interfaces/oraganizational.interface';
 import { IUpdateUnitTypeInput } from '../../interfaces/unit-type-update.interface';
 import { finalize } from 'rxjs';
-import { GraphQLResponseError } from '../../../../../shared/models/graphql-error.model';
-import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
+import { GraphQLResponseError } from '../../../../../../shared/models/graphql-error.model';
+import { ErrorHandlerService } from '../../../../../../core/services/error-handler.service';
 
 @Component({
   selector: 'app-unit-type-update',

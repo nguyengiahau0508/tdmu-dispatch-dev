@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { DepartmentsService } from '../../../../../core/services/oraganizational/departments.service';
+import { DepartmentsService } from '../../../../../../core/services/oraganizational/departments.service';
 import { ToastrService } from 'ngx-toastr';
-import { ErrorHandlerService } from '../../../../../core/services/error-handler.service';
+import { ErrorHandlerService } from '../../../../../../core/services/error-handler.service';
 import { IUpdateDepartmentInput } from '../../interfaces/update-department.interfaces';
 import { finalize } from 'rxjs';
-import { Order } from '../../../../../core/interfaces/page-options.interface';
-import { IDepartment } from '../../../../../core/interfaces/oraganizational.interface';
+import { Order } from '../../../../../../core/interfaces/page-options.interface';
+import { IDepartment } from '../../../../../../core/interfaces/oraganizational.interface';
 
 @Component({
   selector: 'app-department-update',
