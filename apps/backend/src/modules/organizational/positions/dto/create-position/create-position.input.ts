@@ -7,4 +7,7 @@ export class CreatePositionInput {
 
   @Field({ description: 'Số lượng chức vụ' })
   maxSlots: number
+
+  @Field({ description: 'Id của phòng ban mà chức vụ này thuộc về' })
+  departmentId:number
 }
