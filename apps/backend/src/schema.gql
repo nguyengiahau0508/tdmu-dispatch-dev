@@ -1034,7 +1034,7 @@ type Query {
   assignmentsByUser(userId: Int!): GetAssignmentsPaginatedResponse!
   assignment(id: Int!): GetAssignmentResponse!
   departmentsPaginated(input: GetDepartmentsPaginatedInput!): GetDepartmentsPaginatedResponse!
-  getAllDepartmentBySearch: GetAllDepartmentResponse!
+  getAllDepartmentBySearch(search: String!): GetAllDepartmentResponse!
   department(input: GetDepartmentInput!): GetDepartmentResponse!
   getAllByUser(userId: Int!): GetAllByUserReponse!
   approvalHistory(id: Int!): ApprovalHistory!
