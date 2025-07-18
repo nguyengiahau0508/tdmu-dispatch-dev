@@ -42,7 +42,8 @@ export class Position {
   userPositions: UserPosition[];
 
   @Field(() => Int, { description: 'Số lượng người đang giữ chức vụ này' })
-  currentSlotCount(): number {
+  get currentSlotCount(): number {
     return this.userPositions?.filter((up) => !up.endDate).length ?? 0;
   }
+
 }

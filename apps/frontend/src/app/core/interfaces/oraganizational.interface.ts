@@ -23,6 +23,7 @@ export interface IPosition {
   departmentId: number
   department: IDepartment
   maxSlots: number
+  currentSlotCount:number
   userPositions: IUserPosition[]; // Assuming IUserPosition is defined elsewhere
 }
 

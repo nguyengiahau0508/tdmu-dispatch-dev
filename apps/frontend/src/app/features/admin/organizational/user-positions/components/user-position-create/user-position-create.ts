@@ -67,7 +67,7 @@ export class UserPositionCreate implements OnInit {
     if (selectedDepartmentId) {
       this.positionsService.getPostionsByDepartmnetId(selectedDepartmentId).subscribe({
         next: response => {
-          this.positionsOfDepartment = response.data!.positions
+          this.positionsOfDepartment = response.data!.positions.filter(pos => pos.currentSlotCount < pos.maxSlots);
         },
         error: err => {
           console.log(err)

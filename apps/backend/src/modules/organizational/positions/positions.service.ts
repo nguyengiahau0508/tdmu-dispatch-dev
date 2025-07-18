@@ -14,13 +14,13 @@ export class PositionsService {
   constructor(
     @InjectRepository(Position)
     private readonly repository: Repository<Position>
-  ) {}
+  ) { }
 
   async create(createPositionInput: CreatePositionInput): Promise<Position> {
     const created = this.repository.create({
       positionName: createPositionInput.positionName,
       maxSlots: createPositionInput.maxSlots,
-      department: {id: createPositionInput.departmentId}
+      department: { id: createPositionInput.departmentId }
     });
     const saved = await this.repository.save(created);
     if (!saved) throw new BadRequestException('Failed to create position');
@@ -32,7 +32,7 @@ export class PositionsService {
   }
 
   async findByDepartmentId(departmentId: number): Promise<Position[]> {
-    const positions: Position[] = await this.repository.find({ where: { departmentId } });
+    const positions: Position[] = await this.repository.find({ where: { departmentId }, relations: { userPositions: true } });
     if (!positions || positions.length === 0) {
       throw new BadRequestException(`No positions found for department ID ${departmentId}`);
     }
@@ -51,7 +51,7 @@ export class PositionsService {
     if (updatePositionInput.positionName !== undefined) {
       position.positionName = updatePositionInput.positionName;
     }
-    if(updatePositionInput.maxSlots !== undefined){
+    if (updatePositionInput.maxSlots !== undefined) {
       position.maxSlots = updatePositionInput.maxSlots
     }
     const updated = await this.repository.save(position);

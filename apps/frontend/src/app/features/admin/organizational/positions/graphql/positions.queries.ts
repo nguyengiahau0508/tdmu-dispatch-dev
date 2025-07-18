@@ -44,6 +44,7 @@ export const GET_POSITIONS_BY_DEPARTMENT_ID = gql`
           id
           positionName
           maxSlots
+          currentSlotCount
         }
       }
     }
