@@ -60,7 +60,6 @@ export class PositionsService {
   }
 
   updatePosition(input: IUpdatePositionInput): Observable<IApiResponse<{ position: IPosition }>> {
-    console.log(input)
     return this.apollo.mutate<{ updatePosition: IApiResponse<{ position: IPosition }> }>({
       mutation: UPDATE_POSITION_MUTATION,
       variables: { updatePositionInput: input }

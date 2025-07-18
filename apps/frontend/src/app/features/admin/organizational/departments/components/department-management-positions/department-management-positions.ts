@@ -97,4 +97,10 @@ export class DepartmentManagementPositions implements OnChanges {
     this.positionUdpateSelected = null;
     this.isPostionUpdateOpen = false;
   }
+
+  onUpdateFormSuccessFully(){
+    this.fetchPositions()
+    this.positionUdpateSelected = null
+    this.isPostionUpdateOpen = false;
+  }
 }

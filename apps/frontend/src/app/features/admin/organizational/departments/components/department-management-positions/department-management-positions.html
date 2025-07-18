@@ -43,5 +43,5 @@
 }
 
 @if(positionUdpateSelected){
-  <app-position-update [position]="positionUdpateSelected" [isOpen]="isPostionUpdateOpen" (close)="onCloseUpdateForm()"/>
+  <app-position-update [position]="positionUdpateSelected" [isOpen]="isPostionUpdateOpen" (close)="onCloseUpdateForm()" (updatedSuccessfully)="onUpdateFormSuccessFully()"/>
 }
