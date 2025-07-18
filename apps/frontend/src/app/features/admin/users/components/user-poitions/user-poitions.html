@@ -34,5 +34,5 @@
 }
 
 @if (isOpenCreateFormUserPosition) {
-  <app-user-position-create [isOpen]="isOpenCreateFormUserPosition"/>
+  <app-user-position-create [userId]="userId" [isOpen]="isOpenCreateFormUserPosition" (close)="isOpenCreateFormUserPosition = false"/>
 }

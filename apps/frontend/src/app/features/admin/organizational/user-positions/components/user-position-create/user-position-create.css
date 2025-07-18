@@ -9,3 +9,15 @@
     padding: 1rem;
     box-sizing: border-box;
 }
+
+.user-position-form{
+    display: flex;
+    gap: 20px;
+}
+
+.user-position-create_actions{
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}

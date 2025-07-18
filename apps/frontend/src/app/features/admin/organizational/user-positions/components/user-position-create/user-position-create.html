@@ -1,8 +1,23 @@
 @if (isOpen) {
 <!-- Backdrop phủ mờ -->
 <div class="user-position-create__backdrop">
-  <p-scrollpanel [style]="{ width: '100%', height: '150px' }">
-    
-  </p-scrollpanel>
+  <p-panel header="Thêm chức vụ cho người dùng">
+    <form class="user-position-form" [formGroup]="userPositionCreateForm" (ngSubmit)="onSubmit()">
+      <p-inputgroup>
+        <p-select [options]="departments" formControlName="departmentId" placeholder="Chọn phòng ban phân công"
+          [editable]="true" optionLabel="name" optionValue="id" class="w-full md:w-56"
+          (onChange)="onDepartmentChange($event)" />
+      </p-inputgroup>
+      <p-inputgroup>
+        <p-select [options]="positionsOfDepartment" formControlName="positionId" placeholder="Chọn vị trí phân công"
+          [editable]="true" optionLabel="positionName" optionValue="id" class="w-full md:w-56" />
+      </p-inputgroup>
+
+      <div class="user-position-create_actions">
+        <p-button type="submit" label="Lưu" severity="success" />
+        <p-button label="Thoát" severity="secondary" (click)="onClose()"/>
+      </div>
+    </form>
+  </p-panel>
 </div>
 }

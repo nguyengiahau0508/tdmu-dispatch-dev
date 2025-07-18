@@ -57,7 +57,7 @@ export class DepartmentsService {
     );
   }
 
-  getAllDepartments(search: string): Observable<any> {
+  getAllDepartments(search: string): Observable<IApiResponse<{ departments: IDepartment[] }>> {
     return this.apollo
       .watchQuery({
         query: GET_ALL_DEPARTMENTS_BY_SEARCH,
