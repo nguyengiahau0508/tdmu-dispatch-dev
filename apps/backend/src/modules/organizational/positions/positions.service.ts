@@ -19,8 +19,8 @@ export class PositionsService {
   async create(createPositionInput: CreatePositionInput): Promise<Position> {
     const created = this.repository.create({
       positionName: createPositionInput.positionName,
-      departmentId: createPositionInput.departmentId,
-      maxSlots: createPositionInput.maxSlots
+      maxSlots: createPositionInput.maxSlots,
+      department: {id: createPositionInput.departmentId}
     });
     const saved = await this.repository.save(created);
     if (!saved) throw new BadRequestException('Failed to create position');

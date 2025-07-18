@@ -26,7 +26,7 @@ export class Position {
   departmentId: number;
 
   @ManyToOne(() => Department, (department) => department.positions, {
-    onDelete: 'CASCADE',
+    cascade: true,
   })
   @JoinColumn({ name: 'departmentId' }) // Ràng buộc khoá ngoại
   @Field(() => Department, { description: 'Phòng ban của chức vụ' })

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { ErrorHandlerService } from '../../../../../../core/services/error-handler.service';
@@ -14,7 +14,7 @@ import { finalize } from 'rxjs';
   templateUrl: './position-create.html',
   styleUrl: './position-create.css'
 })
-export class PositionCreate {
+export class PositionCreate implements OnInit {
   @Input() departmentId:number = 1
   @Input() isOpen = false;
   @Output() close = new EventEmitter<void>();
@@ -29,7 +29,11 @@ export class PositionCreate {
     private errorHandlerService: ErrorHandlerService,
     private positionsService: PositionsService
   ) {
-    this.positionCreateForm = this.fb.group({
+
+  }
+
+  ngOnInit(): void {
+        this.positionCreateForm = this.fb.group({
       positionName: ['', [Validators.required, Validators.maxLength(256)]],
       departmentId: [this.departmentId, [Validators.required]],
       maxSlots: [1, [Validators.required]]
