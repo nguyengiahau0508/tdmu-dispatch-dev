@@ -1,61 +1,7 @@
 
 @if(isOpen) {
   <div class="user-poitions__backdrop">
-    <div class="user-poitions">
-      <form class="poitions-form" [formGroup]="assignmentForm" (ngSubmit)="$event.preventDefault()">
-        <h2 class="poitions-form__title">Quản lý chức vụ người dùng</h2>
-        <p class="poitions-form__subtitle">Chức vụ của <b>{{ user.fullName }}</b></p>
-
-        <div class="form-group">
-          <label class="form-group__label">Danh sách chức vụ hiện tại</label>
-          <div class="assignments-list">
-            @if(assignments.length === 0) {
-              <div class="empty">Chưa có chức vụ nào</div>
-            } @else {
-              @for (assignment of assignments; track assignment) {
-                <div class="assignment-item">
-                  <span class="assignment-item__unit">{{ assignment.unit.unitName }}</span>
-                  <span class="assignment-item__position">{{ assignment.position.positionName }}</span>
-                  <button type="button" class="assignment-item__remove" (click)="onRemoveAssignment(assignment)">
-                    Xóa
-                  </button>
-                </div>
-              }
-            }
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-group__label">Thêm chức vụ mới</label>
-          <div class="add-assignment-fields">
-            <select formControlName="unitId">
-              <option [ngValue]="null">Chọn đơn vị</option>
-              @for (unit of allUnits; track unit) {
-                <option [ngValue]="unit.id">{{ unit.unitName }}</option>
-              }
-            </select>
-            <select formControlName="positionId">
-              <option [ngValue]="null">Chọn chức vụ</option>
-              @for (position of allPositions; track position) {
-                <option [ngValue]="position.id">{{ position.positionName }}</option>
-              }
-            </select>
-            <button type="button"
-              class="add-assignment__button"
-              (click)="onAddAssignment()"
-              [disabled]="assignmentForm.invalid">
-              {{ isAdding ? 'Đang thêm...' : 'Thêm' }}
-            </button>
-          </div>
-        </div>
-
-        <div class="poitions-form__actions">
-          <button type="button" class="poitions-form__cancel-button" (click)="onClose()">
-            Đóng
-          </button>
-        </div>
-      </form>
-    </div>
+    
   </div>
 }
 
