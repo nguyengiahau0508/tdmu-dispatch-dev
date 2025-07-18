@@ -7,6 +7,7 @@ import { routeAnimations } from '../../../shared/animations/route-animations';
   imports: [RouterOutlet],
   templateUrl: './organizational.html',
   styleUrl: './organizational.css',
+  //animations: [routeAnimations]
 })
 export class Organizational {
   currentUrl = ''

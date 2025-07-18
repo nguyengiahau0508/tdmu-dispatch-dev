@@ -4,14 +4,18 @@ import { PositionsService } from '../../../../../../core/services/oraganizationa
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { SplitButtonModule } from 'primeng/splitbutton';
-import { MenuItem } from 'primeng/api';
+import { ConfirmationService, MenuItem } from 'primeng/api';
 import { PanelModule } from 'primeng/panel';
 import { ToolbarModule } from 'primeng/toolbar';
 import { PositionUpdate } from '../../../positions/components/position-update/position-update';
 import { PositionCreate } from '../../../positions/components/position-create/position-create';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ToastrService } from 'ngx-toastr';
+import { GraphQLResponseError } from '../../../../../../shared/models/graphql-error.model';
+
 @Component({
   selector: 'app-department-management-positions',
-  imports: [TableModule, ButtonModule, SplitButtonModule, PanelModule, ToolbarModule, PositionUpdate, PositionCreate],
+  imports: [ConfirmDialogModule,TableModule, ButtonModule, SplitButtonModule, PanelModule, ToolbarModule, PositionUpdate, PositionCreate],
   templateUrl: './department-management-positions.html',
   styleUrl: './department-management-positions.css'
 })
@@ -31,7 +35,9 @@ export class DepartmentManagementPositions implements OnChanges {
   items: MenuItem[] = []
 
   constructor(
-    private readonly positionsService: PositionsService
+    private readonly positionsService: PositionsService,
+    private readonly confirmationService: ConfirmationService,
+    private toastr: ToastrService,
   ) {
   }
 
@@ -77,7 +83,25 @@ export class DepartmentManagementPositions implements OnChanges {
   }
 
   onPositionRemove(positionId: number) {
-
+ this.confirmationService.confirm({
+      message: 'Bạn có chắc chắn muốn xóa chức vụ này không?',
+      header: 'Xác nhận xóa',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Xóa',
+      rejectLabel: 'Hủy',
+      accept: () => {
+        this.positionsService.removePosition(positionId).subscribe({
+          next: (res) => {
+            this.fetchPositions
+            this.toastr.success(res.metadata.message);
+          },
+          error: (err: GraphQLResponseError) => {
+            // const { message } = this.errorHandlerService.extractGraphQLError(err);
+            // this.toastr.error(message || "Xóa thất bại");
+          }
+        });
+      }
+    });
   }
 
   onPositionUpdate(position: IPosition) {
