@@ -5,7 +5,7 @@
     <div class="position">
       <p-toolbar>
         <ng-template #end>
-          <p-button label="Thêm vị trí mới" />
+          <p-button label="Thêm vị trí mới" (onClick)="onPositionCreate()"/>
         </ng-template>
       </p-toolbar>
 
@@ -42,6 +42,9 @@
 </div>
 }
 
+@if (isPostionCreateOpen) {
+  <app-position-create [departmentId]="department.id" [isOpen]="isPostionCreateOpen" (close)="onCloseCreateForm()" (createdSuccessfully)="fetchPositions()"/>
+}
 @if(positionUdpateSelected){
   <app-position-update [position]="positionUdpateSelected" [isOpen]="isPostionUpdateOpen" (close)="onCloseUpdateForm()" (updatedSuccessfully)="onUpdateFormSuccessFully()"/>
 }

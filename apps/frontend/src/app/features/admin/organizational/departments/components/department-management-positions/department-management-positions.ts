@@ -24,7 +24,7 @@ export class DepartmentManagementPositions implements OnChanges {
   positions: IPosition[] = []
   positionUdpateSelected: null | IPosition = null
   isPostionUpdateOpen = false
-
+  isPostionCreateOpen = false;
   isloading = false;
 
 
@@ -87,6 +87,13 @@ export class DepartmentManagementPositions implements OnChanges {
 
   onShowUsersPosition(positionId: number) {
 
+  }
+
+  onPositionCreate(){
+    this.isPostionCreateOpen = true;
+  }
+  onCloseCreateForm(){
+    this.isPostionCreateOpen = false
   }
 
   onClose() {

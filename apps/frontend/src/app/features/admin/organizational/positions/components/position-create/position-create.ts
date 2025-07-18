@@ -15,6 +15,7 @@ import { finalize } from 'rxjs';
   styleUrl: './position-create.css'
 })
 export class PositionCreate {
+  @Input() departmentId:number = 1
   @Input() isOpen = false;
   @Output() close = new EventEmitter<void>();
   @Output() createdSuccessfully = new EventEmitter<void>();
@@ -29,7 +30,9 @@ export class PositionCreate {
     private positionsService: PositionsService
   ) {
     this.positionCreateForm = this.fb.group({
-      positionName: ['', [Validators.required, Validators.maxLength(256)]]
+      positionName: ['', [Validators.required, Validators.maxLength(256)]],
+      departmentId: [this.departmentId, [Validators.required]],
+      maxSlots: [1, [Validators.required]]
     });
   }
 

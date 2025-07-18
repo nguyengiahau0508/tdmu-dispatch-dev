@@ -1377,6 +1377,9 @@ input CreatePositionInput {
 
   """Số lượng chức vụ"""
   maxSlots: Float!
+
+  """Id của phòng ban mà chức vụ này thuộc về"""
+  departmentId: Float!
 }
 
 input UpdatePositionInput {
@@ -1385,6 +1388,9 @@ input UpdatePositionInput {
 
   """Số lượng chức vụ"""
   maxSlots: Float
+
+  """Id của phòng ban mà chức vụ này thuộc về"""
+  departmentId: Float
   id: Int!
 }
 
