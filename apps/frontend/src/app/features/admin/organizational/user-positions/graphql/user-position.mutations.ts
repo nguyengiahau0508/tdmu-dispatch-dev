@@ -4,7 +4,7 @@ export const CREATE_USER_POSITION = gql`
   mutation CreateUserPosition($createUserPositionInput: CreateUserPositionInput!) {
     createUserPosition(createUserPositionInput: $createUserPositionInput) {
       metadata {
-        code
+        statusCode
         message
       }
       data {

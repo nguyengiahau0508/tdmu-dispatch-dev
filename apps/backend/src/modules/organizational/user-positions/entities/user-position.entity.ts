@@ -5,6 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   JoinColumn,
+  CreateDateColumn,
 } from 'typeorm';
 import { Position } from '../../positions/entities/position.entity';
 import { User } from 'src/modules/users/entities/user.entity';
@@ -35,10 +36,10 @@ export class UserPosition {
   position: Position;
 
   @Field()
-  @Column({ type: 'date' })
-  startDate: string;
+  @CreateDateColumn()
+  startDate: Date;
 
   @Field({ nullable: true })
   @Column({ type: 'date', nullable: true })
-  endDate?: string;
+  endDate?: Date;
 }

@@ -4,7 +4,7 @@ export const GET_ALL_BY_USER = gql`
   query GetAllByUser($userId: Int!) {
     getAllByUser(userId: $userId) {
       metadata {
-        code
+        statusCode
         message
       }
       data {
@@ -12,6 +12,14 @@ export const GET_ALL_BY_USER = gql`
           id
           userId
           positionId
+          position{
+            id
+            positionName
+            department{
+              id
+              name
+            }
+          }
         }
       }
     }

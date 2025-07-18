@@ -2,7 +2,7 @@ import { inject, Injectable } from "@angular/core";
 import { Apollo, QueryRef } from "apollo-angular";
 import { IApiResponse } from "../../../shared/models/api-response.model";
 import { IUserPosition } from "../../interfaces/oraganizational.interface";
-import { map, Observable } from "rxjs";
+import { map, Observable, take, tap } from "rxjs";
 import { GET_ALL_BY_USER } from "../../../features/admin/organizational/user-positions/graphql/user-position.queries";
 import { responsePathAsArray } from "graphql";
 import { ICreateUserPositionInput } from "../../../features/admin/organizational/user-positions/interfaces/create-user-position.interfaces";
@@ -14,14 +14,14 @@ export class UserPositionsService {
     private apollo = inject(Apollo)
 
     private getAllByUserQueryRef!: QueryRef<{
-        GetAllByUser: IApiResponse<{ userPositions: IUserPosition[] }>
+        getAllByUser: IApiResponse<{ userPositions: IUserPosition[] }>
     }, {
         userId: number
     }>;
 
     initGetAllUserPositionByUserQuery(userId: number): Observable<IApiResponse<{ userPositions: IUserPosition[] }>> {
         this.getAllByUserQueryRef = this.apollo.watchQuery<{
-            GetAllByUser: IApiResponse<{ userPositions: IUserPosition[] }>
+            getAllByUser: IApiResponse<{ userPositions: IUserPosition[] }>
         }, {
             userId: number
         }>({
@@ -31,7 +31,8 @@ export class UserPositionsService {
         })
 
         return this.getAllByUserQueryRef.valueChanges.pipe(
-            map(response => response.data.GetAllByUser)
+            //tap(response => console.log(response)),
+            map(response => response.data.getAllByUser)
         )
     }
 

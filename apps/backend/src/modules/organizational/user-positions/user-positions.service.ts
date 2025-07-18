@@ -20,7 +20,8 @@ export class UserPositionsService {
     return this.repository.find({
       where: {
         userId
-      }
+      },
+      relations: ['position', 'position.department']
     })
   }
 

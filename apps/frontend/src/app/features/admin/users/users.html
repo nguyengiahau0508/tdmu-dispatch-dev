@@ -96,7 +96,7 @@
 }
 
 @if(selectedUserPoitions){
-<app-user-poitions [isOpen]="isUserPoitionsOpen" [user]="selectedUserPoitions" (close)="toggleUserPoitions()"
+<app-user-poitions [userId]="selectedUserPoitions.id" [isOpen]="isUserPoitionsOpen" [user]="selectedUserPoitions" (close)="toggleUserPoitions()"
   (updated)="onUserPoitionsUpdated()" />
 }
 

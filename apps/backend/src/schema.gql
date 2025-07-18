@@ -42,9 +42,14 @@ type UserPosition {
   positionId: Int!
   user: User!
   position: Position!
-  startDate: String!
-  endDate: String
+  startDate: DateTime!
+  endDate: DateTime
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Position {
   """ID chức vụ"""
@@ -106,11 +111,6 @@ type Unit {
   """Đơn vị cha"""
   parentUnit: Unit
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type Assignment {
   """ID của assignment"""
