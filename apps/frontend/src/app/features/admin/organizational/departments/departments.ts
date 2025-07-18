@@ -11,10 +11,11 @@ import { GraphQLResponseError } from '../../../../shared/models/graphql-error.mo
 import { DepartmentCreate } from './components/department-create/department-create';
 import { DepartmentUpdate } from './components/department-update/department-update';
 import { IDepartment } from '../../../../core/interfaces/oraganizational.interface';
+import { DepartmentManagementPositions } from './components/department-management-positions/department-management-positions';
 
 @Component({
   selector: 'app-departments',
-  imports: [Pagination, ConfirmDialogModule, DepartmentCreate, DepartmentUpdate],
+  imports: [Pagination, ConfirmDialogModule, DepartmentCreate, DepartmentUpdate, DepartmentManagementPositions],
   templateUrl: './departments.html',
   styleUrl: './departments.css',
   providers: [ConfirmationService]
@@ -121,8 +122,13 @@ export class Departments {
     this.departmentUpdateSelected = null;
   }
 
+  onClosePostionMangement(){
+    this.isDepartmentPositionOpen = false
+    this.departmentPostionSelected = null
+  }
+
   onManagePositions(department: IDepartment){
     this.departmentPostionSelected = department;
-    
+    this.isDepartmentPositionOpen = true
   }
 }

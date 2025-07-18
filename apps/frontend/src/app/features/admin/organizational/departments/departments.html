@@ -66,3 +66,6 @@
 @if(departmentUpdateSelected){
   <app-department-update [department]="departmentUpdateSelected" [isOpen]="isDepartmentUpdateOpen" (close)="onCloseUpdate()" (updatedSuccessfully)="refetchDepartments()"/>
 }
+@if(departmentPostionSelected){
+  <app-department-management-positions [department]="departmentPostionSelected" [isOpen]="isDepartmentPositionOpen" (close)="onClosePostionMangement()"/>
+}

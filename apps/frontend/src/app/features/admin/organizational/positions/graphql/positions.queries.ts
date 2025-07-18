@@ -18,7 +18,7 @@ export const GET_POSITIONS_QUERY = gql`
 `;
 
 export const GET_ALL_POSITIONS_QUERY = gql`
-  query GetAllPositions {
+  query GetAllPositions{
     allPositions {
       metadata {
         message
@@ -27,6 +27,23 @@ export const GET_ALL_POSITIONS_QUERY = gql`
       data {
         id
         positionName
+      }
+    }
+  }
+`;
+
+export const GET_POSITIONS_BY_DEPARTMENT_ID = gql`
+  query GetPositionByDepartmentId($departmentId: Int!) {
+    allPositionsByDepartmentId(departmentId: $departmentId) {
+      metadata {
+        message
+        timestamp
+      }
+      data {
+        positions {
+          id
+          positionName
+        }
       }
     }
   }

@@ -552,6 +552,18 @@ type GetAllPositionsResponse {
   metadata: Metadata!
 }
 
+type GetPositionsOutput {
+  positions: [Position!]!
+}
+
+type GetPositionsResponse {
+  """Dữ liệu trả về"""
+  data: GetPositionsOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
 type CreateAssignmentOutput {
   """ID của assignment"""
   id: Int!
@@ -979,6 +991,7 @@ type Query {
   unitTypes(input: GetUnitTypesPaginatedInput!): GetUnitTypesPaginatedResponse!
   unitType(id: Int!): GetUnitTypeResponse!
   positions(input: GetPositionsPaginatedInput!): GetPositionsPaginatedResponse!
+  allPositionsByDepartmentId(departmentId: Int!): GetPositionsResponse!
   allPositions: GetAllPositionsResponse!
   position(id: Int!): GetPositionResponse!
   assignments: GetAssignmentsPaginatedResponse!

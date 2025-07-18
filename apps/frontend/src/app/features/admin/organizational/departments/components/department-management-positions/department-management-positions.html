@@ -1,1 +1,23 @@
-<p>department-management-positions works!</p>
+@if (isOpen) {
+<!-- Backdrop phủ mờ -->
+<div class="department-management-positions__backdrop">
+  <div class="position">
+    <p-table [value]="positions" [tableStyle]="{ 'min-width': '50rem' }">
+      <ng-template #header>
+        <tr>
+          <th>ID</th>
+          <th>Tên vị trí</th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-position>
+        <tr>
+          <td>{{ position.id }}</td>
+          <td>{{ position.positionName }}</td>
+          <td ><p-button label=":" /></td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+}

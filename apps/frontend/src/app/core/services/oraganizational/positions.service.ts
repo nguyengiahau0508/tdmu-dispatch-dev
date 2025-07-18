@@ -2,7 +2,7 @@ import { inject, Injectable } from "@angular/core";
 import { Apollo, QueryRef } from "apollo-angular";
 import { Observable } from "rxjs";
 import { map, tap } from "rxjs/operators";
-import { GET_POSITIONS_QUERY, GET_ALL_POSITIONS_QUERY } from '../../../features/admin/organizational/positions/graphql/positions.queries';
+import { GET_POSITIONS_QUERY, GET_ALL_POSITIONS_QUERY, GET_POSITIONS_BY_DEPARTMENT_ID } from '../../../features/admin/organizational/positions/graphql/positions.queries';
 import { CREATE_POSITION_MUTATION, UPDATE_POSITION_MUTATION, REMOVE_POSITION_MUTATION } from '../../../features/admin/organizational/positions/graphql/positions.mutations';
 import { IPosition } from '../../interfaces/oraganizational.interface';
 import { IGetPositionsPaginatedInput } from '../../../features/admin/organizational/positions/interfaces/get-positions-paginated.interface';
@@ -75,5 +75,21 @@ export class PositionsService {
     }).pipe(
       map(result => result.data!.removePosition)
     );
+  }
+
+  getPostionsByDepartmnetId(departmentId: number): Observable<IApiResponse<{
+    positions: IPosition[] 
+  }>> {
+    return this.apollo.query<{
+      allPositionsByDepartmentId: IApiResponse<{
+         positions: IPosition[] 
+      }>
+    }>({
+      query: GET_POSITIONS_BY_DEPARTMENT_ID,
+      variables: {departmentId}
+    }).pipe(
+      //tap(response=>console.log(response)),
+      map(response=>response.data.allPositionsByDepartmentId)
+    )
   }
 }
