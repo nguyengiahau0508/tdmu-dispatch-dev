@@ -12,9 +12,10 @@ import { ButtonModule } from 'primeng/button';
 import { UserPositionsService } from '../../../../../../core/services/oraganizational/user-positions.service';
 import { ICreateUserPositionInput } from '../../interfaces/create-user-position.interfaces';
 import { ToastrService } from 'ngx-toastr';
+import { DatePickerModule } from 'primeng/datepicker';
 @Component({
   selector: 'app-user-position-create',
-  imports: [PanelModule, SelectModule,InputGroupModule, InputGroupAddonModule, ButtonModule,
+  imports: [PanelModule, SelectModule, InputGroupModule, InputGroupAddonModule, ButtonModule,DatePickerModule,
     CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './user-position-create.html',
   styleUrl: './user-position-create.css'
@@ -44,7 +45,8 @@ export class UserPositionCreate implements OnInit {
     this.userPositionCreateForm = this.fb.group({
       userId: [this.userId, [Validators.required]],
       departmentId: [null, [Validators.required]],
-      positionId: [null, [Validators.required]]
+      positionId: [null, [Validators.required]],
+      startDate: [null, [Validators.required]]
     })
   }
 
@@ -75,19 +77,19 @@ export class UserPositionCreate implements OnInit {
   }
 
   onSubmit() {
-    if(this.userPositionCreateForm.invalid) return
+    if (this.userPositionCreateForm.invalid) return
     const userPositionCreateFormData: ICreateUserPositionInput = this.userPositionCreateForm.value
     this.userPositionsService.createUserPosition(userPositionCreateFormData).subscribe({
-      next: (response)=>{
+      next: (response) => {
         this.toasrt.success("Thêm thành công chức vụ cho người dùng")
       },
-      error: err=>{
+      error: err => {
         //console.log(err)
       }
     })
   }
 
-  onClose(){
+  onClose() {
     this.close.emit()
   }
 }

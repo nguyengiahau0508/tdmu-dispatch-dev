@@ -4,13 +4,17 @@
   <p-panel header="Thêm chức vụ cho người dùng">
     <form class="user-position-form" [formGroup]="userPositionCreateForm" (ngSubmit)="onSubmit()">
       <p-inputgroup>
-        <p-select [options]="departments" formControlName="departmentId" placeholder="Chọn phòng ban phân công"
+        <p-select [options]="departments" formControlName="departmentId" placeholder="Chọn phòng ban"
           [editable]="true" optionLabel="name" optionValue="id" class="w-full md:w-56"
           (onChange)="onDepartmentChange($event)" />
       </p-inputgroup>
       <p-inputgroup>
-        <p-select [options]="positionsOfDepartment" formControlName="positionId" placeholder="Chọn vị trí phân công"
+        <p-select [options]="positionsOfDepartment" formControlName="positionId" placeholder="Chọn vị trí"
           [editable]="true" optionLabel="positionName" optionValue="id" class="w-full md:w-56" />
+      </p-inputgroup>
+
+      <p-inputgroup>
+        <p-datepicker formControlName="startDate" placeholder="Chọn thời gian bắt đầu"/>
       </p-inputgroup>
 
       <div class="user-position-create_actions">
