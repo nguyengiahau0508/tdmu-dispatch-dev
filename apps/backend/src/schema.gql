@@ -792,6 +792,18 @@ type CreateUserPositionResponse {
   metadata: Metadata!
 }
 
+type GetAllByUserOutput {
+  userPositions: [UserPosition!]!
+}
+
+type GetAllByUserReponse {
+  """Dữ liệu trả về"""
+  data: GetAllByUserOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
 type ApprovalHistory {
   """Example field (placeholder)"""
   exampleField: Int!
@@ -1011,6 +1023,7 @@ type Query {
   assignment(id: Int!): GetAssignmentResponse!
   departmentsPaginated(input: GetDepartmentsPaginatedInput!): GetDepartmentsPaginatedResponse!
   department(input: GetDepartmentInput!): GetDepartmentResponse!
+  getAllByUser(userId: Int!): GetAllByUserReponse!
   approvalHistory(id: Int!): ApprovalHistory!
   approvalProcess(id: Int!): ApprovalProcess!
   approvalStep(id: Int!): ApprovalStep!

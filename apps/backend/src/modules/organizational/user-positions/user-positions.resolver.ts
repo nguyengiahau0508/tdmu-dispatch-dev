@@ -5,17 +5,27 @@ import { CreateUserPositionInput } from './dto/create-user-position/create-user-
 import { CreateUserPositionResponse } from './dto/create-user-position/create-user-position.response';
 import { createResponseMetadata } from 'src/common/helpers/metadata.helper';
 import { HttpStatus } from '@nestjs/common';
+import { GetAllByUserReponse } from './dto/get-all-by-user/get-all-by-user.response';
 
 @Resolver(() => UserPosition)
 export class UserPositionsResolver {
-  constructor(private readonly userPositionsService: UserPositionsService) {}
+  constructor(private readonly userPositionsService: UserPositionsService) { }
 
   @Mutation(() => CreateUserPositionResponse)
- async createUserPosition(@Args('createUserPositionInput') createUserPositionInput: CreateUserPositionInput): Promise<CreateUserPositionResponse> {
+  async createUserPosition(@Args('createUserPositionInput') createUserPositionInput: CreateUserPositionInput): Promise<CreateUserPositionResponse> {
     const result = await this.userPositionsService.create(createUserPositionInput);
     return {
       metadata: createResponseMetadata(HttpStatus.OK, "Tạo thành công"),
-      data: {userPosition: result}
+      data: { userPosition: result }
+    }
+  }
+
+  @Query(() => GetAllByUserReponse)
+  async getAllByUser(@Args('userId', { type: () => Int }) userId: number): Promise<GetAllByUserReponse> {
+    const userPositions = await this.userPositionsService.getAllByUser(userId)
+    return {
+      metadata: createResponseMetadata(HttpStatus.OK, "Lấy thành công tất cả vị trí của người dùng"),
+      data: {userPositions}
     }
   }
 

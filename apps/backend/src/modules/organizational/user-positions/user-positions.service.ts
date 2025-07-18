@@ -16,6 +16,14 @@ export class UserPositionsService {
     return await this.repository.save(created)
   }
 
+  async getAllByUser(userId:number){
+    return this.repository.find({
+      where: {
+        userId
+      }
+    })
+  }
+
   // findAll() {
   //   return `This action returns all userPositions`;
   // }
