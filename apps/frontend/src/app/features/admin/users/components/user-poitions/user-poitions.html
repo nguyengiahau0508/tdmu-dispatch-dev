@@ -3,7 +3,7 @@
   <p-panel header="Quản lí chức vụ người dùng">
     <p-toolbar>
       <ng-template #end>
-        <p-button label="Thêm vị trí mới" />
+        <p-button label="Thêm vị trí mới" (onClick)="onUserPostionCreate()"/>
       </ng-template>
     </p-toolbar>
     <p-table [value]="userPositions" [tableStyle]="{ 'min-width': '50rem' }">
@@ -31,4 +31,8 @@
   </p-panel>
 
 </div>
+}
+
+@if (isOpenCreateFormUserPosition) {
+  <app-user-position-create [isOpen]="isOpenCreateFormUserPosition"/>
 }

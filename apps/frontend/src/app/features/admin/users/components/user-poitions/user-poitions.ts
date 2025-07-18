@@ -17,10 +17,14 @@ import { PanelModule } from 'primeng/panel';
 import { MenuItem } from 'primeng/api';
 import { ToolbarModule } from 'primeng/toolbar';
 import { ButtonModule } from 'primeng/button';
+import { UserPositionCreate } from '../../../organizational/user-positions/components/user-position-create/user-position-create';
+import { UserPositionUpdate } from '../../../organizational/user-positions/components/user-position-update/user-position-update';
 @Component({
   selector: 'app-user-poitions',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, TableModule, DatePipe, SplitButtonModule, PanelModule, ToolbarModule, ButtonModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TableModule, DatePipe, SplitButtonModule, PanelModule, ToolbarModule, ButtonModule,
+    UserPositionCreate, UserPositionUpdate
+  ],
   templateUrl: './user-poitions.html',
   styleUrl: './user-poitions.css'
 })
@@ -28,11 +32,12 @@ export class UserPoitions implements OnInit {
   @Input({ required: true }) userId!: number
   @Input() isOpen = false;
   @Input({ required: true }) user!: IUser;
-  
+
   @Output() close = new EventEmitter<void>();
   @Output() updated = new EventEmitter<void>();
 
   userPositions: IUserPosition[] = []
+  isOpenCreateFormUserPosition: boolean = false
 
   constructor(
     private readonly userPositionsService: UserPositionsService
@@ -47,7 +52,7 @@ export class UserPoitions implements OnInit {
       next: response => {
         console.log(response.data?.userPositions)
         this.userPositions = response.data!.userPositions.map(
-          userPosition=>({
+          userPosition => ({
             ...userPosition,
             actions: this.getMenuItemsForUserPosition(userPosition)
           })
@@ -73,7 +78,7 @@ export class UserPoitions implements OnInit {
   }
 
   onUserPostionCreate() {
-
+    this.isOpenCreateFormUserPosition = true
   }
 
   onUserPositionUpdate() {
