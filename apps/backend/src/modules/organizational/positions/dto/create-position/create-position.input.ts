@@ -4,4 +4,7 @@ import { InputType, Field } from '@nestjs/graphql';
 export class CreatePositionInput {
   @Field({ description: 'Tên chức vụ' })
   positionName: string;
+
+  @Field({ description: 'Số lượng chức vụ' })
+  maxSlots: number
 }

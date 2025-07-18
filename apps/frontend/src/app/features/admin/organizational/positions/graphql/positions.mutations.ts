@@ -28,6 +28,7 @@ export const UPDATE_POSITION_MUTATION = gql`
         position {
           id
           positionName
+          maxSlots
         }
       }
     }

@@ -1374,11 +1374,17 @@ input UpdateUnitTypeInput {
 input CreatePositionInput {
   """Tên chức vụ"""
   positionName: String!
+
+  """Số lượng chức vụ"""
+  maxSlots: Float!
 }
 
 input UpdatePositionInput {
   """Tên chức vụ"""
   positionName: String
+
+  """Số lượng chức vụ"""
+  maxSlots: Float
   id: Int!
 }
 

@@ -49,6 +49,9 @@ export class PositionsService {
     if (updatePositionInput.positionName !== undefined) {
       position.positionName = updatePositionInput.positionName;
     }
+    if(updatePositionInput.maxSlots !== undefined){
+      position.maxSlots = updatePositionInput.maxSlots
+    }
     const updated = await this.repository.save(position);
     if (!updated) throw new BadRequestException('Failed to update position');
     return updated;
