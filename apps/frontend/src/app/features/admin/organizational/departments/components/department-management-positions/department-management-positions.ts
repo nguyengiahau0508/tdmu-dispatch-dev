@@ -71,7 +71,7 @@ export class DepartmentManagementPositions implements OnChanges {
         }));
       },
       error: err => {
-        console.log(err)
+        
       }
     })
   }

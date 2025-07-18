@@ -7,6 +7,6 @@ import { Departments } from "./departments/departments";
 export const organizationalRoutes: Routes = [
   { path: 'units', component: Units },
   { path: 'unit-types', component: UnitTypes },
-  { path: 'positions', component: Positions },
+  //{ path: 'positions', component: Positions },
   { path: 'departments', component: Departments }
 ]
