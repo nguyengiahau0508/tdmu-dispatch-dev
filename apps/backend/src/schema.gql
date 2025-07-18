@@ -67,6 +67,9 @@ type Position {
   """Số lượng tối đa người giữ chức vụ này"""
   maxSlots: Int!
   userPositions: [UserPosition!]!
+
+  """Số lượng người đang giữ chức vụ này"""
+  currentSlotCount: Int!
 }
 
 type UnitType {

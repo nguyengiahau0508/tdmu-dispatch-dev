@@ -12,6 +12,7 @@ export class UserPositionsService {
   ){}
 
   async create(createUserPositionInput: CreateUserPositionInput) {
+    
     const created = this.repository.create(createUserPositionInput)
     return await this.repository.save(created)
   }
