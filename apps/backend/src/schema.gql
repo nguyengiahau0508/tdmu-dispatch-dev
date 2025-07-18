@@ -780,6 +780,18 @@ type RemoveDepartmentResponse {
   metadata: Metadata!
 }
 
+type GetAllDepartmentOutput {
+  departments: [Department!]!
+}
+
+type GetAllDepartmentResponse {
+  """Dữ liệu trả về"""
+  data: GetAllDepartmentOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
 type CreateUserPositionOutput {
   userPosition: UserPosition!
 }
@@ -1022,6 +1034,7 @@ type Query {
   assignmentsByUser(userId: Int!): GetAssignmentsPaginatedResponse!
   assignment(id: Int!): GetAssignmentResponse!
   departmentsPaginated(input: GetDepartmentsPaginatedInput!): GetDepartmentsPaginatedResponse!
+  getAllDepartmentBySearch: GetAllDepartmentResponse!
   department(input: GetDepartmentInput!): GetDepartmentResponse!
   getAllByUser(userId: Int!): GetAllByUserReponse!
   approvalHistory(id: Int!): ApprovalHistory!

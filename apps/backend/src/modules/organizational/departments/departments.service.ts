@@ -23,6 +23,20 @@ export class DepartmentsService {
     return saved;
   }
 
+  findAllDepartmentBySearch(search: string) {
+    const where: FindOptionsWhere<Department>[] = [];
+    if (search) {
+      where.push({ name: ILike(`%${search}%`) });
+      const searchId = Number(search);
+      if (!isNaN(searchId)) {
+        where.push({ id: searchId });
+      }
+    }
+    return this.repository.find({
+      where: where.length > 0 ? where : undefined
+    });
+  }
+
   async findPaginated(input: GetDepartmentsPaginatedInput): Promise<PageDto<Department>> {
     const { search, order, parentDepartmentId, skip, take } = input;
     const where: FindOptionsWhere<Department>[] = [];
