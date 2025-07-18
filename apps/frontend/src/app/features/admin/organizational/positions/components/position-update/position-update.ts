@@ -33,7 +33,8 @@ export class PositionUpdate implements OnInit {
 
   ngOnInit(): void {
     this.positionUpdateForm = this.fb.group({
-      positionName: [this.position?.positionName || '', [Validators.required, Validators.maxLength(256)]]
+      positionName: [this.position?.positionName || '', [Validators.required, Validators.maxLength(256)]],
+      maxSlots: [this.position?.maxSlots||1, [Validators.required]]
     });
   }
 
