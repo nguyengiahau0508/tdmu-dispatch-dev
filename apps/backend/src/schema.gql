@@ -780,6 +780,18 @@ type RemoveDepartmentResponse {
   metadata: Metadata!
 }
 
+type CreateUserPositionOutput {
+  userPosition: UserPosition!
+}
+
+type CreateUserPositionResponse {
+  """Dữ liệu trả về"""
+  data: CreateUserPositionOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
 type ApprovalHistory {
   """Example field (placeholder)"""
   exampleField: Int!
@@ -999,8 +1011,6 @@ type Query {
   assignment(id: Int!): GetAssignmentResponse!
   departmentsPaginated(input: GetDepartmentsPaginatedInput!): GetDepartmentsPaginatedResponse!
   department(input: GetDepartmentInput!): GetDepartmentResponse!
-  userPositions: [UserPosition!]!
-  userPosition(id: Int!): UserPosition!
   approvalHistory(id: Int!): ApprovalHistory!
   approvalProcess(id: Int!): ApprovalProcess!
   approvalStep(id: Int!): ApprovalStep!
@@ -1187,9 +1197,7 @@ type Mutation {
   createDepartment(input: CreateDepartmentInput!): CreateDepartmentResponse!
   updateDepartment(input: UpdateDepartmentInput!): UpdateDepartmentResponse!
   removeDepartment(input: RemoveDepartmentInput!): RemoveDepartmentResponse!
-  createUserPosition(createUserPositionInput: CreateUserPositionInput!): UserPosition!
-  updateUserPosition(updateUserPositionInput: UpdateUserPositionInput!): UserPosition!
-  removeUserPosition(id: Int!): UserPosition!
+  createUserPosition(createUserPositionInput: CreateUserPositionInput!): CreateUserPositionResponse!
   createApprovalHistory(createApprovalHistoryInput: CreateApprovalHistoryInput!): ApprovalHistory!
   updateApprovalHistory(updateApprovalHistoryInput: UpdateApprovalHistoryInput!): ApprovalHistory!
   removeApprovalHistory(id: Int!): ApprovalHistory!
@@ -1448,14 +1456,9 @@ input RemoveDepartmentInput {
 }
 
 input CreateUserPositionInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-input UpdateUserPositionInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  userId: Int!
+  positionId: Int!
+  startDate: DateTime!
 }
 
 input CreateApprovalHistoryInput {

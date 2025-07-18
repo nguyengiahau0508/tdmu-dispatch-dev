@@ -24,12 +24,12 @@ export class UserPosition {
   @Column()
   positionId: number;
 
-  @ManyToOne(() => User, (user) => user.userPositions, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.userPositions, { cascade: true })
   @JoinColumn({ name: 'userId' })
   @Field(() => User)
   user: User;
 
-  @ManyToOne(() => Position, (position) => position.userPositions, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Position, (position) => position.userPositions, { cascade: true })
   @JoinColumn({ name: 'positionId' })
   @Field(() => Position)
   position: Position;

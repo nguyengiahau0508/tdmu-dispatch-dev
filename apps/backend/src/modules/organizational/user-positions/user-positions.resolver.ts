@@ -1,35 +1,41 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { UserPositionsService } from './user-positions.service';
 import { UserPosition } from './entities/user-position.entity';
-import { CreateUserPositionInput } from './dto/create-user-position.input';
-import { UpdateUserPositionInput } from './dto/update-user-position.input';
+import { CreateUserPositionInput } from './dto/create-user-position/create-user-position.input';
+import { CreateUserPositionResponse } from './dto/create-user-position/create-user-position.response';
+import { createResponseMetadata } from 'src/common/helpers/metadata.helper';
+import { HttpStatus } from '@nestjs/common';
 
 @Resolver(() => UserPosition)
 export class UserPositionsResolver {
   constructor(private readonly userPositionsService: UserPositionsService) {}
 
-  @Mutation(() => UserPosition)
-  createUserPosition(@Args('createUserPositionInput') createUserPositionInput: CreateUserPositionInput) {
-    return this.userPositionsService.create(createUserPositionInput);
+  @Mutation(() => CreateUserPositionResponse)
+ async createUserPosition(@Args('createUserPositionInput') createUserPositionInput: CreateUserPositionInput): Promise<CreateUserPositionResponse> {
+    const result = await this.userPositionsService.create(createUserPositionInput);
+    return {
+      metadata: createResponseMetadata(HttpStatus.OK, "Tạo thành công"),
+      data: {userPosition: result}
+    }
   }
 
-  @Query(() => [UserPosition], { name: 'userPositions' })
-  findAll() {
-    return this.userPositionsService.findAll();
-  }
+  // @Query(() => [UserPosition], { name: 'userPositions' })
+  // findAll() {
+  //   return this.userPositionsService.findAll();
+  // }
 
-  @Query(() => UserPosition, { name: 'userPosition' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.userPositionsService.findOne(id);
-  }
+  // @Query(() => UserPosition, { name: 'userPosition' })
+  // findOne(@Args('id', { type: () => Int }) id: number) {
+  //   return this.userPositionsService.findOne(id);
+  // }
 
-  @Mutation(() => UserPosition)
-  updateUserPosition(@Args('updateUserPositionInput') updateUserPositionInput: UpdateUserPositionInput) {
-    return this.userPositionsService.update(updateUserPositionInput.id, updateUserPositionInput);
-  }
+  // @Mutation(() => UserPosition)
+  // updateUserPosition(@Args('updateUserPositionInput') updateUserPositionInput: UpdateUserPositionInput) {
+  //   return this.userPositionsService.update(updateUserPositionInput.id, updateUserPositionInput);
+  // }
 
-  @Mutation(() => UserPosition)
-  removeUserPosition(@Args('id', { type: () => Int }) id: number) {
-    return this.userPositionsService.remove(id);
-  }
+  // @Mutation(() => UserPosition)
+  // removeUserPosition(@Args('id', { type: () => Int }) id: number) {
+  //   return this.userPositionsService.remove(id);
+  // }
 }
