@@ -10,3 +10,8 @@
   padding: 1rem;
   box-sizing: border-box;
 }
+
+.department-management-positions_action{  
+  display: flex;
+  justify-content: flex-end;
+}

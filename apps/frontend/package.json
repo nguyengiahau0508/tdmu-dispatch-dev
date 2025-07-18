@@ -26,6 +26,7 @@
     "apollo-upload-client": "^18.0.1",
     "graphql": "^16.11.0",
     "ngx-toastr": "^19.0.0",
+    "primeicons": "^7.0.0",
     "primeng": "^20.0.0-rc.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

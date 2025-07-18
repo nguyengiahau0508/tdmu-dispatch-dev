@@ -1,23 +1,47 @@
 @if (isOpen) {
 <!-- Backdrop phủ mờ -->
 <div class="department-management-positions__backdrop">
-  <div class="position">
-    <p-table [value]="positions" [tableStyle]="{ 'min-width': '50rem' }">
-      <ng-template #header>
-        <tr>
-          <th>ID</th>
-          <th>Tên vị trí</th>
-          <th></th>
-        </tr>
-      </ng-template>
-      <ng-template #body let-position>
-        <tr>
-          <td>{{ position.id }}</td>
-          <td>{{ position.positionName }}</td>
-          <td ><p-button label=":" /></td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
+<p-panel header="Header">
+    <div class="position">
+      <p-toolbar>
+        <ng-template #end>
+          <p-button label="Thêm vị trí mới" />
+        </ng-template>
+      </p-toolbar>
+
+      <p-table [value]="positions" [scrollable]="true" scrollHeight="600px" [tableStyle]="{ 'min-width': '50rem' }">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>ID</th>
+            <th>Tên vị trí</th>
+            <th>Số lượng</th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-position>
+          <tr>
+            <td>{{ position.id }}</td>
+            <td>{{ position.positionName }}</td>
+            <td>{{ position.maxSlots }}</td>
+            <td>
+              <p-splitButton
+                label="Cài đặt"
+                dropdownIcon="pi pi-cog"
+                [model]="position.actions"
+              />
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <div class="department-management-positions_action">
+        <p-button label="Close" (onClick)="onClose()" />
+      </div>
+    </div>
+  </p-panel>
 </div>
+}
+
+@if(positionUdpateSelected){
+  <app-position-update [position]="positionUdpateSelected" [isOpen]="isPostionUpdateOpen" (close)="onCloseUpdateForm()"/>
 }

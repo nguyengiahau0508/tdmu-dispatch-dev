@@ -24,7 +24,7 @@ export const appConfig: ApplicationConfig = {
     provideToastr(),
     providePrimeNG({
       theme: {
-        preset: Aura
+        preset: Tdmu
       }
     }),
     {

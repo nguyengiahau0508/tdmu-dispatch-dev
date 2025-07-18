@@ -43,6 +43,7 @@ export const GET_POSITIONS_BY_DEPARTMENT_ID = gql`
         positions {
           id
           positionName
+          maxSlots
         }
       }
     }
