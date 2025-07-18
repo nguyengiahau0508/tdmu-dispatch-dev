@@ -47,3 +47,22 @@ export const GET_DEPARTMENT_QUERY = gql`
     }
   }
 `;
+
+
+export const GET_ALL_DEPARTMENTS_BY_SEARCH = gql`
+  query GetAllDepartmentsBySearch($search: String!) {
+    getAllDepartmentBySearch(search: $search) {
+      metadata {
+        message
+        timestamp
+        statusCode
+      }
+      data {
+        departments {
+          id
+          name
+        }
+      }
+    }
+  }
+`;

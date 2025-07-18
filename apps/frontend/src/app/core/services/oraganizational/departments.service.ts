@@ -3,6 +3,7 @@ import { Apollo, QueryRef } from 'apollo-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
+  GET_ALL_DEPARTMENTS_BY_SEARCH,
   GET_DEPARTMENTS_PAGINATED_QUERY,
   GET_DEPARTMENT_QUERY
 } from '../../../features/admin/organizational/departments/graphql/department.queries';
@@ -54,6 +55,17 @@ export class DepartmentsService {
     }).pipe(
       map(result => result.data.department)
     );
+  }
+
+  getAllDepartments(search: string): Observable<any> {
+    return this.apollo
+      .watchQuery({
+        query: GET_ALL_DEPARTMENTS_BY_SEARCH,
+        variables: { search }
+      })
+      .valueChanges.pipe(
+        map((result: any) => result.data.getAllDepartmentBySearch)
+      );
   }
 
   createDepartment(input: ICreateDepartmentInput): Observable<IApiResponse<{ department: IDepartment }>> {
