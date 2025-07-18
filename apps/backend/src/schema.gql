@@ -1483,6 +1483,7 @@ input RemoveDepartmentInput {
 
 input CreateUserPositionInput {
   userId: Int!
+  departmentId: Int!
   positionId: Int!
   startDate: DateTime!
 }
