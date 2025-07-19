@@ -8,7 +8,7 @@ import { PositionsService } from '../../../../../core/services/oraganizational/p
 import { UnitsService } from '../../../../../core/services/oraganizational/units.service';
 import { IAssignment, IPosition, IUnit, IUserPosition } from '../../../../../core/interfaces/oraganizational.interface';
 import { IUser } from '../../../../../core/interfaces/user.interface';
-import { ToastrService } from 'ngx-toastr';
+import { Toast, ToastrService } from 'ngx-toastr';
 import { finalize } from 'rxjs';
 import { UserPositionsService } from '../../../../../core/services/oraganizational/user-positions.service';
 import { TableModule } from 'primeng/table';
@@ -19,12 +19,15 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { ButtonModule } from 'primeng/button';
 import { UserPositionCreate } from '../../../organizational/user-positions/components/user-position-create/user-position-create';
 import { UserPositionUpdate } from '../../../organizational/user-positions/components/user-position-update/user-position-update';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 @Component({
   selector: 'app-user-poitions',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, TableModule, DatePipe, SplitButtonModule, PanelModule, ToolbarModule, ButtonModule,
-    UserPositionCreate, UserPositionUpdate
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TableModule, DatePipe, SplitButtonModule, PanelModule, ToolbarModule, ButtonModule, ConfirmDialogModule,
+    UserPositionCreate
   ],
+  providers: [ConfirmationService],
   templateUrl: './user-poitions.html',
   styleUrl: './user-poitions.css'
 })
@@ -40,7 +43,9 @@ export class UserPoitions implements OnInit {
   isOpenCreateFormUserPosition: boolean = false
 
   constructor(
-    private readonly userPositionsService: UserPositionsService
+    private readonly userPositionsService: UserPositionsService,
+    private readonly ConfirmationService: ConfirmationService,
+    private readonly toasrt: ToastrService
   ) { }
 
   ngOnInit(): void {
@@ -67,12 +72,17 @@ export class UserPoitions implements OnInit {
       {
         label: 'Cập nhật',
         icon: 'pi pi-pencil',
-        command: () => this.onUserPositionUpdate
+        command: () => this.onUserPositionUpdate()
       },
       {
         label: 'Xóa khỏi phòng ban',
         icon: 'pi pi-trash',
         command: () => this.onUserPositionRemove()
+      },
+      {
+        label: 'Kết thúc chức vụ',
+        icon: 'pi pi-ban',
+        command: () => this.onUserPostionEnd(userPosition.id)
       }
     ];
   }
@@ -87,6 +97,26 @@ export class UserPoitions implements OnInit {
 
   onUserPositionRemove() {
 
+  }
+
+  onUserPostionEnd(userPositionId: number) {
+    this.ConfirmationService.confirm({
+      message: 'Bạn có chắc chắn kết thúc chức vụ này',
+      header: 'Xác nhận xóa',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Đồng ý',
+      rejectLabel: 'Hủy bỏ',
+      accept: () => {
+        this.userPositionsService.endUserPosition(userPositionId).subscribe({
+          next: response => {
+            this.toasrt.success("Kết thúc chức vụ thành công")
+          },
+          error: err => {
+            //console.log(err)
+          }
+        })
+      }
+    });
   }
 
   onClose() {
