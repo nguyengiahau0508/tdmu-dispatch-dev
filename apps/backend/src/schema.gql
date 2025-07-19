@@ -819,21 +819,6 @@ type GetAllByUserReponse {
   metadata: Metadata!
 }
 
-type ApprovalHistory {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-type ApprovalProcess {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-type ApprovalStep {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
 type DocumentCategory {
   id: Int!
   name: String!
@@ -1013,6 +998,57 @@ type UpdateDocumentTypeResponse {
   metadata: Metadata!
 }
 
+type WorkflowStep {
+  id: Int!
+  name: String!
+  type: StepType!
+  assignedRole: String!
+  orderNumber: Int!
+  nextStepId: Int
+  template: WorkflowTemplate!
+}
+
+enum StepType {
+  START
+  APPROVAL
+  TRANSFER
+  END
+}
+
+type WorkflowActionLog {
+  id: Int!
+  instance: WorkflowInstance!
+  step: WorkflowStep!
+  actionBy: Int!
+  actionAt: DateTime!
+  note: String
+}
+
+type WorkflowInstance {
+  id: Int!
+  template: WorkflowTemplate!
+  documentId: Int!
+  currentStep: WorkflowStep
+  status: WorkflowStatus!
+  logs: [WorkflowActionLog!]!
+}
+
+enum WorkflowStatus {
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+type WorkflowTemplate {
+  id: Int!
+  name: String!
+  description: String
+  createdBy: Int!
+  createdAt: DateTime!
+  steps: [WorkflowStep!]!
+  instances: [WorkflowInstance!]!
+}
+
 type Query {
   users: [User!]!
   user(id: Int!): User
@@ -1040,9 +1076,14 @@ type Query {
   getAllDepartmentBySearch(search: String!): GetAllDepartmentResponse!
   department(input: GetDepartmentInput!): GetDepartmentResponse!
   getAllByUser(userId: Int!): GetAllByUserReponse!
-  approvalHistory(id: Int!): ApprovalHistory!
-  approvalProcess(id: Int!): ApprovalProcess!
-  approvalStep(id: Int!): ApprovalStep!
+  workflowActionLogs: [WorkflowActionLog!]!
+  workflowActionLog(id: Int!): WorkflowActionLog!
+  workflowInstances: [WorkflowInstance!]!
+  workflowInstance(id: Int!): WorkflowInstance!
+  workflowSteps: [WorkflowStep!]!
+  workflowStep(id: Int!): WorkflowStep!
+  workflowTemplates: [WorkflowTemplate!]!
+  workflowTemplate(id: Int!): WorkflowTemplate!
   documents(input: GetDocumentsPaginatedInput!): GetDocumentsPaginatedResponse!
   document(id: Int!): GetDocumentResponse!
   documentTypes(input: GetDocumentTypesPaginatedInput!): GetDocumentTypesPaginatedResponse!
@@ -1228,15 +1269,18 @@ type Mutation {
   removeDepartment(input: RemoveDepartmentInput!): RemoveDepartmentResponse!
   createUserPosition(createUserPositionInput: CreateUserPositionInput!): CreateUserPositionResponse!
   endUserPosition(id: Int!): CreateUserPositionResponse!
-  createApprovalHistory(createApprovalHistoryInput: CreateApprovalHistoryInput!): ApprovalHistory!
-  updateApprovalHistory(updateApprovalHistoryInput: UpdateApprovalHistoryInput!): ApprovalHistory!
-  removeApprovalHistory(id: Int!): ApprovalHistory!
-  createApprovalProcess(createApprovalProcessInput: CreateApprovalProcessInput!): ApprovalProcess!
-  updateApprovalProcess(updateApprovalProcessInput: UpdateApprovalProcessInput!): ApprovalProcess!
-  removeApprovalProcess(id: Int!): ApprovalProcess!
-  createApprovalStep(createApprovalStepInput: CreateApprovalStepInput!): ApprovalStep!
-  updateApprovalStep(updateApprovalStepInput: UpdateApprovalStepInput!): ApprovalStep!
-  removeApprovalStep(id: Int!): ApprovalStep!
+  createWorkflowActionLog(createWorkflowActionLogInput: CreateWorkflowActionLogInput!): WorkflowActionLog!
+  updateWorkflowActionLog(updateWorkflowActionLogInput: UpdateWorkflowActionLogInput!): WorkflowActionLog!
+  removeWorkflowActionLog(id: Int!): WorkflowActionLog!
+  createWorkflowInstance(createWorkflowInstanceInput: CreateWorkflowInstanceInput!): WorkflowInstance!
+  updateWorkflowInstance(updateWorkflowInstanceInput: UpdateWorkflowInstanceInput!): WorkflowInstance!
+  removeWorkflowInstance(id: Int!): WorkflowInstance!
+  createWorkflowStep(createWorkflowStepInput: CreateWorkflowStepInput!): WorkflowStep!
+  updateWorkflowStep(updateWorkflowStepInput: UpdateWorkflowStepInput!): WorkflowStep!
+  removeWorkflowStep(id: Int!): WorkflowStep!
+  createWorkflowTemplate(createWorkflowTemplateInput: CreateWorkflowTemplateInput!): WorkflowTemplate!
+  updateWorkflowTemplate(updateWorkflowTemplateInput: UpdateWorkflowTemplateInput!): WorkflowTemplate!
+  removeWorkflowTemplate(id: Int!): WorkflowTemplate!
   createDocument(createDocumentInput: CreateDocumentInput!, file: Upload): GetDocumentResponse!
   updateDocument(updateDocumentInput: UpdateDocumentInput!): GetDocumentResponse!
   removeDocument(id: Int!): RemoveDocumentResponse!
@@ -1492,34 +1536,45 @@ input CreateUserPositionInput {
   startDate: DateTime!
 }
 
-input CreateApprovalHistoryInput {
+input CreateWorkflowActionLogInput {
   """Example field (placeholder)"""
   exampleField: Int!
 }
 
-input UpdateApprovalHistoryInput {
+input UpdateWorkflowActionLogInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!
 }
 
-input CreateApprovalProcessInput {
+input CreateWorkflowInstanceInput {
   """Example field (placeholder)"""
   exampleField: Int!
 }
 
-input UpdateApprovalProcessInput {
+input UpdateWorkflowInstanceInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!
 }
 
-input CreateApprovalStepInput {
+input CreateWorkflowStepInput {
   """Example field (placeholder)"""
   exampleField: Int!
 }
 
-input UpdateApprovalStepInput {
+input UpdateWorkflowStepInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateWorkflowTemplateInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateWorkflowTemplateInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!

@@ -55,6 +55,6 @@ export class UserPositionsService {
   // }
 
   // remove(id: number) {
-  //   return `This action removes a #${id} userPosition`;
+    
   // }
 }
