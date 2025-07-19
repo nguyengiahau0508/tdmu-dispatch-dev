@@ -3,7 +3,7 @@
   <p-panel header="Quản lí chức vụ người dùng">
     <p-toolbar>
       <ng-template #end>
-        <p-button label="Thêm vị trí mới" (onClick)="onUserPostionCreate()"/>
+        <p-button label="Thêm vị trí mới" (onClick)="onUserPostionCreate()" />
       </ng-template>
     </p-toolbar>
     <p-table [value]="userPositions" [tableStyle]="{ 'min-width': '50rem' }">
@@ -13,6 +13,7 @@
           <th>Vị trí</th>
           <th>Phòng ban</th>
           <th>Ngày bắt đầu</th>
+          <th>Ngày kết thúc</th>
           <th></th>
         </tr>
       </ng-template>
@@ -22,19 +23,21 @@
           <td>{{ userPosition.position.positionName }}</td>
           <td>{{ userPosition.position.department.name }}</td>
           <td>{{ userPosition.startDate | date:'d/M/yy' }}</td>
+          <td>{{ userPosition.endDate | date:'d/M/yy' }}</td>
           <td><p-splitbutton label="Cài đặt" icon="pi pi-check" dropdownIcon="pi pi-cog"
               [model]="userPosition.actions" /></td>
         </tr>
       </ng-template>
     </p-table>
-    <div class="actions"><p-button label="Thoát ra" (onClick)="onClose()"/></div>
+    <div class="actions"><p-button label="Thoát ra" (onClick)="onClose()" /></div>
   </p-panel>
 
 </div>
 }
 
 @if (isOpenCreateFormUserPosition) {
-  <app-user-position-create [userId]="userId" [isOpen]="isOpenCreateFormUserPosition" (close)="isOpenCreateFormUserPosition = false"/>
+<app-user-position-create [userId]="userId" [isOpen]="isOpenCreateFormUserPosition"
+  (close)="isOpenCreateFormUserPosition = false" />
 }
 
 <p-confirmdialog />

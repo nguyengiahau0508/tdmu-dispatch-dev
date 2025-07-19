@@ -12,6 +12,7 @@ export const GET_ALL_BY_USER = gql`
           id
           userId
           startDate
+          endDate
           positionId
           position{
             id
