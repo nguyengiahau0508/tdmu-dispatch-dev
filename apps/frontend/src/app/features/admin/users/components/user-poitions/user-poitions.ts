@@ -63,7 +63,9 @@ export class UserPoitions implements OnInit {
           })
         )
       },
-      error: err => { }
+      error: err => {
+        console.log(err)
+      }
     })
   }
 

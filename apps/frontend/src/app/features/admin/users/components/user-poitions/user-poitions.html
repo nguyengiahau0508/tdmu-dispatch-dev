@@ -23,7 +23,8 @@
           <td>{{ userPosition.position.positionName }}</td>
           <td>{{ userPosition.position.department.name }}</td>
           <td>{{ userPosition.startDate | date:'d/M/yy' }}</td>
-          <td>{{ userPosition.endDate | date:'d/M/yy' }}</td>
+          <td>
+            {{ userPosition.endDate | date:'d/M/yy' }}</td>
           <td><p-splitbutton label="Cài đặt" icon="pi pi-check" dropdownIcon="pi pi-cog"
               [model]="userPosition.actions" /></td>
         </tr>

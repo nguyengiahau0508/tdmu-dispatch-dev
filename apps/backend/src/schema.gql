@@ -42,7 +42,7 @@ type UserPosition {
   positionId: Int!
   user: User!
   position: Position!
-  startDate: DateTime
+  startDate: DateTime!
   endDate: DateTime
 }
 

@@ -35,11 +35,11 @@ export class UserPosition {
   @Field(() => Position)
   position: Position;
 
-  @Field({nullable:true})
+  @Field()
   @CreateDateColumn()
   startDate: Date;
 
   @Field({ nullable: true })
-  @Column({ type: 'date', nullable: true })
-  endDate?: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  endDate: Date;
 }
