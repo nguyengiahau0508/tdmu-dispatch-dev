@@ -6,7 +6,7 @@ import { map, Observable, take, tap } from "rxjs";
 import { GET_ALL_BY_USER } from "../../../features/admin/organizational/user-positions/graphql/user-position.queries";
 import { responsePathAsArray } from "graphql";
 import { ICreateUserPositionInput } from "../../../features/admin/organizational/user-positions/interfaces/create-user-position.interfaces";
-import { CREATE_USER_POSITION } from "../../../features/admin/organizational/user-positions/graphql/user-position.mutations";
+import { CREATE_USER_POSITION, END_USER_POSITION } from "../../../features/admin/organizational/user-positions/graphql/user-position.mutations";
 
 
 @Injectable({ providedIn: 'root' })
@@ -46,4 +46,18 @@ export class UserPositionsService {
             map(response => response.data!.CreateUserPosition)
         )
     }
+
+    endUserPosition(id: number): Observable<IApiResponse<{ userPosition: IUserPosition }>> {
+        return this.apollo.mutate<{
+            EndUserPosition: IApiResponse<{
+                userPosition: IUserPosition
+            }>
+        }>({
+            mutation: END_USER_POSITION,
+            variables: { id }
+        }).pipe(
+            map(response => response.data!.EndUserPosition)
+        )
+    }
+
 }

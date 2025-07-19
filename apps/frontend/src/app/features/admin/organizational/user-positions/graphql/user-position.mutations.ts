@@ -17,3 +17,23 @@ export const CREATE_USER_POSITION = gql`
     }
   }
 `;
+
+export const END_USER_POSITION = gql`
+  mutation EndUserPosition($id: Int!) {
+    endUserPosition(id: $id) {
+      metadata {
+        message
+        timestamp
+        statusCode
+      }
+      data {
+        userPosition {
+          id
+          startDate
+          endDate
+          # Thêm các field khác nếu cần (tùy thuộc vào bạn hiển thị gì)
+        }
+      }
+    }
+  }
+`;
