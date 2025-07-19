@@ -35,7 +35,7 @@ export class UserPosition {
   @Field(() => Position)
   position: Position;
 
-  @Field()
+  @Field({nullable:true})
   @CreateDateColumn()
   startDate: Date;
 
