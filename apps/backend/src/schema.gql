@@ -1227,6 +1227,7 @@ type Mutation {
   updateDepartment(input: UpdateDepartmentInput!): UpdateDepartmentResponse!
   removeDepartment(input: RemoveDepartmentInput!): RemoveDepartmentResponse!
   createUserPosition(createUserPositionInput: CreateUserPositionInput!): CreateUserPositionResponse!
+  endUserPosition(id: Int!): CreateUserPositionResponse!
   createApprovalHistory(createApprovalHistoryInput: CreateApprovalHistoryInput!): ApprovalHistory!
   updateApprovalHistory(updateApprovalHistoryInput: UpdateApprovalHistoryInput!): ApprovalHistory!
   removeApprovalHistory(id: Int!): ApprovalHistory!

@@ -25,7 +25,16 @@ export class UserPositionsResolver {
     const userPositions = await this.userPositionsService.getAllByUser(userId)
     return {
       metadata: createResponseMetadata(HttpStatus.OK, "Lấy thành công tất cả vị trí của người dùng"),
-      data: {userPositions}
+      data: { userPositions }
+    }
+  }
+
+  @Mutation(() => CreateUserPositionResponse)
+  async endUserPosition(@Args('id', { type: () => Int }) id: number): Promise<CreateUserPositionResponse> {
+    const userPosition = await this.userPositionsService.endUserPosition(id)
+    return {
+      metadata: createResponseMetadata(HttpStatus.OK, "Cập nhật thành công"),
+      data: { userPosition }
     }
   }
 
