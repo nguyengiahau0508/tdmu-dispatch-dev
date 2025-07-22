@@ -1,7 +1,8 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { WorkflowStep } from '../../workflow-steps/entities/workflow-step.entity';
 import { WorkflowInstance } from '../../workflow-instances/entities/workflow-instance.entity';
+import { User } from 'src/modules/users/entities/user.entity';
 
 
 @ObjectType()
@@ -21,10 +22,14 @@ export class WorkflowTemplate {
 
   @Field(() => Int)
   @Column()
-  createdBy: number;
+  createdByUserId: number;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'createdByUserId' })
+  createdByUser: User
 
   @Field()
-  @Column({ type: 'datetime' })
+  @CreateDateColumn({ type: 'datetime' })
   createdAt: Date;
 
   @Field(() => [WorkflowStep])

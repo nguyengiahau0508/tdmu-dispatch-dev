@@ -14,7 +14,7 @@ registerEnumType(StepType, {
 });
 
 @ObjectType()
-@Entity('workflow_steps')
+@Entity()
 export class WorkflowStep {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
@@ -40,8 +40,12 @@ export class WorkflowStep {
   @Column({ nullable: true })
   nextStepId?: number;
 
+  @Column()
+  @Field(() => Int)
+  templateId: number
+
   @Field(() => WorkflowTemplate)
   @ManyToOne(() => WorkflowTemplate, (template) => template.steps)
-  @JoinColumn({ name: 'template_id' })
+  @JoinColumn({ name: 'templateId' })
   template: WorkflowTemplate;
 }

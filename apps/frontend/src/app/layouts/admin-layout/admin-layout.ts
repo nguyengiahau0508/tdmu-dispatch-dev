@@ -96,7 +96,11 @@ export class AdminLayout {
     this.router.navigate(['admin', 'organizational'])
   }
 
-  onGoToDocumentCatalog(){
+  onGoToDocumentCatalog() {
     this.router.navigate(['admin', 'document-catalog'])
+  }
+
+  onGoToWorkflow() {
+    this.router.navigate(['admin', 'workflow'])
   }
 }

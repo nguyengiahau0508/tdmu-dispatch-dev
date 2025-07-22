@@ -10,14 +10,22 @@ export class WorkflowActionLog {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column()
+  @Field(() => Int)
+  instanceId: number
+
   @Field(() => WorkflowInstance)
   @ManyToOne(() => WorkflowInstance, (instance) => instance.logs)
-  @JoinColumn({ name: 'instance_id' })
+  @JoinColumn({ name: 'instanceId' })
   instance: WorkflowInstance;
+
+  @Column()
+  @Field(() => Int)
+  stepId: number
 
   @Field(() => WorkflowStep)
   @ManyToOne(() => WorkflowStep)
-  @JoinColumn({ name: 'step_id' })
+  @JoinColumn({ name: 'stepId' })
   step: WorkflowStep;
 
   @Field(() => Int)

@@ -4,7 +4,6 @@ import { WorkflowTemplate } from '../../workflow-templates/entities/workflow-tem
 import { WorkflowStep } from '../../workflow-steps/entities/workflow-step.entity';
 import { WorkflowActionLog } from '../../workflow-action-logs/entities/workflow-action-log.entity';
 
-
 export enum WorkflowStatus {
   IN_PROGRESS = 'IN_PROGRESS',
   COMPLETED = 'COMPLETED',
@@ -16,24 +15,32 @@ registerEnumType(WorkflowStatus, {
 });
 
 @ObjectType()
-@Entity('workflow_instances')
+@Entity()
 export class WorkflowInstance {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column()
+  @Field(() => Int)
+  templateId: number
+
   @Field(() => WorkflowTemplate)
   @ManyToOne(() => WorkflowTemplate, (template) => template.instances)
-  @JoinColumn({ name: 'template_id' })
+  @JoinColumn({ name: 'templateId' })
   template: WorkflowTemplate;
 
   @Field(() => Int)
   @Column()
   documentId: number;
 
+  @Column()
+  @Field(() => Int)
+  currentStepId: number
+
   @Field(() => WorkflowStep, { nullable: true })
   @ManyToOne(() => WorkflowStep, { nullable: true })
-  @JoinColumn({ name: 'current_step_id' })
+  @JoinColumn({ name: 'currentStepId' })
   currentStep?: WorkflowStep;
 
   @Field(() => WorkflowStatus)

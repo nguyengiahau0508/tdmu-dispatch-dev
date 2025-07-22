@@ -7,7 +7,6 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
   // Middleware
   app.use(cookieParser())
   app.useGlobalPipes(new ValidationPipe({ transform: true }))

@@ -1005,6 +1005,7 @@ type WorkflowStep {
   assignedRole: String!
   orderNumber: Int!
   nextStepId: Int
+  templateId: Int!
   template: WorkflowTemplate!
 }
 
@@ -1017,7 +1018,9 @@ enum StepType {
 
 type WorkflowActionLog {
   id: Int!
+  instanceId: Int!
   instance: WorkflowInstance!
+  stepId: Int!
   step: WorkflowStep!
   actionBy: Int!
   actionAt: DateTime!
@@ -1026,8 +1029,10 @@ type WorkflowActionLog {
 
 type WorkflowInstance {
   id: Int!
+  templateId: Int!
   template: WorkflowTemplate!
   documentId: Int!
+  currentStepId: Int!
   currentStep: WorkflowStep
   status: WorkflowStatus!
   logs: [WorkflowActionLog!]!
@@ -1043,7 +1048,7 @@ type WorkflowTemplate {
   id: Int!
   name: String!
   description: String
-  createdBy: Int!
+  createdByUserId: Int!
   createdAt: DateTime!
   steps: [WorkflowStep!]!
   instances: [WorkflowInstance!]!

@@ -9,8 +9,9 @@ import { Organizational } from './features/admin/organizational/organizational';
 import { Users } from './features/admin/users/users';
 import { organizationalRoutes } from './features/admin/organizational/organizational.routes';
 import { DocumentCatalog } from './features/admin/document-catalog/document-catalog';
-import { DocumentCategory } from './features/admin/document-catalog/document-category/document-category';
-import {  documentCatalogRoutes } from './features/admin/document-catalog/document-catalog.routes';
+import { documentCatalogRoutes } from './features/admin/document-catalog/document-catalog.routes';
+import { Workflow } from './features/admin/workflow/workflow';
+import { workflowRoutes } from './features/admin/workflow/workflow.routes';
 
 export const routes: Routes = [
   { path: 'auth', component: AuthLayout, children: authRoutes },
@@ -23,7 +24,9 @@ export const routes: Routes = [
     path: 'admin', component: AdminLayout, canActivate: [AdminGuard], children: [
       { path: 'users', component: Users },
       { path: 'organizational', component: Organizational, children: organizationalRoutes },
-      {path: 'document-catalog', component: DocumentCatalog, children: documentCatalogRoutes}
+      { path: 'document-catalog', component: DocumentCatalog, children: documentCatalogRoutes },
+      { path: 'workflow', component: Workflow, children: workflowRoutes }
     ]
   }
 ];
+

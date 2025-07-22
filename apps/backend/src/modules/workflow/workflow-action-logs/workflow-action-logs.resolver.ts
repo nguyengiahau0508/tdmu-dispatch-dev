@@ -10,7 +10,7 @@ export class WorkflowActionLogsResolver {
 
   @Mutation(() => WorkflowActionLog)
   createWorkflowActionLog(@Args('createWorkflowActionLogInput') createWorkflowActionLogInput: CreateWorkflowActionLogInput) {
-    return this.workflowActionLogsService.create(createWorkflowActionLogInput);
+    return this.workflowActionLogsService.createAndSave(createWorkflowActionLogInput);
   }
 
   @Query(() => [WorkflowActionLog], { name: 'workflowActionLogs' })

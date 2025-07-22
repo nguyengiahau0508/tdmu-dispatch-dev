@@ -5,7 +5,7 @@
     <div class="sidebar__brand" title="Trang chủ">
       <img src="/icons/tdmu.png" alt="Doanh nghiệp" />
     </div>
-    
+
     <!-- Menu chính -->
     <div class="sidebar__menu">
 
@@ -15,7 +15,6 @@
         <img src="/icons/person.svg" alt="" />
         <span class="sidebar__tooltip">Quản lí người dùng</span>
       </div>
-
       <!-- Quản lí cơ cấu tổ chức -->
       <div class="sidebar__menu-item" [class.active]="isActive('/admin/organizational')"
         (click)="onGoToOrganizational()" title="Quản lí cơ cấu tổ chức">
@@ -24,15 +23,15 @@
       </div>
 
       <div class="sidebar__menu-item" title="Danh mục" [class.active]="isActive('/admin/document-catalog')"
-        (click)="onGoToDocumentCatalog()"
-      >
+        (click)="onGoToDocumentCatalog()">
         <img src="/icons/category.svg" alt="" />
         <span class="sidebar__tooltip">Danh mục</span>
       </div>
 
-      <div class="sidebar__menu-item" title="Danh mục">
+      <div class="sidebar__menu-item" title="Danh mục" (click)="onGoToWorkflow()"
+        [class.active]="isActive('/admin/workflow')">
         <img src="/icons/grading.svg" alt="" />
-        <span class="sidebar__tooltip">Xét duyệt</span>
+        <span class="sidebar__tooltip">Quy trình xét duyệt</span>
       </div>
 
       <div class="sidebar__menu-item" title="Đánh số tự động">

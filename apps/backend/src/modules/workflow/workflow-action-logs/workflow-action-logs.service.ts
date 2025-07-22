@@ -4,9 +4,9 @@ import { UpdateWorkflowActionLogInput } from './dto/update-workflow-action-log.i
 
 @Injectable()
 export class WorkflowActionLogsService {
-  create(createWorkflowActionLogInput: CreateWorkflowActionLogInput) {
+  createAndSave(createWorkflowActionLogInput: CreateWorkflowActionLogInput) {
     return 'This action adds a new workflowActionLog';
-  }
+  } 
 
   findAll() {
     return `This action returns all workflowActionLogs`;
