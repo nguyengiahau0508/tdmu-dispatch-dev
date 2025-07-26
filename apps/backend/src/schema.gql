@@ -1054,6 +1054,32 @@ type WorkflowTemplate {
   instances: [WorkflowInstance!]!
 }
 
+type GetWorkflowTemplateOuput {
+  workflowTemplate: WorkflowTemplate!
+}
+
+type GetWorkflowTemplateReponse {
+  """Dữ liệu trả về"""
+  data: GetWorkflowTemplateOuput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type GetWorkflowTemplatePaginatedResponse {
+  """Dữ liệu trả về (danh sách)"""
+  data: [WorkflowTemplate!]
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+
+  """Tổng số mục (cho phân trang)"""
+  totalCount: Int
+
+  """Còn trang tiếp theo không (cho phân trang)"""
+  hasNextPage: Boolean
+}
+
 type Query {
   users: [User!]!
   user(id: Int!): User
@@ -1087,6 +1113,7 @@ type Query {
   workflowInstance(id: Int!): WorkflowInstance!
   workflowSteps: [WorkflowStep!]!
   workflowStep(id: Int!): WorkflowStep!
+  findPaginated(input: GetWorkflowTemplatePaginatedInput!): GetWorkflowTemplatePaginatedResponse!
   workflowTemplates: [WorkflowTemplate!]!
   workflowTemplate(id: Int!): WorkflowTemplate!
   documents(input: GetDocumentsPaginatedInput!): GetDocumentsPaginatedResponse!
@@ -1194,6 +1221,18 @@ input GetDepartmentInput {
   id: Int!
 }
 
+input GetWorkflowTemplatePaginatedInput {
+  """Thứ tự sắp xếp"""
+  order: Order = ASC
+
+  """Số trang hiện tại"""
+  page: Int = 1
+
+  """Số lượng item trên mỗi trang"""
+  take: Int = 10
+  search: String
+}
+
 input GetDocumentsPaginatedInput {
   """Thứ tự sắp xếp"""
   order: Order = ASC
@@ -1283,7 +1322,7 @@ type Mutation {
   createWorkflowStep(createWorkflowStepInput: CreateWorkflowStepInput!): WorkflowStep!
   updateWorkflowStep(updateWorkflowStepInput: UpdateWorkflowStepInput!): WorkflowStep!
   removeWorkflowStep(id: Int!): WorkflowStep!
-  createWorkflowTemplate(createWorkflowTemplateInput: CreateWorkflowTemplateInput!): WorkflowTemplate!
+  createWorkflowTemplate(createWorkflowTemplateInput: CreateWorkflowTemplateInput!): GetWorkflowTemplateReponse!
   updateWorkflowTemplate(updateWorkflowTemplateInput: UpdateWorkflowTemplateInput!): WorkflowTemplate!
   removeWorkflowTemplate(id: Int!): WorkflowTemplate!
   createDocument(createDocumentInput: CreateDocumentInput!, file: Upload): GetDocumentResponse!
@@ -1575,13 +1614,13 @@ input UpdateWorkflowStepInput {
 }
 
 input CreateWorkflowTemplateInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  name: String!
+  description: String
 }
 
 input UpdateWorkflowTemplateInput {
-  """Example field (placeholder)"""
-  exampleField: Int
+  name: String
+  description: String
   id: Int!
 }
 

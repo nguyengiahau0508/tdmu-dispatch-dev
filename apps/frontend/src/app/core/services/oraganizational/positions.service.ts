@@ -78,18 +78,19 @@ export class PositionsService {
   }
 
   getPostionsByDepartmnetId(departmentId: number): Observable<IApiResponse<{
-    positions: IPosition[] 
+    positions: IPosition[]
   }>> {
     return this.apollo.query<{
       allPositionsByDepartmentId: IApiResponse<{
-         positions: IPosition[] 
+        positions: IPosition[]
       }>
     }>({
       query: GET_POSITIONS_BY_DEPARTMENT_ID,
-      variables: {departmentId}
+      variables: { departmentId },
+      fetchPolicy: 'no-cache'
     }).pipe(
       //tap(response=>console.log(response)),
-      map(response=>response.data.allPositionsByDepartmentId)
+      map(response => response.data.allPositionsByDepartmentId)
     )
   }
 }

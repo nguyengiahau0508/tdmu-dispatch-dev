@@ -1,11 +1,11 @@
 <div class="organizational">
   <div class="organizational__sidebar">
     <div class="sidebar__menu">
-      <div class="sidebar__menu-item" (click)="onGoToUnitType()"
-        [class.active]="isActive('/admin/organizational/unit-types')">
-        <img src="/icons/subheader.svg" alt="" title="Loại đơn vị" />
-        <span>Loại đơn vị</span>
-      </div>
+      <!-- <div class="sidebar__menu-item" (click)="onGoToUnitType()" -->
+      <!--   [class.active]="isActive('/admin/organizational/unit-types')"> -->
+      <!--   <img src="/icons/subheader.svg" alt="" title="Loại đơn vị" /> -->
+      <!--   <span>Loại đơn vị</span> -->
+      <!-- </div> -->
       <div class="sidebar__menu-item" (click)="onGoToUnits()" [class.active]="isActive('/admin/organizational/units')">
         <img src="/icons/moving_ministry.svg" alt="" title="Đơn vị" />
         <span>Đơn vị</span>
@@ -18,7 +18,7 @@
         <img src="/icons/airline_seat.svg" alt="" title="Phòng ban" />
         <span>Phòng ban</span>
       </div>
-    </div>  
+    </div>
   </div>
   <div class="organizational__main" [@routeAnimations]="getAnimationData()">
     <router-outlet></router-outlet>

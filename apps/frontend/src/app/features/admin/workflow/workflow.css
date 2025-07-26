@@ -1,0 +1,198 @@
+.users {
+  background-color: var(--color-background-primary);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+}
+
+/* Header chứa tìm kiếm và thêm */
+.users__header {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header__group {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.header__group--block {
+  display: block;
+}
+
+
+/* Ô tìm kiếm */
+.users__header .header__search input {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  width: 200px;
+}
+
+.users__header .header__search input::placeholder {
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+}
+
+/* Nút Thêm */
+.users__header .header__add button {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+  background-color: var(--color-primary);
+  color: var(--color-text-on-primary);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.users__header .header__add button:hover {
+  background-color: color-mix(in srgb, var(--color-primary) 80%, black);
+}
+
+.users__header .header__add img {
+  width: 16px;
+  height: 16px;
+}
+
+
+.users__main {
+  background-color: var(--color-background-primary);
+  border-radius: 0.5rem;
+  overflow: auto;
+  height: 100%;
+}
+
+/* Table style */
+.users__table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--color-background-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.users__table thead {
+  background-color: var(--color-primary);
+  color: var(--color-text-on-primary);
+}
+
+.users__table th,
+.users__table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.users__table tr:hover {
+  background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+}
+
+/* Cột tên có tooltip */
+.user-cell {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: help;
+}
+
+/* Cột hành động */
+.row-actions {
+  position: relative;
+  text-align: right;
+  width: 100px;
+}
+
+/* Nút 3 chấm */
+.menu-button {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: var(--color-text-secondary);
+}
+
+.menu-button:hover {
+  color: var(--color-primary);
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+  position: absolute;
+  top: 3rem;
+  right: 0;
+  background-color: var(--color-background-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0.25rem;
+  box-shadow: var(--shadow-default);
+  z-index: 100;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-menu button {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  text-align: left;
+  width: 100%;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.dropdown-menu button:hover {
+  background-color: var(--color-background-secondary);
+  color: var(--color-primary);
+}
+
+
+.avatar__wrapper {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f3f3f3;
+  margin-right: 1rem;
+}
+
+.avatar__placeholder {
+  width: 100%;
+  height: 100%;
+  background: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  border-radius: 50%;
+}
+
+
+.avatar__img {
+  width: 40px;         /* Bạn có thể đổi kích thước tuỳ ý */
+  height: 40px;
+  object-fit: cover;   /* Giữ tỉ lệ, cắt dư */
+  border-radius: 50%;  /* Bo tròn thành hình tròn */
+  border: 1px solid #ccc; /* Viền nhẹ */
+  background-color: var(--color-accent); /* Nền fallback nếu ảnh lỗi */
+  display: block;      /* Tránh inline-gap */
+}

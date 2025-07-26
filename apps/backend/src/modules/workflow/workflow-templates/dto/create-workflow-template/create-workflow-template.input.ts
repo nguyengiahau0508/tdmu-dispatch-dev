@@ -14,9 +14,9 @@ export class CreateWorkflowTemplateInput {
   @IsOptional()
   description?: string;
 
-  @Field(() => Int)
-  @IsInt()
-  @Min(1, { message: 'ID người tạo phải là số nguyên dương' })
-  createdByUserId: number;
+  // @Field(() => Int)
+  // @IsInt()
+  // @Min(1, { message: 'ID người tạo phải là số nguyên dương' })
+  // createdByUserId: number;
 }
 

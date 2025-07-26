@@ -8,4 +8,4 @@ import { WorkflowActionLog } from './entities/workflow-action-log.entity';
   imports: [TypeOrmModule.forFeature([WorkflowActionLog])],
   providers: [WorkflowActionLogsResolver, WorkflowActionLogsService],
 })
-export class WorkflowActionLogsModule {}
+export class WorkflowActionLogsModule { }
