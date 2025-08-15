@@ -45,5 +45,4 @@ export class Position {
   get currentSlotCount(): number {
     return this.userPositions?.filter((up) => !up.endDate).length ?? 0;
   }
-
 }

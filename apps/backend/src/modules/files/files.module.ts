@@ -7,12 +7,9 @@ import { GoogleDriveModule } from 'src/integrations/google-drive/google-drive.mo
 import { FilesController } from './files.controller';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([File]),
-    GoogleDriveModule
-  ],
+  imports: [TypeOrmModule.forFeature([File]), GoogleDriveModule],
   providers: [FilesResolver, FilesService],
   controllers: [FilesController],
-  exports: [FilesService]
+  exports: [FilesService],
 })
-export class FilesModule { }
+export class FilesModule {}

@@ -7,6 +7,6 @@ import { WorkflowActionLog } from './entities/workflow-action-log.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([WorkflowActionLog])],
   providers: [WorkflowActionLogsResolver, WorkflowActionLogsService],
-  exports: [WorkflowActionLogsService]
+  exports: [WorkflowActionLogsService],
 })
 export class WorkflowActionLogsModule {}

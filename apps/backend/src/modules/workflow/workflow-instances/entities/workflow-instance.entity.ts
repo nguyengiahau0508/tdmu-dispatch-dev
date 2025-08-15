@@ -1,5 +1,14 @@
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { WorkflowTemplate } from '../../workflow-templates/entities/workflow-template.entity';
 import { WorkflowStep } from '../../workflow-steps/entities/workflow-step.entity';
 import { WorkflowActionLog } from '../../workflow-action-logs/entities/workflow-action-log.entity';
@@ -47,7 +56,11 @@ export class WorkflowInstance {
   currentStep?: WorkflowStep;
 
   @Field(() => WorkflowStatus)
-  @Column({ type: 'enum', enum: WorkflowStatus, default: WorkflowStatus.IN_PROGRESS })
+  @Column({
+    type: 'enum',
+    enum: WorkflowStatus,
+    default: WorkflowStatus.IN_PROGRESS,
+  })
   status: WorkflowStatus;
 
   @Field(() => Int)

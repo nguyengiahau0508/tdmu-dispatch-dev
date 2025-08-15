@@ -17,4 +17,4 @@ export class CreateDepartmentInput {
   @IsInt()
   @IsOptional()
   parentDepartmentId?: number;
-} 
+}

@@ -1,5 +1,5 @@
-import { Field, Int, ObjectType } from "@nestjs/graphql";
-import { PageMetaDtoParameters } from "./interface";
+import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { PageMetaDtoParameters } from './interface';
 
 @ObjectType()
 export class PageMetaDto {

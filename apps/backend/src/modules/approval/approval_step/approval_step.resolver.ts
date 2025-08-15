@@ -9,7 +9,10 @@ export class ApprovalStepResolver {
   constructor(private readonly approvalStepService: ApprovalStepService) {}
 
   @Mutation(() => ApprovalStep)
-  createApprovalStep(@Args('createApprovalStepInput') createApprovalStepInput: CreateApprovalStepInput) {
+  createApprovalStep(
+    @Args('createApprovalStepInput')
+    createApprovalStepInput: CreateApprovalStepInput,
+  ) {
     return this.approvalStepService.create(createApprovalStepInput);
   }
 
@@ -24,8 +27,14 @@ export class ApprovalStepResolver {
   }
 
   @Mutation(() => ApprovalStep)
-  updateApprovalStep(@Args('updateApprovalStepInput') updateApprovalStepInput: UpdateApprovalStepInput) {
-    return this.approvalStepService.update(updateApprovalStepInput.id, updateApprovalStepInput);
+  updateApprovalStep(
+    @Args('updateApprovalStepInput')
+    updateApprovalStepInput: UpdateApprovalStepInput,
+  ) {
+    return this.approvalStepService.update(
+      updateApprovalStepInput.id,
+      updateApprovalStepInput,
+    );
   }
 
   @Mutation(() => ApprovalStep)

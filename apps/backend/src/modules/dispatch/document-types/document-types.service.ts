@@ -11,11 +11,14 @@ import { PageMetaDto } from 'src/common/shared/pagination/page-meta.dto';
 @Injectable()
 export class DocumentTypesService {
   constructor(
-    @InjectRepository(DocumentType) private readonly documentTypesRepository: Repository<DocumentType>
+    @InjectRepository(DocumentType)
+    private readonly documentTypesRepository: Repository<DocumentType>,
   ) {}
 
-  create(createDocumentTypeInput:CreateDocumentTypeInput ) {
-    const documentType = this.documentTypesRepository.create(createDocumentTypeInput);
+  create(createDocumentTypeInput: CreateDocumentTypeInput) {
+    const documentType = this.documentTypesRepository.create(
+      createDocumentTypeInput,
+    );
     return this.documentTypesRepository.save(documentType);
   }
 
@@ -23,11 +26,16 @@ export class DocumentTypesService {
     return `This action returns all documentTypes`;
   }
 
-  async findPaginated(input: GetDocumentTypesPaginatedInput): Promise<PageDto<DocumentType>> {
+  async findPaginated(
+    input: GetDocumentTypesPaginatedInput,
+  ): Promise<PageDto<DocumentType>> {
     const { search, page, take, order } = input;
-    const queryBuilder = this.documentTypesRepository.createQueryBuilder('documentType');
+    const queryBuilder =
+      this.documentTypesRepository.createQueryBuilder('documentType');
     if (search) {
-      queryBuilder.where('documentType.name LIKE :search', { search: `%${search}%` });
+      queryBuilder.where('documentType.name LIKE :search', {
+        search: `%${search}%`,
+      });
     }
     queryBuilder.orderBy('documentType.id', order);
     queryBuilder.skip(input.skip).take(take);
@@ -37,15 +45,19 @@ export class DocumentTypesService {
   }
 
   async findOne(id: number): Promise<DocumentType> {
-    const documentType = await this.documentTypesRepository.findOne({ where: { id } });
+    const documentType = await this.documentTypesRepository.findOne({
+      where: { id },
+    });
     if (!documentType) {
       throw new BadRequestException(`DocumentType with ID ${id} not found`);
     }
     return documentType;
   }
 
- async update(id: number, updateDocumentTypeInput: UpdateDocumentTypeInput) {
-    const documentType = await this.documentTypesRepository.findOne({ where: { id } });
+  async update(id: number, updateDocumentTypeInput: UpdateDocumentTypeInput) {
+    const documentType = await this.documentTypesRepository.findOne({
+      where: { id },
+    });
     if (!documentType) {
       throw new BadRequestException(`DocumentType with ID ${id} not found`);
     }
@@ -58,7 +70,8 @@ export class DocumentTypesService {
       documentType.description = updateDocumentTypeInput.description;
     }
 
-    const updatedDocumentType = await this.documentTypesRepository.save(documentType);
+    const updatedDocumentType =
+      await this.documentTypesRepository.save(documentType);
     if (!updatedDocumentType) {
       throw new BadRequestException('Failed to update DocumentType');
     }

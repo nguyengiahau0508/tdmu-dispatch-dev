@@ -9,4 +9,4 @@ export class GetAllUnitsResponse {
 
   @Field(() => Metadata)
   metadata: Metadata;
-} 
+}

@@ -17,15 +17,15 @@ import { TokenService } from './services/token.service';
       useFactory: (configService: ConfigService) => {
         const jwtConfig = configService.get<IJwtConfig>('jwt');
         return {
-          secret: jwtConfig?.secret
-        }
+          secret: jwtConfig?.secret,
+        };
       },
-      inject: [ConfigService]
+      inject: [ConfigService],
     }),
     ConfigModule,
-    UsersModule
+    UsersModule,
   ],
   providers: [AuthResolver, JwtStrategy, AuthService, OtpService, TokenService],
-  exports: [AuthService]
+  exports: [AuthService],
 })
-export class AuthModule { }
+export class AuthModule {}

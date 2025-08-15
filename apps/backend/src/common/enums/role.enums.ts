@@ -5,7 +5,7 @@ export enum Role {
    */
   SYSTEM_ADMIN = 'SYSTEM_ADMIN',
 
-  /** 
+  /**
    * @description Quyền của Lãnh đạo cấp cao (Hiệu trưởng, Phó Hiệu trưởng).
    * Phê duyệt các văn bản quan trọng nhất, xem báo cáo toàn trường, ra quyết định chiến lược.
    */

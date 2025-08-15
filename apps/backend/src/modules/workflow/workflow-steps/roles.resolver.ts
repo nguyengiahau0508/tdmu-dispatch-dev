@@ -6,7 +6,10 @@ import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
 @Resolver(() => RoleDto)
 @UseGuards(GqlAuthGuard)
 export class RolesResolver {
-  @Query(() => [RoleDto], { name: 'workflowRoles', description: 'Lấy danh sách các vai trò có thể gán cho workflow step' })
+  @Query(() => [RoleDto], {
+    name: 'workflowRoles',
+    description: 'Lấy danh sách các vai trò có thể gán cho workflow step',
+  })
   getRoles() {
     return [
       { value: 'SYSTEM_ADMIN', label: 'Quản trị viên hệ thống' },
@@ -15,7 +18,7 @@ export class RolesResolver {
       { value: 'DEPARTMENT_STAFF', label: 'Chuyên viên/Nhân viên' },
       { value: 'CLERK', label: 'Văn thư' },
       { value: 'DEGREE_MANAGER', label: 'Quản lý văn bằng' },
-      { value: 'BASIC_USER', label: 'Người dùng cơ bản' }
+      { value: 'BASIC_USER', label: 'Người dùng cơ bản' },
     ];
   }
 }

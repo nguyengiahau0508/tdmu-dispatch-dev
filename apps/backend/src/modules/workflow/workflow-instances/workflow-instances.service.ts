@@ -1,7 +1,14 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, ILike } from 'typeorm';
-import { WorkflowInstance, WorkflowStatus } from './entities/workflow-instance.entity';
+import {
+  WorkflowInstance,
+  WorkflowStatus,
+} from './entities/workflow-instance.entity';
 import { CreateWorkflowInstanceInput } from './dto/create-workflow-instance/create-workflow-instance.input';
 import { UpdateWorkflowInstanceInput } from './dto/update-workflow-instance/update-workflow-instance.input';
 import { WorkflowActionInput } from './dto/workflow-action/workflow-action.input';
@@ -15,23 +22,29 @@ import { StepType } from '../workflow-steps/entities/workflow-step.entity';
 @Injectable()
 export class WorkflowInstancesService {
   constructor(
-    @InjectRepository(WorkflowInstance) private readonly repository: Repository<WorkflowInstance>,
+    @InjectRepository(WorkflowInstance)
+    private readonly repository: Repository<WorkflowInstance>,
     private readonly workflowStepsService: WorkflowStepsService,
     private readonly workflowActionLogsService: WorkflowActionLogsService,
-    private readonly workflowTemplatesService: WorkflowTemplatesService
+    private readonly workflowTemplatesService: WorkflowTemplatesService,
   ) {}
 
-  async create(createWorkflowInstanceInput: CreateWorkflowInstanceInput, user: User): Promise<WorkflowInstance> {
+  async create(
+    createWorkflowInstanceInput: CreateWorkflowInstanceInput,
+    user: User,
+  ): Promise<WorkflowInstance> {
     // Validate template exists and is active
-    const template = await this.workflowTemplatesService.findOne(createWorkflowInstanceInput.templateId);
+    const template = await this.workflowTemplatesService.findOne(
+      createWorkflowInstanceInput.templateId,
+    );
     if (!template.isActive) {
       throw new BadRequestException('Workflow template is not active');
     }
 
     // Get first step (START step)
     const steps = await this.workflowStepsService.findByTemplateId(template.id);
-    const startStep = steps.find(step => step.type === StepType.START);
-    
+    const startStep = steps.find((step) => step.type === StepType.START);
+
     if (!startStep) {
       throw new BadRequestException('Workflow template must have a START step');
     }
@@ -41,7 +54,7 @@ export class WorkflowInstancesService {
       ...createWorkflowInstanceInput,
       currentStepId: startStep.id,
       createdByUserId: user.id,
-      status: WorkflowStatus.IN_PROGRESS
+      status: WorkflowStatus.IN_PROGRESS,
     });
 
     const savedInstance = await this.repository.save(instance);
@@ -52,17 +65,25 @@ export class WorkflowInstancesService {
       startStep.id,
       ActionType.START,
       user,
-      'Workflow instance started'
+      'Workflow instance started',
     );
 
     // Load relations and return
     const instanceWithRelations = await this.repository.findOne({
       where: { id: savedInstance.id },
-      relations: ['template', 'currentStep', 'createdByUser', 'logs', 'logs.actionByUser']
+      relations: [
+        'template',
+        'currentStep',
+        'createdByUser',
+        'logs',
+        'logs.actionByUser',
+      ],
     });
 
     if (!instanceWithRelations) {
-      throw new NotFoundException(`Workflow instance with ID ${savedInstance.id} not found after creation`);
+      throw new NotFoundException(
+        `Workflow instance with ID ${savedInstance.id} not found after creation`,
+      );
     }
 
     return instanceWithRelations;
@@ -71,14 +92,21 @@ export class WorkflowInstancesService {
   async findAll(): Promise<WorkflowInstance[]> {
     return this.repository.find({
       relations: ['template', 'currentStep', 'createdByUser', 'logs'],
-      order: { createdAt: 'DESC' }
+      order: { createdAt: 'DESC' },
     });
   }
 
   async findOne(id: number): Promise<WorkflowInstance> {
     const instance = await this.repository.findOne({
       where: { id },
-      relations: ['template', 'currentStep', 'createdByUser', 'logs', 'logs.actionByUser', 'logs.step']
+      relations: [
+        'template',
+        'currentStep',
+        'createdByUser',
+        'logs',
+        'logs.actionByUser',
+        'logs.step',
+      ],
     });
 
     if (!instance) {
@@ -92,11 +120,13 @@ export class WorkflowInstancesService {
     return this.repository.find({
       where: { createdByUserId: userId },
       relations: ['template', 'currentStep', 'createdByUser', 'logs'],
-      order: { createdAt: 'DESC' }
+      order: { createdAt: 'DESC' },
     });
   }
 
-  async findByCurrentStepAssignee(assignedRole: string): Promise<WorkflowInstance[]> {
+  async findByCurrentStepAssignee(
+    assignedRole: string,
+  ): Promise<WorkflowInstance[]> {
     return this.repository
       .createQueryBuilder('instance')
       .leftJoinAndSelect('instance.template', 'template')
@@ -104,14 +134,19 @@ export class WorkflowInstancesService {
       .leftJoinAndSelect('instance.createdByUser', 'createdByUser')
       .leftJoinAndSelect('instance.logs', 'logs')
       .where('currentStep.assignedRole = :assignedRole', { assignedRole })
-      .andWhere('instance.status = :status', { status: WorkflowStatus.IN_PROGRESS })
+      .andWhere('instance.status = :status', {
+        status: WorkflowStatus.IN_PROGRESS,
+      })
       .orderBy('instance.createdAt', 'DESC')
       .getMany();
   }
 
-  async update(id: number, updateWorkflowInstanceInput: UpdateWorkflowInstanceInput): Promise<WorkflowInstance> {
+  async update(
+    id: number,
+    updateWorkflowInstanceInput: UpdateWorkflowInstanceInput,
+  ): Promise<WorkflowInstance> {
     const instance = await this.findOne(id);
-    
+
     Object.assign(instance, updateWorkflowInstanceInput);
     return this.repository.save(instance);
   }
@@ -122,13 +157,20 @@ export class WorkflowInstancesService {
     return true;
   }
 
-  async executeAction(actionInput: WorkflowActionInput, user: User): Promise<WorkflowInstance> {
+  async executeAction(
+    actionInput: WorkflowActionInput,
+    user: User,
+  ): Promise<WorkflowInstance> {
     const instance = await this.findOne(actionInput.instanceId);
-    const currentStep = await this.workflowStepsService.findOne(actionInput.stepId);
+    const currentStep = await this.workflowStepsService.findOne(
+      actionInput.stepId,
+    );
 
     // Validate user can perform action on this step
     if (!user.roles.includes(currentStep.assignedRole as any)) {
-      throw new BadRequestException('User does not have permission to perform this action');
+      throw new BadRequestException(
+        'User does not have permission to perform this action',
+      );
     }
 
     // Log the action
@@ -138,7 +180,7 @@ export class WorkflowInstancesService {
       actionInput.actionType,
       user,
       actionInput.note,
-      actionInput.metadata
+      actionInput.metadata,
     );
 
     // Process the action
@@ -158,10 +200,15 @@ export class WorkflowInstancesService {
     }
   }
 
-  private async handleApproveAction(instance: WorkflowInstance, currentStep: any): Promise<WorkflowInstance> {
+  private async handleApproveAction(
+    instance: WorkflowInstance,
+    currentStep: any,
+  ): Promise<WorkflowInstance> {
     // Find next step
-    const nextStep = await this.workflowStepsService.findNextStep(currentStep.id);
-    
+    const nextStep = await this.workflowStepsService.findNextStep(
+      currentStep.id,
+    );
+
     if (nextStep) {
       // Move to next step
       instance.currentStepId = nextStep.id;
@@ -176,25 +223,35 @@ export class WorkflowInstancesService {
     return this.findOne(instance.id);
   }
 
-  private async handleRejectAction(instance: WorkflowInstance): Promise<WorkflowInstance> {
+  private async handleRejectAction(
+    instance: WorkflowInstance,
+  ): Promise<WorkflowInstance> {
     instance.status = WorkflowStatus.REJECTED;
     await this.repository.save(instance);
     return this.findOne(instance.id);
   }
 
-  private async handleTransferAction(instance: WorkflowInstance, currentStep: any, actionInput: WorkflowActionInput): Promise<WorkflowInstance> {
+  private async handleTransferAction(
+    instance: WorkflowInstance,
+    currentStep: any,
+    actionInput: WorkflowActionInput,
+  ): Promise<WorkflowInstance> {
     // For transfer, we might want to move to a specific step
     // For now, just move to next step like approve
     return this.handleApproveAction(instance, currentStep);
   }
 
-  private async handleCancelAction(instance: WorkflowInstance): Promise<WorkflowInstance> {
+  private async handleCancelAction(
+    instance: WorkflowInstance,
+  ): Promise<WorkflowInstance> {
     instance.status = WorkflowStatus.CANCELLED;
     await this.repository.save(instance);
     return this.findOne(instance.id);
   }
 
-  private async handleCompleteAction(instance: WorkflowInstance): Promise<WorkflowInstance> {
+  private async handleCompleteAction(
+    instance: WorkflowInstance,
+  ): Promise<WorkflowInstance> {
     instance.status = WorkflowStatus.COMPLETED;
     instance.currentStepId = 0;
     await this.repository.save(instance);

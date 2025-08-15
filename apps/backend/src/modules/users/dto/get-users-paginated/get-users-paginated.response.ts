@@ -4,4 +4,4 @@ import { User } from '../../entities/user.entity';
 import { PaginatedResponse } from 'src/common/graphql/api-response.dto';
 
 @ObjectType()
-export class GetUsersPaginatedResponse extends PaginatedResponse(User) { } 
+export class GetUsersPaginatedResponse extends PaginatedResponse(User) {}

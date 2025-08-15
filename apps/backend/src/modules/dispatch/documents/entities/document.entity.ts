@@ -1,5 +1,12 @@
 import { ObjectType, Field, Int, registerEnumType } from '@nestjs/graphql';
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  JoinColumn,
+  ManyToOne,
+} from 'typeorm';
 import { File } from 'src/modules/files/entities/file.entity';
 import { DocumentCategory } from '../../document-category/entities/document-category.entity';
 
@@ -10,7 +17,8 @@ export enum DocumentTypeEnum {
 }
 registerEnumType(DocumentTypeEnum, {
   name: 'DocumentTypeEnum',
-  description: 'Type of document: OUTGOING (sent), INCOMING (received), INTERNAL (internal document)',
+  description:
+    'Type of document: OUTGOING (sent), INCOMING (received), INTERNAL (internal document)',
 });
 
 @ObjectType()
@@ -59,6 +67,10 @@ export class Document {
   createdAt: Date;
 
   @Field({ nullable: true })
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
   updatedAt: Date;
 }

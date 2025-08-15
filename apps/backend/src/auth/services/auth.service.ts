@@ -1,4 +1,3 @@
-
 import {
   BadRequestException,
   Injectable,
@@ -19,19 +18,22 @@ import { RefreshTokenOutput } from '../dto/refresh-token/refresh-token.output';
 
 @Injectable()
 export class AuthService {
-
   constructor(
     private readonly usersService: UsersService,
     private readonly mailService: MailService,
     private readonly otpService: OtpService,
-    private readonly tokenService: TokenService
-  ) { }
+    private readonly tokenService: TokenService,
+  ) {}
 
   /**
- * Handles user sign-in logic.
- * Validates credentials and returns JWT tokens if successful.
- */
-  public async signIn(email: string, pass: string, @Res({ passthrough: true }) res: Response): Promise<SignInOutput> {
+   * Handles user sign-in logic.
+   * Validates credentials and returns JWT tokens if successful.
+   */
+  public async signIn(
+    email: string,
+    pass: string,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<SignInOutput> {
     // Find user by email
     const user = await this.usersService.findOneByEmail(email);
     if (!user) {
@@ -53,8 +55,8 @@ export class AuthService {
     }
 
     if (user.isFirstLogin) {
-      const otp = await this.otpService.generateOTP(user.id)
-      this.mailService.sendOtpMail(user.email, user.fullName, otp)
+      const otp = await this.otpService.generateOTP(user.id);
+      this.mailService.sendOtpMail(user.email, user.fullName, otp);
       throw new UnauthorizedException({
         message: 'Bạn cần đổi mật khẩu trong lần đầu đăng nhập',
         code: ErrorCode.FIRST_LOGIN_CHANGE_PASSWORD_REQUIRED,
@@ -70,10 +72,10 @@ export class AuthService {
     ]);
 
     res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,         // bảo mật - không cho JS đọc
-      secure: false,          // cho phép qua HTTP (chỉ dùng trong dev)
-      sameSite: 'lax',        // hoặc 'none' nếu cần chia sẻ full cross-site
-      path: '/',              // hoặc '/graphql' nếu bạn chỉ xử lý ở đó
+      httpOnly: true, // bảo mật - không cho JS đọc
+      secure: false, // cho phép qua HTTP (chỉ dùng trong dev)
+      sameSite: 'lax', // hoặc 'none' nếu cần chia sẻ full cross-site
+      path: '/', // hoặc '/graphql' nếu bạn chỉ xử lý ở đó
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
     });
 
@@ -81,11 +83,14 @@ export class AuthService {
     return {
       accessToken,
       //refreshToken,
-      user
+      user,
     };
   }
 
-  public async signInWithOtp(email: string, otp: string): Promise<SignInOtpOutput> {
+  public async signInWithOtp(
+    email: string,
+    otp: string,
+  ): Promise<SignInOtpOutput> {
     // Find user by email
     const user = await this.usersService.findOneByEmail(email);
     if (!user) {
@@ -96,13 +101,14 @@ export class AuthService {
       });
     }
 
-    const isMatch = await this.otpService.validateOTP(user.id, otp)
-    if (!isMatch) throw new UnauthorizedException({
-      message: "Mã OTP không hợp lệ",
-      code: ErrorCode.OTP_INVALID
-    })
+    const isMatch = await this.otpService.validateOTP(user.id, otp);
+    if (!isMatch)
+      throw new UnauthorizedException({
+        message: 'Mã OTP không hợp lệ',
+        code: ErrorCode.OTP_INVALID,
+      });
 
-    await this.otpService.clearOTP(user.id)
+    await this.otpService.clearOTP(user.id);
 
     const payload = { sub: user.id, email: user.email, role: user.roles };
 
@@ -127,39 +133,40 @@ export class AuthService {
       });
     }
 
-    const otp = await this.otpService.generateOTP(user.id)
-    this.mailService.sendOtpMail(user.email, user.fullName, otp)
+    const otp = await this.otpService.generateOTP(user.id);
+    this.mailService.sendOtpMail(user.email, user.fullName, otp);
   }
 
   async refreshToken(@Req() req: Request): Promise<RefreshTokenOutput> {
-    const refreshToken = req.cookies['refreshToken']
-    if (!refreshToken) throw new UnauthorizedException({
-      message: 'Có lổi xảy ra',
-      code: ErrorCode.TOKEN_INVALID,
-    })
-    const decode = await this.tokenService.extractToken(refreshToken)
+    const refreshToken = req.cookies['refreshToken'];
+    if (!refreshToken)
+      throw new UnauthorizedException({
+        message: 'Có lổi xảy ra',
+        code: ErrorCode.TOKEN_INVALID,
+      });
+    const decode = await this.tokenService.extractToken(refreshToken);
 
     const accessToken = await this.tokenService.generateAccessToken({
       sub: decode.sub,
       email: decode.email,
-      role: decode.role
-    })
+      role: decode.role,
+    });
 
     return {
-      accessToken
-    }
+      accessToken,
+    };
   }
 
   async logout(@Req() req: Request, @Res() res: Response) {
-    const refreshToken = req.cookies['refreshToken']
-    if (!refreshToken) throw new UnauthorizedException({
-      message: 'Có lổi xảy ra',
-      code: ErrorCode.TOKEN_INVALID,
-    })
-    const decode = await this.tokenService.extractToken(refreshToken)
+    const refreshToken = req.cookies['refreshToken'];
+    if (!refreshToken)
+      throw new UnauthorizedException({
+        message: 'Có lổi xảy ra',
+        code: ErrorCode.TOKEN_INVALID,
+      });
+    const decode = await this.tokenService.extractToken(refreshToken);
 
-    await this.tokenService.revokeToken(decode.tokenId)
-    res.clearCookie('refreshToken')
+    await this.tokenService.revokeToken(decode.tokenId);
+    res.clearCookie('refreshToken');
   }
 }
-

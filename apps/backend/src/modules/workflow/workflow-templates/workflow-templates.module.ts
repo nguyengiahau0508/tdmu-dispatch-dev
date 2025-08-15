@@ -7,6 +7,6 @@ import { WorkflowTemplate } from './entities/workflow-template.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([WorkflowTemplate])],
   providers: [WorkflowTemplatesResolver, WorkflowTemplatesService],
-  exports: [WorkflowTemplatesService]
+  exports: [WorkflowTemplatesService],
 })
 export class WorkflowTemplatesModule {}

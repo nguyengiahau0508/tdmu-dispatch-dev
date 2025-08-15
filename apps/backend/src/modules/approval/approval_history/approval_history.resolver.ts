@@ -6,10 +6,15 @@ import { UpdateApprovalHistoryInput } from './dto/update-approval_history.input'
 
 @Resolver(() => ApprovalHistory)
 export class ApprovalHistoryResolver {
-  constructor(private readonly approvalHistoryService: ApprovalHistoryService) {}
+  constructor(
+    private readonly approvalHistoryService: ApprovalHistoryService,
+  ) {}
 
   @Mutation(() => ApprovalHistory)
-  createApprovalHistory(@Args('createApprovalHistoryInput') createApprovalHistoryInput: CreateApprovalHistoryInput) {
+  createApprovalHistory(
+    @Args('createApprovalHistoryInput')
+    createApprovalHistoryInput: CreateApprovalHistoryInput,
+  ) {
     return this.approvalHistoryService.create(createApprovalHistoryInput);
   }
 
@@ -24,8 +29,14 @@ export class ApprovalHistoryResolver {
   }
 
   @Mutation(() => ApprovalHistory)
-  updateApprovalHistory(@Args('updateApprovalHistoryInput') updateApprovalHistoryInput: UpdateApprovalHistoryInput) {
-    return this.approvalHistoryService.update(updateApprovalHistoryInput.id, updateApprovalHistoryInput);
+  updateApprovalHistory(
+    @Args('updateApprovalHistoryInput')
+    updateApprovalHistoryInput: UpdateApprovalHistoryInput,
+  ) {
+    return this.approvalHistoryService.update(
+      updateApprovalHistoryInput.id,
+      updateApprovalHistoryInput,
+    );
   }
 
   @Mutation(() => ApprovalHistory)

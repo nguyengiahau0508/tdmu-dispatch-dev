@@ -12,4 +12,4 @@ export * from './get-document/get-document.response';
 
 // Get Documents Paginated DTOs
 export * from './get-documents-paginated/get-documents-paginated.input';
-export * from './get-documents-paginated/get-documents-paginated.response'; 
+export * from './get-documents-paginated/get-documents-paginated.response';

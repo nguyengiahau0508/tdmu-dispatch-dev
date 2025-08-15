@@ -17,4 +17,3 @@ export class UpdateUserInput extends PartialType(CreateUserInput) {
   @IsOptional()
   avatar?: string;
 }
-

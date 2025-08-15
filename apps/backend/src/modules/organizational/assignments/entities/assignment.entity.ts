@@ -1,5 +1,11 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
-import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  Column,
+} from 'typeorm';
 import { User } from 'src/modules/users/entities/user.entity';
 import { Position } from 'src/modules/organizational/positions/entities/position.entity';
 import { Unit } from 'src/modules/organizational/units/entities/unit.entity';
@@ -15,7 +21,7 @@ export class Assignment {
   @Field(() => Int, { description: 'ID người dùng được phân công' })
   userId: number;
 
-  @ManyToOne(() => User, user => user.assignments)
+  @ManyToOne(() => User, (user) => user.assignments)
   @JoinColumn({ name: 'userId' })
   @Field(() => User, { description: 'Người dùng được phân công' })
   user: User;
@@ -38,4 +44,3 @@ export class Assignment {
   @Field(() => Unit, { description: 'Đơn vị tổ chức của assignment' })
   unit: Unit;
 }
-

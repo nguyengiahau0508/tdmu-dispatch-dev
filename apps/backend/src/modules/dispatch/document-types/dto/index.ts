@@ -18,4 +18,4 @@ export * from './get-document-type/get-document-type.response';
 
 // Get DocumentTypes Paginated DTOs
 export * from './get-document-types-paginated/get-document-types-paginated.input';
-export * from './get-document-types-paginated/get-document-types-paginated.response'; 
+export * from './get-document-types-paginated/get-document-types-paginated.response';

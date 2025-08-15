@@ -13,14 +13,14 @@ import { Like } from 'typeorm';
 export class PositionsService {
   constructor(
     @InjectRepository(Position)
-    private readonly repository: Repository<Position>
-  ) { }
+    private readonly repository: Repository<Position>,
+  ) {}
 
   async create(createPositionInput: CreatePositionInput): Promise<Position> {
     const created = this.repository.create({
       positionName: createPositionInput.positionName,
       maxSlots: createPositionInput.maxSlots,
-      department: { id: createPositionInput.departmentId }
+      department: { id: createPositionInput.departmentId },
     });
     const saved = await this.repository.save(created);
     if (!saved) throw new BadRequestException('Failed to create position');
@@ -32,27 +32,37 @@ export class PositionsService {
   }
 
   async findByDepartmentId(departmentId: number): Promise<Position[]> {
-    const positions: Position[] = await this.repository.find({ where: { departmentId }, relations: { userPositions: true } });
+    const positions: Position[] = await this.repository.find({
+      where: { departmentId },
+      relations: { userPositions: true },
+    });
     if (!positions || positions.length === 0) {
-      throw new BadRequestException(`No positions found for department ID ${departmentId}`);
+      throw new BadRequestException(
+        `No positions found for department ID ${departmentId}`,
+      );
     }
     return positions;
   }
 
   async findOne(id: number): Promise<Position> {
     const position = await this.repository.findOne({ where: { id } });
-    if (!position) throw new BadRequestException(`Position with ID ${id} not found`);
+    if (!position)
+      throw new BadRequestException(`Position with ID ${id} not found`);
     return position;
   }
 
-  async update(id: number, updatePositionInput: UpdatePositionInput): Promise<Position> {
+  async update(
+    id: number,
+    updatePositionInput: UpdatePositionInput,
+  ): Promise<Position> {
     const position = await this.repository.findOne({ where: { id } });
-    if (!position) throw new BadRequestException(`Position with ID ${id} not found`);
+    if (!position)
+      throw new BadRequestException(`Position with ID ${id} not found`);
     if (updatePositionInput.positionName !== undefined) {
       position.positionName = updatePositionInput.positionName;
     }
     if (updatePositionInput.maxSlots !== undefined) {
-      position.maxSlots = updatePositionInput.maxSlots
+      position.maxSlots = updatePositionInput.maxSlots;
     }
     const updated = await this.repository.save(position);
     if (!updated) throw new BadRequestException('Failed to update position');
@@ -61,12 +71,15 @@ export class PositionsService {
 
   async remove(id: number): Promise<{ success: boolean }> {
     const position = await this.repository.findOne({ where: { id } });
-    if (!position) throw new BadRequestException(`Position with ID ${id} not found`);
+    if (!position)
+      throw new BadRequestException(`Position with ID ${id} not found`);
     await this.repository.remove(position);
     return { success: true };
   }
 
-  async findPaginated(input: GetPositionsPaginatedInput): Promise<GetPositionsPaginatedResponse> {
+  async findPaginated(
+    input: GetPositionsPaginatedInput,
+  ): Promise<GetPositionsPaginatedResponse> {
     const { search, skip, take = 10 } = input;
     const where = search ? { positionName: Like(`%${search}%`) } : {};
     const [data, totalCount] = await this.repository.findAndCount({

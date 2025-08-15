@@ -1,5 +1,12 @@
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, JoinColumn, CreateDateColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  JoinColumn,
+  CreateDateColumn,
+} from 'typeorm';
 import { WorkflowInstance } from '../../workflow-instances/entities/workflow-instance.entity';
 import { WorkflowStep } from '../../workflow-steps/entities/workflow-step.entity';
 import { User } from 'src/modules/users/entities/user.entity';

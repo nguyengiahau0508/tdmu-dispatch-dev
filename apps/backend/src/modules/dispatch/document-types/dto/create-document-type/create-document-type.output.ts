@@ -1,9 +1,8 @@
-import { Field, ObjectType } from "@nestjs/graphql";
-import { DocumentType } from "../../entities/document-type.entity";
-
+import { Field, ObjectType } from '@nestjs/graphql';
+import { DocumentType } from '../../entities/document-type.entity';
 
 @ObjectType()
 export class CreateDocumentTypeOutput {
-    @Field(()=> DocumentType)
-    documentType: DocumentType;
+  @Field(() => DocumentType)
+  documentType: DocumentType;
 }

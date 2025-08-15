@@ -17,10 +17,13 @@ export class DocumentsService {
   constructor(
     @InjectRepository(Document)
     private readonly documentRepository: Repository<Document>,
-    private readonly googleDriveService: GoogleDriveService
-  ) { }
+    private readonly googleDriveService: GoogleDriveService,
+  ) {}
 
-  async create(createDocumentInput: CreateDocumentInput, file?: FileUpload): Promise<Document> {
+  async create(
+    createDocumentInput: CreateDocumentInput,
+    file?: FileUpload,
+  ): Promise<Document> {
     let driveFileId: string | undefined = undefined;
     if (file) {
       const uploadedId = await this.googleDriveService.uploadFile(file);
@@ -28,36 +31,39 @@ export class DocumentsService {
     }
     const entity = this.documentRepository.create({
       ...createDocumentInput,
-      file: driveFileId ? {
-        driveFileId: driveFileId,
-        isPublic: false,
-      } : undefined
+      file: driveFileId
+        ? {
+            driveFileId: driveFileId,
+            isPublic: false,
+          }
+        : undefined,
     });
     return this.documentRepository.save(entity);
   }
 
-async findPaginated(input: GetDocumentsPaginatedInput): Promise<PageDto<Document>> {
-  const { search, page, take, order, skip } = input;
+  async findPaginated(
+    input: GetDocumentsPaginatedInput,
+  ): Promise<PageDto<Document>> {
+    const { search, page, take, order, skip } = input;
 
-  // Xây dựng điều kiện WHERE
-  const where: FindOptionsWhere<Document>[] = [];
+    // Xây dựng điều kiện WHERE
+    const where: FindOptionsWhere<Document>[] = [];
 
-  if (search) {
-    // Nếu có search, dùng ILike (PostgreSQL) hoặc Like (MySQL)
-    where.push({ title: ILike(`%${search}%`) });
+    if (search) {
+      // Nếu có search, dùng ILike (PostgreSQL) hoặc Like (MySQL)
+      where.push({ title: ILike(`%${search}%`) });
+    }
+
+    const [data, itemCount] = await this.documentRepository.findAndCount({
+      where: where.length > 0 ? where : undefined,
+      order: { id: order },
+      skip: skip,
+      take: take,
+    });
+
+    const meta = new PageMetaDto({ pageOptionsDto: input, itemCount });
+    return new PageDto(data, meta);
   }
-
-  const [data, itemCount] = await this.documentRepository.findAndCount({
-    where: where.length > 0 ? where : undefined,
-    order: { id: order },
-    skip: skip,
-    take: take,
-  });
-
-  const meta = new PageMetaDto({ pageOptionsDto: input, itemCount });
-  return new PageDto(data, meta);
-}
-
 
   async findOne(id: number): Promise<Document> {
     const entity = await this.documentRepository.findOne({ where: { id } });
@@ -67,7 +73,10 @@ async findPaginated(input: GetDocumentsPaginatedInput): Promise<PageDto<Document
     return entity;
   }
 
-  async update(id: number, updateDocumentInput: UpdateDocumentInput): Promise<Document> {
+  async update(
+    id: number,
+    updateDocumentInput: UpdateDocumentInput,
+  ): Promise<Document> {
     const entity = await this.documentRepository.findOne({ where: { id } });
     if (!entity) {
       throw new BadRequestException(`Document with ID ${id} not found`);

@@ -1,9 +1,9 @@
-import { Module } from "@nestjs/common";
-import { UsersModule } from "./users/users.module";
-import { OraganizationalModule } from "./organizational/oraganizational.module";
+import { Module } from '@nestjs/common';
+import { UsersModule } from './users/users.module';
+import { OraganizationalModule } from './organizational/oraganizational.module';
 import { FilesModule } from './files/files.module';
-import { DispatchModule } from "./dispatch/dispatch.module";
-import { WorkflowModule } from "./workflow/workflow.module";
+import { DispatchModule } from './dispatch/dispatch.module';
+import { WorkflowModule } from './workflow/workflow.module';
 
 @Module({
   imports: [
@@ -11,8 +11,8 @@ import { WorkflowModule } from "./workflow/workflow.module";
     OraganizationalModule,
     FilesModule,
     WorkflowModule,
-    DispatchModule
+    DispatchModule,
   ],
-  providers: []
+  providers: [],
 })
-export class FeaturesModule { }
+export class FeaturesModule {}

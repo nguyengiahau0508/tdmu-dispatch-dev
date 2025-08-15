@@ -6,10 +6,15 @@ import { UpdateApprovalProcessInput } from './dto/update-approval-process.input'
 
 @Resolver(() => ApprovalProcess)
 export class ApprovalProcessResolver {
-  constructor(private readonly approvalProcessService: ApprovalProcessService) {}
+  constructor(
+    private readonly approvalProcessService: ApprovalProcessService,
+  ) {}
 
   @Mutation(() => ApprovalProcess)
-  createApprovalProcess(@Args('createApprovalProcessInput') createApprovalProcessInput: CreateApprovalProcessInput) {
+  createApprovalProcess(
+    @Args('createApprovalProcessInput')
+    createApprovalProcessInput: CreateApprovalProcessInput,
+  ) {
     return this.approvalProcessService.create(createApprovalProcessInput);
   }
 
@@ -24,8 +29,14 @@ export class ApprovalProcessResolver {
   }
 
   @Mutation(() => ApprovalProcess)
-  updateApprovalProcess(@Args('updateApprovalProcessInput') updateApprovalProcessInput: UpdateApprovalProcessInput) {
-    return this.approvalProcessService.update(updateApprovalProcessInput.id, updateApprovalProcessInput);
+  updateApprovalProcess(
+    @Args('updateApprovalProcessInput')
+    updateApprovalProcessInput: UpdateApprovalProcessInput,
+  ) {
+    return this.approvalProcessService.update(
+      updateApprovalProcessInput.id,
+      updateApprovalProcessInput,
+    );
   }
 
   @Mutation(() => ApprovalProcess)

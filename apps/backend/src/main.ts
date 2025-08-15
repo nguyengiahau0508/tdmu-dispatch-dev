@@ -8,12 +8,12 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   // Middleware
-  app.use(cookieParser())
-  app.useGlobalPipes(new ValidationPipe({ transform: true }))
+  app.use(cookieParser());
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.enableCors({
     origin: true,
     credentials: true,
-  })
+  });
   app.use(
     graphqlUploadExpress({
       maxFileSize: 10 * 1024 * 1024,

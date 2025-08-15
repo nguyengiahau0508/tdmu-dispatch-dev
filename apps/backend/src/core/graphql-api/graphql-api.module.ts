@@ -29,4 +29,4 @@ import { IGraphQLConfig } from '../../config/interfaces';
     }),
   ],
 })
-export class GraphqlApiModule { }
+export class GraphqlApiModule {}

@@ -9,4 +9,4 @@ import { UnitType } from '../unit-types/entities/unit-type.entity';
   imports: [TypeOrmModule.forFeature([Unit, UnitType])],
   providers: [UnitsResolver, UnitsService],
 })
-export class UnitsModule { }
+export class UnitsModule {}

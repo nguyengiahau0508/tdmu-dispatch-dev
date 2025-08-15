@@ -8,6 +8,6 @@ import { WorkflowStep } from './entities/workflow-step.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([WorkflowStep])],
   providers: [WorkflowStepsResolver, RolesResolver, WorkflowStepsService],
-  exports: [WorkflowStepsService]
+  exports: [WorkflowStepsService],
 })
 export class WorkflowStepsModule {}

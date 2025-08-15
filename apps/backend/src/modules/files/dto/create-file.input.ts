@@ -1,4 +1,3 @@
-
 import { InputType, Field, Int } from '@nestjs/graphql';
 
 @InputType()
@@ -18,4 +17,3 @@ export class CreateFileInput {
   @Field(() => Boolean)
   isPublic: boolean;
 }
-

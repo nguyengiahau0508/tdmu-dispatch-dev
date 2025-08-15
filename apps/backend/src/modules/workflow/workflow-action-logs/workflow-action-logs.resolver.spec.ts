@@ -10,7 +10,9 @@ describe('WorkflowActionLogsResolver', () => {
       providers: [WorkflowActionLogsResolver, WorkflowActionLogsService],
     }).compile();
 
-    resolver = module.get<WorkflowActionLogsResolver>(WorkflowActionLogsResolver);
+    resolver = module.get<WorkflowActionLogsResolver>(
+      WorkflowActionLogsResolver,
+    );
   });
 
   it('should be defined', () => {

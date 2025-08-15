@@ -12,4 +12,4 @@ export * from './get-document-category/get-document-category.response';
 
 // Get DocumentCategories Paginated DTOs
 export * from './get-document-categories-paginated/get-document-categories-paginated.input';
-export * from './get-document-categories-paginated/get-document-categories-paginated.response'; 
+export * from './get-document-categories-paginated/get-document-categories-paginated.response';

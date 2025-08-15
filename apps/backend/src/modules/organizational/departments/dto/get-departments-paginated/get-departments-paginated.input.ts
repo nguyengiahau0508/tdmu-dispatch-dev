@@ -1,6 +1,6 @@
-import { Field, InputType, Int } from "@nestjs/graphql";
-import { IsOptional, IsString } from "class-validator";
-import { PageOptionsDto } from "src/common/shared/pagination/dtos";
+import { Field, InputType, Int } from '@nestjs/graphql';
+import { IsOptional, IsString } from 'class-validator';
+import { PageOptionsDto } from 'src/common/shared/pagination/dtos';
 
 @InputType()
 export class GetDepartmentsPaginatedInput extends PageOptionsDto {
@@ -12,4 +12,4 @@ export class GetDepartmentsPaginatedInput extends PageOptionsDto {
   @Field(() => Int, { nullable: true, description: 'ID phòng ban cha để lọc' })
   @IsOptional()
   parentDepartmentId?: number;
-} 
+}

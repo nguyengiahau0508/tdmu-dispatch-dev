@@ -8,7 +8,12 @@ import { PositionsModule } from '../positions/positions.module';
 import { UnitsModule } from '../units/units.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Assignment]), UsersModule, PositionsModule, UnitsModule],
+  imports: [
+    TypeOrmModule.forFeature([Assignment]),
+    UsersModule,
+    PositionsModule,
+    UnitsModule,
+  ],
   providers: [AssignmentsResolver, AssignmentsService],
 })
-export class AssignmentsModule { }
+export class AssignmentsModule {}

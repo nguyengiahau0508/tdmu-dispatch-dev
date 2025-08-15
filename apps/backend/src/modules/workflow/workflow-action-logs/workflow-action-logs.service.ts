@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { WorkflowActionLog, ActionType } from './entities/workflow-action-log.entity';
+import {
+  WorkflowActionLog,
+  ActionType,
+} from './entities/workflow-action-log.entity';
 import { CreateWorkflowActionLogInput } from './dto/create-workflow-action-log.input';
 import { UpdateWorkflowActionLogInput } from './dto/update-workflow-action-log.input';
 import { User } from 'src/modules/users/entities/user.entity';
@@ -9,15 +12,21 @@ import { User } from 'src/modules/users/entities/user.entity';
 @Injectable()
 export class WorkflowActionLogsService {
   constructor(
-    @InjectRepository(WorkflowActionLog) private readonly repository: Repository<WorkflowActionLog>
+    @InjectRepository(WorkflowActionLog)
+    private readonly repository: Repository<WorkflowActionLog>,
   ) {}
 
-  async create(createWorkflowActionLogInput: CreateWorkflowActionLogInput, user: User): Promise<WorkflowActionLog> {
+  async create(
+    createWorkflowActionLogInput: CreateWorkflowActionLogInput,
+    user: User,
+  ): Promise<WorkflowActionLog> {
     const log = this.repository.create({
       ...createWorkflowActionLogInput,
       actionByUser: user,
       actionAt: new Date(),
-      metadata: createWorkflowActionLogInput.metadata ? JSON.parse(createWorkflowActionLogInput.metadata) : null
+      metadata: createWorkflowActionLogInput.metadata
+        ? JSON.parse(createWorkflowActionLogInput.metadata)
+        : null,
     });
 
     return this.repository.save(log);
@@ -26,7 +35,7 @@ export class WorkflowActionLogsService {
   async findAll(): Promise<WorkflowActionLog[]> {
     return this.repository.find({
       relations: ['instance', 'step', 'actionByUser'],
-      order: { actionAt: 'DESC' }
+      order: { actionAt: 'DESC' },
     });
   }
 
@@ -34,7 +43,7 @@ export class WorkflowActionLogsService {
     return this.repository.find({
       where: { instanceId },
       relations: ['step', 'actionByUser'],
-      order: { actionAt: 'ASC' }
+      order: { actionAt: 'ASC' },
     });
   }
 
@@ -42,30 +51,37 @@ export class WorkflowActionLogsService {
     return this.repository.find({
       where: { actionByUserId: userId },
       relations: ['instance', 'step'],
-      order: { actionAt: 'DESC' }
+      order: { actionAt: 'DESC' },
     });
   }
 
   async findOne(id: number): Promise<WorkflowActionLog> {
     const log = await this.repository.findOne({
       where: { id },
-      relations: ['instance', 'step', 'actionByUser']
+      relations: ['instance', 'step', 'actionByUser'],
     });
 
     if (!log) {
-      throw new NotFoundException(`Workflow action log with ID ${id} not found`);
+      throw new NotFoundException(
+        `Workflow action log with ID ${id} not found`,
+      );
     }
 
     return log;
   }
 
-  async update(id: number, updateWorkflowActionLogInput: UpdateWorkflowActionLogInput): Promise<WorkflowActionLog> {
+  async update(
+    id: number,
+    updateWorkflowActionLogInput: UpdateWorkflowActionLogInput,
+  ): Promise<WorkflowActionLog> {
     const log = await this.findOne(id);
-    
+
     if (updateWorkflowActionLogInput.metadata) {
-      updateWorkflowActionLogInput.metadata = JSON.parse(updateWorkflowActionLogInput.metadata);
+      updateWorkflowActionLogInput.metadata = JSON.parse(
+        updateWorkflowActionLogInput.metadata,
+      );
     }
-    
+
     Object.assign(log, updateWorkflowActionLogInput);
     return this.repository.save(log);
   }
@@ -77,12 +93,12 @@ export class WorkflowActionLogsService {
   }
 
   async logAction(
-    instanceId: number, 
-    stepId: number, 
-    actionType: ActionType, 
-    user: User, 
-    note?: string, 
-    metadata?: any
+    instanceId: number,
+    stepId: number,
+    actionType: ActionType,
+    user: User,
+    note?: string,
+    metadata?: any,
   ): Promise<WorkflowActionLog> {
     const log = this.repository.create({
       instanceId,
@@ -91,7 +107,7 @@ export class WorkflowActionLogsService {
       actionByUser: user,
       actionAt: new Date(),
       note,
-      metadata
+      metadata,
     });
 
     return this.repository.save(log);
@@ -101,7 +117,7 @@ export class WorkflowActionLogsService {
     return this.repository.find({
       where: { instanceId },
       relations: ['step', 'actionByUser'],
-      order: { actionAt: 'ASC' }
+      order: { actionAt: 'ASC' },
     });
   }
 
@@ -109,7 +125,7 @@ export class WorkflowActionLogsService {
     return this.repository.find({
       relations: ['instance', 'step', 'actionByUser'],
       order: { actionAt: 'DESC' },
-      take: limit
+      take: limit,
     });
   }
 }

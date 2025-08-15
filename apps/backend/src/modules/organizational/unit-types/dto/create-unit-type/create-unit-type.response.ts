@@ -1,6 +1,6 @@
-import { ObjectType } from "@nestjs/graphql";
-import { ApiResponse } from "src/common/graphql/api-response.dto";
-import { CreateUnitTypeOutput } from "./create-unit-type.output";
+import { ObjectType } from '@nestjs/graphql';
+import { ApiResponse } from 'src/common/graphql/api-response.dto';
+import { CreateUnitTypeOutput } from './create-unit-type.output';
 
 @ObjectType()
-export class CreateUnitTypeResponse extends ApiResponse(CreateUnitTypeOutput) { }
+export class CreateUnitTypeResponse extends ApiResponse(CreateUnitTypeOutput) {}

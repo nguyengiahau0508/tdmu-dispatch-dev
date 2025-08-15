@@ -19,59 +19,87 @@ import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
 @Resolver(() => Unit)
 @UseGuards(GqlAuthGuard)
 export class UnitsResolver {
-  constructor(private readonly unitsService: UnitsService) { }
+  constructor(private readonly unitsService: UnitsService) {}
   @Mutation(() => CreateUnitResponse)
   @Roles(Role.SYSTEM_ADMIN)
-  async createUnit(@Args('createUnitInput') createUnitInput: CreateUnitInput): Promise<CreateUnitResponse> {
+  async createUnit(
+    @Args('createUnitInput') createUnitInput: CreateUnitInput,
+  ): Promise<CreateUnitResponse> {
     return {
-      metadata: createResponseMetadata(HttpStatus.ACCEPTED, "Tạo đơn vị thành công"),
-      data: await this.unitsService.create(createUnitInput)
-    }
+      metadata: createResponseMetadata(
+        HttpStatus.ACCEPTED,
+        'Tạo đơn vị thành công',
+      ),
+      data: await this.unitsService.create(createUnitInput),
+    };
   }
 
   @Query(() => GetUnitsPaginatedResponse, { name: 'units' })
-  async findAll(@Args('input') input: GetUnitsPaginatedInput): Promise<GetUnitsPaginatedResponse> {
+  async findAll(
+    @Args('input') input: GetUnitsPaginatedInput,
+  ): Promise<GetUnitsPaginatedResponse> {
     const pageData = await this.unitsService.findAll(input);
     return {
-      metadata: createResponseMetadata(HttpStatus.OK, "Lấy danh sách đơn vị thành công"),
+      metadata: createResponseMetadata(
+        HttpStatus.OK,
+        'Lấy danh sách đơn vị thành công',
+      ),
       data: pageData.data,
       totalCount: pageData.meta.itemCount,
-      hasNextPage: pageData.meta.hasNextPage
-    }
+      hasNextPage: pageData.meta.hasNextPage,
+    };
   }
 
   @Query(() => GetUnitResponse, { name: 'unit' })
-  async findOne(@Args('id', { type: () => Int }) id: number): Promise<GetUnitResponse> {
+  async findOne(
+    @Args('id', { type: () => Int }) id: number,
+  ): Promise<GetUnitResponse> {
     return {
-      metadata: createResponseMetadata(HttpStatus.OK, "Lấy thông tin đơn vị thành công"),
-      data: await this.unitsService.findOne(id)
-    }
+      metadata: createResponseMetadata(
+        HttpStatus.OK,
+        'Lấy thông tin đơn vị thành công',
+      ),
+      data: await this.unitsService.findOne(id),
+    };
   }
 
   @Mutation(() => UpdateUnitResponse)
   @Roles(Role.SYSTEM_ADMIN)
-  async updateUnit(@Args('updateUnitInput') updateUnitInput: UpdateUnitInput): Promise<UpdateUnitResponse> {
+  async updateUnit(
+    @Args('updateUnitInput') updateUnitInput: UpdateUnitInput,
+  ): Promise<UpdateUnitResponse> {
     return {
-      metadata: createResponseMetadata(HttpStatus.ACCEPTED, "Cập nhật đơn vị thành công"),
-      data: await this.unitsService.update(updateUnitInput.id, updateUnitInput)
-    }
+      metadata: createResponseMetadata(
+        HttpStatus.ACCEPTED,
+        'Cập nhật đơn vị thành công',
+      ),
+      data: await this.unitsService.update(updateUnitInput.id, updateUnitInput),
+    };
   }
 
   @Mutation(() => RemoveUnitResponse)
   @Roles(Role.SYSTEM_ADMIN)
-  async removeUnit(@Args('id', { type: () => Int }) id: number): Promise<RemoveUnitResponse> {
-    const data = await this.unitsService.remove(id)
+  async removeUnit(
+    @Args('id', { type: () => Int }) id: number,
+  ): Promise<RemoveUnitResponse> {
+    const data = await this.unitsService.remove(id);
     return {
-      metadata: createResponseMetadata(HttpStatus.ACCEPTED, "Xóa đơn vị thành công"),
-      data: data
-    }
+      metadata: createResponseMetadata(
+        HttpStatus.ACCEPTED,
+        'Xóa đơn vị thành công',
+      ),
+      data: data,
+    };
   }
 
   @Query(() => GetAllUnitsResponse, { name: 'allUnits' })
   async findAllUnits(): Promise<GetAllUnitsResponse> {
     const data = await this.unitsService.findAllUnits();
     return {
-      metadata: createResponseMetadata(HttpStatus.OK, "Lấy tất cả đơn vị thành công"),
+      metadata: createResponseMetadata(
+        HttpStatus.OK,
+        'Lấy tất cả đơn vị thành công',
+      ),
       data,
     };
   }

@@ -1,7 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, ILike } from 'typeorm';
-import { WorkflowStep, StepType, StepStatus } from './entities/workflow-step.entity';
+import {
+  WorkflowStep,
+  StepType,
+  StepStatus,
+} from './entities/workflow-step.entity';
 import { CreateWorkflowStepInput } from './dto/create-workflow-step.input';
 import { UpdateWorkflowStepInput } from './dto/update-workflow-step.input';
 import { GetWorkflowStepPaginatedInput } from './dto/get-workflow-step-paginated/get-workflow-step-paginated.input';
@@ -11,12 +15,15 @@ import { PageMetaDto } from 'src/common/shared/pagination/page-meta.dto';
 @Injectable()
 export class WorkflowStepsService {
   constructor(
-    @InjectRepository(WorkflowStep) private readonly repository: Repository<WorkflowStep>
+    @InjectRepository(WorkflowStep)
+    private readonly repository: Repository<WorkflowStep>,
   ) {}
 
-  async create(createWorkflowStepInput: CreateWorkflowStepInput): Promise<WorkflowStep> {
+  async create(
+    createWorkflowStepInput: CreateWorkflowStepInput,
+  ): Promise<WorkflowStep> {
     const step = this.repository.create(createWorkflowStepInput);
-    
+
     // Set order number if not provided
     if (!step.orderNumber) {
       const existingSteps = await this.findByTemplateId(step.templateId);
@@ -24,21 +31,25 @@ export class WorkflowStepsService {
     }
 
     const savedStep = await this.repository.save(step);
-    
+
     // Load template relation after save
     const stepWithRelations = await this.repository.findOne({
       where: { id: savedStep.id },
-      relations: ['template', 'actionLogs']
+      relations: ['template', 'actionLogs'],
     });
 
     if (!stepWithRelations) {
-      throw new NotFoundException(`Workflow step with ID ${savedStep.id} not found after creation`);
+      throw new NotFoundException(
+        `Workflow step with ID ${savedStep.id} not found after creation`,
+      );
     }
 
     return stepWithRelations;
   }
 
-  async findPaginated(input: GetWorkflowStepPaginatedInput): Promise<WorkflowStepPageDto> {
+  async findPaginated(
+    input: GetWorkflowStepPaginatedInput,
+  ): Promise<WorkflowStepPageDto> {
     const { search, templateId, type, order, page = 1, take = 10 } = input;
     const skip = (page - 1) * take;
 
@@ -65,12 +76,12 @@ export class WorkflowStepsService {
       order: { orderNumber: order || 'ASC' },
       skip,
       take,
-      relations: ['template', 'actionLogs']
+      relations: ['template', 'actionLogs'],
     });
 
-    const pageMetaDto = new PageMetaDto({ 
-      pageOptionsDto: { page, take, skip }, 
-      itemCount 
+    const pageMetaDto = new PageMetaDto({
+      pageOptionsDto: { page, take, skip },
+      itemCount,
     });
     return new WorkflowStepPageDto(data, pageMetaDto);
   }
@@ -78,14 +89,14 @@ export class WorkflowStepsService {
   async findAll(): Promise<WorkflowStep[]> {
     return this.repository.find({
       relations: ['template'],
-      order: { orderNumber: 'ASC' }
+      order: { orderNumber: 'ASC' },
     });
   }
 
   async findOne(id: number): Promise<WorkflowStep> {
     const step = await this.repository.findOne({
       where: { id },
-      relations: ['template', 'actionLogs', 'actionLogs.actionByUser']
+      relations: ['template', 'actionLogs', 'actionLogs.actionByUser'],
     });
 
     if (!step) {
@@ -98,11 +109,14 @@ export class WorkflowStepsService {
   async findByTemplateId(templateId: number): Promise<WorkflowStep[]> {
     return this.repository.find({
       where: { templateId, isActive: true },
-      order: { orderNumber: 'ASC' }
+      order: { orderNumber: 'ASC' },
     });
   }
 
-  async update(id: number, updateWorkflowStepInput: UpdateWorkflowStepInput): Promise<WorkflowStep> {
+  async update(
+    id: number,
+    updateWorkflowStepInput: UpdateWorkflowStepInput,
+  ): Promise<WorkflowStep> {
     const step = await this.findOne(id);
 
     Object.assign(step, updateWorkflowStepInput);
@@ -124,13 +138,13 @@ export class WorkflowStepsService {
 
   async findNextStep(currentStepId: number): Promise<WorkflowStep | null> {
     const currentStep = await this.findOne(currentStepId);
-    
+
     const nextStep = await this.repository.findOne({
       where: {
         templateId: currentStep.templateId,
         orderNumber: currentStep.orderNumber + 1,
-        isActive: true
-      }
+        isActive: true,
+      },
     });
 
     return nextStep;
@@ -138,7 +152,7 @@ export class WorkflowStepsService {
 
   async reorderSteps(templateId: number): Promise<void> {
     const steps = await this.findByTemplateId(templateId);
-    
+
     for (let i = 0; i < steps.length; i++) {
       steps[i].orderNumber = i + 1;
       await this.repository.save(steps[i]);
@@ -151,7 +165,7 @@ export class WorkflowStepsService {
 
     // Remove step from current position
     steps.splice(step.orderNumber - 1, 1);
-    
+
     // Insert at new position
     steps.splice(newOrder - 1, 0, step);
 
@@ -166,16 +180,16 @@ export class WorkflowStepsService {
 
   async duplicateStep(stepId: number): Promise<WorkflowStep> {
     const originalStep = await this.findOne(stepId);
-    
+
     const duplicatedStep = this.repository.create({
       ...originalStep,
       id: undefined, // Remove ID to create new record
       name: `${originalStep.name} (Copy)`,
-      orderNumber: originalStep.orderNumber + 1
+      orderNumber: originalStep.orderNumber + 1,
     });
 
     const savedStep = await this.repository.save(duplicatedStep);
-    
+
     // Reorder steps after duplication
     await this.reorderSteps(originalStep.templateId);
 
@@ -183,9 +197,9 @@ export class WorkflowStepsService {
   }
 
   async getStepTypes(): Promise<{ value: string; label: string }[]> {
-    return Object.values(StepType).map(type => ({
+    return Object.values(StepType).map((type) => ({
       value: type,
-      label: this.getStepTypeLabel(type)
+      label: this.getStepTypeLabel(type),
     }));
   }
 
@@ -194,7 +208,7 @@ export class WorkflowStepsService {
       [StepType.START]: 'Bắt đầu',
       [StepType.APPROVAL]: 'Phê duyệt',
       [StepType.TRANSFER]: 'Chuyển tiếp',
-      [StepType.END]: 'Kết thúc'
+      [StepType.END]: 'Kết thúc',
     };
     return labels[type] || type;
   }
@@ -207,7 +221,7 @@ export class WorkflowStepsService {
       { value: 'DEPARTMENT_STAFF', label: 'Chuyên viên/Nhân viên' },
       { value: 'CLERK', label: 'Văn thư' },
       { value: 'DEGREE_MANAGER', label: 'Quản lý văn bằng' },
-      { value: 'BASIC_USER', label: 'Người dùng cơ bản' }
+      { value: 'BASIC_USER', label: 'Người dùng cơ bản' },
     ];
   }
 }

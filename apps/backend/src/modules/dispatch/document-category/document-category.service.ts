@@ -13,19 +13,28 @@ import { RemoveDocumentCategoryOutput } from './dto/remove-document-category/rem
 export class DocumentCategoryService {
   constructor(
     @InjectRepository(DocumentCategory)
-    private readonly documentCategoryRepository: Repository<DocumentCategory>
+    private readonly documentCategoryRepository: Repository<DocumentCategory>,
   ) {}
 
-  async create(createDocumentCategoryInput: CreateDocumentCategoryInput): Promise<DocumentCategory> {
-    const entity = this.documentCategoryRepository.create(createDocumentCategoryInput);
+  async create(
+    createDocumentCategoryInput: CreateDocumentCategoryInput,
+  ): Promise<DocumentCategory> {
+    const entity = this.documentCategoryRepository.create(
+      createDocumentCategoryInput,
+    );
     return this.documentCategoryRepository.save(entity);
   }
 
-  async findPaginated(input: GetDocumentCategoriesPaginatedInput): Promise<PageDto<DocumentCategory>> {
+  async findPaginated(
+    input: GetDocumentCategoriesPaginatedInput,
+  ): Promise<PageDto<DocumentCategory>> {
     const { search, page, take, order } = input;
-    const queryBuilder = this.documentCategoryRepository.createQueryBuilder('documentCategory');
+    const queryBuilder =
+      this.documentCategoryRepository.createQueryBuilder('documentCategory');
     if (search) {
-      queryBuilder.where('documentCategory.name LIKE :search', { search: `%${search}%` });
+      queryBuilder.where('documentCategory.name LIKE :search', {
+        search: `%${search}%`,
+      });
     }
     queryBuilder.orderBy('documentCategory.id', order);
     queryBuilder.skip(input.skip).take(take);
@@ -39,15 +48,22 @@ export class DocumentCategoryService {
   }
 
   async findOne(id: number): Promise<DocumentCategory> {
-    const entity = await this.documentCategoryRepository.findOne({ where: { id } });
+    const entity = await this.documentCategoryRepository.findOne({
+      where: { id },
+    });
     if (!entity) {
       throw new BadRequestException(`DocumentCategory with ID ${id} not found`);
     }
     return entity;
   }
 
-  async update(id: number, updateDocumentCategoryInput: UpdateDocumentCategoryInput): Promise<DocumentCategory> {
-    const entity = await this.documentCategoryRepository.findOne({ where: { id } });
+  async update(
+    id: number,
+    updateDocumentCategoryInput: UpdateDocumentCategoryInput,
+  ): Promise<DocumentCategory> {
+    const entity = await this.documentCategoryRepository.findOne({
+      where: { id },
+    });
     if (!entity) {
       throw new BadRequestException(`DocumentCategory with ID ${id} not found`);
     }

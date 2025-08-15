@@ -13,7 +13,10 @@ export class CreateWorkflowInstanceInput {
   @Min(1, { message: 'ID document phải là số nguyên dương' })
   documentId: number;
 
-  @Field(() => String, { nullable: true, description: 'Ghi chú cho workflow instance' })
+  @Field(() => String, {
+    nullable: true,
+    description: 'Ghi chú cho workflow instance',
+  })
   @IsString()
   @IsOptional()
   notes?: string;

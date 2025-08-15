@@ -33,4 +33,4 @@ import { IDatabaseConfig } from '../../config/interfaces';
   // Không cần exports TypeOrmModule.forRootAsync() vì nó đã thiết lập kết nối toàn cục.
   // Bạn sẽ exports TypeOrmModule.forFeature() từ các feature modules.
 })
-export class DatabaseModule { }
+export class DatabaseModule {}

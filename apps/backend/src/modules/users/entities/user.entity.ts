@@ -15,7 +15,6 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-
 // Đăng ký enum với GraphQL
 registerEnumType(Role, {
   name: 'Role', // Tên này sẽ được sử dụng trong GraphQL schema
@@ -32,7 +31,9 @@ export class User {
   id: number;
 
   @Column({ unique: true })
-  @Field(() => String, { description: 'Email của người dùng (dùng để đăng nhập)' })
+  @Field(() => String, {
+    description: 'Email của người dùng (dùng để đăng nhập)',
+  })
   email: string;
 
   // Không nên expose passwordHash ra GraphQL schema bằng @Field()
@@ -52,12 +53,18 @@ export class User {
   isActive: boolean;
 
   @Column({ default: true })
-  @Field(() => Boolean, { description: 'Đánh dấu người dùng đăng nhập lần đầu (để yêu cầu đổi mật khẩu)' })
+  @Field(() => Boolean, {
+    description:
+      'Đánh dấu người dùng đăng nhập lần đầu (để yêu cầu đổi mật khẩu)',
+  })
   isFirstLogin: boolean;
 
   @Column({ nullable: true, type: 'text' })
-  @Field(() => String, { nullable: true, description: "Ảnh đại diện của người dùng" })
-  avatar: string
+  @Field(() => String, {
+    nullable: true,
+    description: 'Ảnh đại diện của người dùng',
+  })
+  avatar: string;
 
   @Column({
     type: 'set',
@@ -67,7 +74,7 @@ export class User {
   @Field(() => [Role], { description: 'Danh sách vai trò của người dùng' })
   roles: Role[];
 
-  @OneToMany(() => Assignment, assignment => assignment.user)
+  @OneToMany(() => Assignment, (assignment) => assignment.user)
   @Field(() => [Assignment])
   assignments: Assignment[];
 

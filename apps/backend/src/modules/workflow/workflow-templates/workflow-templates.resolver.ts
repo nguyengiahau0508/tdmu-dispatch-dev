@@ -13,41 +13,67 @@ import { User } from 'src/modules/users/entities/user.entity';
 @Resolver(() => WorkflowTemplate)
 @UseGuards(GqlAuthGuard)
 export class WorkflowTemplatesResolver {
-  constructor(private readonly workflowTemplatesService: WorkflowTemplatesService) {}
+  constructor(
+    private readonly workflowTemplatesService: WorkflowTemplatesService,
+  ) {}
 
-  @Mutation(() => WorkflowTemplate, { description: 'Tạo workflow template mới' })
+  @Mutation(() => WorkflowTemplate, {
+    description: 'Tạo workflow template mới',
+  })
   createWorkflowTemplate(
-    @Args('createWorkflowTemplateInput') createWorkflowTemplateInput: CreateWorkflowTemplateInput,
-    @CurrentUser() user: User
+    @Args('createWorkflowTemplateInput')
+    createWorkflowTemplateInput: CreateWorkflowTemplateInput,
+    @CurrentUser() user: User,
   ) {
-    return this.workflowTemplatesService.create(createWorkflowTemplateInput, user);
+    return this.workflowTemplatesService.create(
+      createWorkflowTemplateInput,
+      user,
+    );
   }
 
-  @Query(() => [WorkflowTemplate], { name: 'workflowTemplates', description: 'Lấy tất cả workflow templates' })
+  @Query(() => [WorkflowTemplate], {
+    name: 'workflowTemplates',
+    description: 'Lấy tất cả workflow templates',
+  })
   findAll() {
     return this.workflowTemplatesService.findAll();
   }
 
-  @Query(() => WorkflowTemplatePageDto, { name: 'workflowTemplatesPaginated', description: 'Lấy danh sách workflow templates có phân trang' })
+  @Query(() => WorkflowTemplatePageDto, {
+    name: 'workflowTemplatesPaginated',
+    description: 'Lấy danh sách workflow templates có phân trang',
+  })
   findPaginated(@Args('input') input: GetWorkflowTemplatePaginatedInput) {
     return this.workflowTemplatesService.findPaginated(input);
   }
 
-  @Query(() => WorkflowTemplate, { name: 'workflowTemplate', description: 'Lấy workflow template theo ID' })
+  @Query(() => WorkflowTemplate, {
+    name: 'workflowTemplate',
+    description: 'Lấy workflow template theo ID',
+  })
   findOne(@Args('id', { type: () => Int }) id: number) {
     return this.workflowTemplatesService.findOne(id);
   }
 
-  @Query(() => [WorkflowTemplate], { name: 'activeWorkflowTemplates', description: 'Lấy danh sách workflow templates đang hoạt động' })
+  @Query(() => [WorkflowTemplate], {
+    name: 'activeWorkflowTemplates',
+    description: 'Lấy danh sách workflow templates đang hoạt động',
+  })
   findActiveTemplates() {
     return this.workflowTemplatesService.findActiveTemplates();
   }
 
-  @Mutation(() => WorkflowTemplate, { description: 'Cập nhật workflow template' })
+  @Mutation(() => WorkflowTemplate, {
+    description: 'Cập nhật workflow template',
+  })
   updateWorkflowTemplate(
-    @Args('updateWorkflowTemplateInput') updateWorkflowTemplateInput: UpdateWorkflowTemplateInput
+    @Args('updateWorkflowTemplateInput')
+    updateWorkflowTemplateInput: UpdateWorkflowTemplateInput,
   ) {
-    return this.workflowTemplatesService.update(updateWorkflowTemplateInput.id, updateWorkflowTemplateInput);
+    return this.workflowTemplatesService.update(
+      updateWorkflowTemplateInput.id,
+      updateWorkflowTemplateInput,
+    );
   }
 
   @Mutation(() => Boolean, { description: 'Xóa workflow template' })

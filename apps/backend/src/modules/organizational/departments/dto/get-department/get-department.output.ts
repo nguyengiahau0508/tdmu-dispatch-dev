@@ -5,4 +5,4 @@ import { Department } from '../../entities/department.entity';
 export class GetDepartmentOutput {
   @Field(() => Department, { description: 'Thông tin phòng ban' })
   department: Department;
-} 
+}

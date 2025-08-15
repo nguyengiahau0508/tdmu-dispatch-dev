@@ -16,4 +16,4 @@ export class StreamFileOutput {
 
   @Field(() => Boolean)
   isPublic: boolean;
-} 
+}

@@ -10,6 +10,7 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { GraphQLExceptionFilter } from './common/filters/graphql-exception.filter';
 import { GqlAuthGuard } from './auth/guards/gql-auth.guard';
 import { IntegrationsModule } from './integrations/integrations.module';
+import { SeederModule } from './database/seeds/seeder.module';
 
 @Module({
   imports: [
@@ -19,15 +20,19 @@ import { IntegrationsModule } from './integrations/integrations.module';
     GraphqlApiModule,
     FeaturesModule,
     IntegrationsModule,
+    SeederModule,
   ],
   controllers: [AppController],
-  providers: [AppService,
+  providers: [
+    AppService,
     {
-      provide: APP_FILTER, useClass: GraphQLExceptionFilter
+      provide: APP_FILTER,
+      useClass: GraphQLExceptionFilter,
     },
     {
-      provide: APP_GUARD, useClass: GqlAuthGuard
-    }
+      provide: APP_GUARD,
+      useClass: GqlAuthGuard,
+    },
   ],
 })
-export class AppModule { }
+export class AppModule {}

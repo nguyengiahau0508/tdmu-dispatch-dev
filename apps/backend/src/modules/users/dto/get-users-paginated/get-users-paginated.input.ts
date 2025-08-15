@@ -5,7 +5,10 @@ import { Role } from 'src/common/enums/role.enums';
 
 @InputType()
 export class GetUsersPaginatedInput extends PageOptionsDto {
-  @Field(() => String, { nullable: true, description: 'Tìm kiếm theo tên hoặc email' })
+  @Field(() => String, {
+    nullable: true,
+    description: 'Tìm kiếm theo tên hoặc email',
+  })
   @IsString()
   @IsOptional()
   search?: string;
@@ -15,8 +18,11 @@ export class GetUsersPaginatedInput extends PageOptionsDto {
   @IsOptional()
   role?: Role;
 
-  @Field(() => Boolean, { nullable: true, description: 'Lọc theo trạng thái hoạt động' })
+  @Field(() => Boolean, {
+    nullable: true,
+    description: 'Lọc theo trạng thái hoạt động',
+  })
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
-} 
+}

@@ -1,6 +1,10 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IJwtConfig } from 'src/config/interfaces';
 import { ErrorCode } from 'src/common/enums/error-code.enum';
@@ -12,7 +16,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private readonly configService: ConfigService,
     private readonly tokenService: TokenService,
-    private readonly userService: UsersService
+    private readonly userService: UsersService,
   ) {
     const jwtConfig = configService.get<IJwtConfig>('jwt');
     if (!jwtConfig) {
@@ -27,7 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: ITokenPayload) {
-    const isValid = await this.tokenService.isTokenValid(payload.tokenId)
+    const isValid = await this.tokenService.isTokenValid(payload.tokenId);
     if (!isValid) {
       throw new UnauthorizedException({
         message: 'Xác thực thất bại',
@@ -35,7 +39,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       });
     }
 
-    if (payload.type == "refresh") {
+    if (payload.type == 'refresh') {
       throw new UnauthorizedException({
         message: 'Xác thực thất bại',
         code: ErrorCode.REFRESH_TOKEN_MISUSED,
@@ -43,10 +47,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     if (payload.type == 'onetime') {
-      await this.tokenService.revokeToken(payload.tokenId)
+      await this.tokenService.revokeToken(payload.tokenId);
     }
 
-    const currentUser = await this.userService.findOneById(payload.sub)
-    return currentUser
+    const currentUser = await this.userService.findOneById(payload.sub);
+    return currentUser;
   }
 }

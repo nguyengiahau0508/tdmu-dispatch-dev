@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, ILike } from 'typeorm';
 import { Department } from './entities/department.entity';
@@ -13,10 +17,12 @@ import { PageDto } from 'src/common/shared/pagination/page.dto';
 export class DepartmentsService {
   constructor(
     @InjectRepository(Department)
-    private readonly repository: Repository<Department>
+    private readonly repository: Repository<Department>,
   ) {}
 
-  async create(createDepartmentInput: CreateDepartmentInput): Promise<Department> {
+  async create(
+    createDepartmentInput: CreateDepartmentInput,
+  ): Promise<Department> {
     const created = this.repository.create(createDepartmentInput);
     const saved = await this.repository.save(created);
     if (!saved) throw new BadRequestException('Tạo phòng ban thất bại');
@@ -33,17 +39,25 @@ export class DepartmentsService {
       }
     }
     return this.repository.find({
-      where: where.length > 0 ? where : undefined
+      where: where.length > 0 ? where : undefined,
     });
   }
 
-  async findPaginated(input: GetDepartmentsPaginatedInput): Promise<PageDto<Department>> {
+  async findPaginated(
+    input: GetDepartmentsPaginatedInput,
+  ): Promise<PageDto<Department>> {
     const { search, order, parentDepartmentId, skip, take } = input;
     const where: FindOptionsWhere<Department>[] = [];
     if (search) {
       where.push(
-        { name: ILike(`%${search}%`), ...(parentDepartmentId && { parentDepartmentId }) },
-        { description: ILike(`%${search}%`), ...(parentDepartmentId && { parentDepartmentId }) },
+        {
+          name: ILike(`%${search}%`),
+          ...(parentDepartmentId && { parentDepartmentId }),
+        },
+        {
+          description: ILike(`%${search}%`),
+          ...(parentDepartmentId && { parentDepartmentId }),
+        },
       );
     } else if (parentDepartmentId) {
       where.push({ parentDepartmentId });
@@ -64,13 +78,18 @@ export class DepartmentsService {
       where: { id },
       relations: ['parentDepartment', 'children'],
     });
-    if (!department) throw new NotFoundException(`Không tìm thấy phòng ban với ID ${id}`);
+    if (!department)
+      throw new NotFoundException(`Không tìm thấy phòng ban với ID ${id}`);
     return department;
   }
 
-  async update(id: number, updateDepartmentInput: UpdateDepartmentInput): Promise<Department> {
+  async update(
+    id: number,
+    updateDepartmentInput: UpdateDepartmentInput,
+  ): Promise<Department> {
     const department = await this.repository.findOne({ where: { id } });
-    if (!department) throw new NotFoundException(`Không tìm thấy phòng ban với ID ${id}`);
+    if (!department)
+      throw new NotFoundException(`Không tìm thấy phòng ban với ID ${id}`);
     Object.assign(department, updateDepartmentInput);
     const updated = await this.repository.save(department);
     if (!updated) throw new BadRequestException('Cập nhật phòng ban thất bại');
@@ -79,9 +98,12 @@ export class DepartmentsService {
 
   async remove(id: number): Promise<Department> {
     const department = await this.repository.findOne({ where: { id } });
-    if (!department) throw new NotFoundException(`Không tìm thấy phòng ban với ID ${id}`);
+    if (!department)
+      throw new NotFoundException(`Không tìm thấy phòng ban với ID ${id}`);
     // Kiểm tra có phòng ban con không
-    const children = await this.repository.find({ where: { parentDepartmentId: id } });
+    const children = await this.repository.find({
+      where: { parentDepartmentId: id },
+    });
     if (children.length > 0) {
       throw new BadRequestException('Không thể xóa phòng ban có phòng ban con');
     }

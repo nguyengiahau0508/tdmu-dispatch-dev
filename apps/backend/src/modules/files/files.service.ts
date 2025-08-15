@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UpdateFileInput } from './dto/update-file.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { File } from './entities/file.entity';
@@ -9,12 +13,10 @@ import { CreateFileInput } from './dto/create-file.input';
 
 @Injectable()
 export class FilesService {
-
   constructor(
     @InjectRepository(File) private readonly repository: Repository<File>,
-    private readonly googleDriveService: GoogleDriveService
-  ) {
-  }
+    private readonly googleDriveService: GoogleDriveService,
+  ) {}
 
   async checkAccess(user: User, file: File) {
     if (file.isPublic) return true;
@@ -68,7 +70,7 @@ export class FilesService {
   }
 
   create(createFileInput: CreateFileInput) {
-    return this.repository.create(createFileInput)
+    return this.repository.create(createFileInput);
   }
 
   findAll() {

@@ -11,4 +11,4 @@ export class SignInInput {
   @IsString()
   @MinLength(6)
   password: string;
-} 
+}

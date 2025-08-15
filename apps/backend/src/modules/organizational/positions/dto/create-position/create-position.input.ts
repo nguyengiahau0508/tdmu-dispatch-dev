@@ -6,8 +6,8 @@ export class CreatePositionInput {
   positionName: string;
 
   @Field({ description: 'Số lượng chức vụ' })
-  maxSlots: number
+  maxSlots: number;
 
   @Field({ description: 'Id của phòng ban mà chức vụ này thuộc về' })
-  departmentId:number
+  departmentId: number;
 }

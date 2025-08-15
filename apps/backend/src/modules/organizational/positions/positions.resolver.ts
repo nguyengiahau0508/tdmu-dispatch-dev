@@ -18,74 +18,111 @@ import { GetPositionsResponse } from './dto/get-all-position/get-all-position.re
 
 @Resolver(() => Position)
 export class PositionsResolver {
-  constructor(private readonly positionsService: PositionsService) { }
+  constructor(private readonly positionsService: PositionsService) {}
 
   @Mutation(() => CreatePositionResponse)
   @Roles(Role.SYSTEM_ADMIN)
-  async createPosition(@Args('createPositionInput') createPositionInput: CreatePositionInput): Promise<CreatePositionResponse> {
-    const position = await this.positionsService.create(createPositionInput)
+  async createPosition(
+    @Args('createPositionInput') createPositionInput: CreatePositionInput,
+  ): Promise<CreatePositionResponse> {
+    const position = await this.positionsService.create(createPositionInput);
     return {
-      metadata: createResponseMetadata(HttpStatus.CREATED, 'Tạo chức vụ thành công'),
+      metadata: createResponseMetadata(
+        HttpStatus.CREATED,
+        'Tạo chức vụ thành công',
+      ),
       data: { position },
     };
   }
 
   @Query(() => GetPositionsPaginatedResponse, { name: 'positions' })
-  async findAll(@Args('input') input: GetPositionsPaginatedInput): Promise<GetPositionsPaginatedResponse> {
+  async findAll(
+    @Args('input') input: GetPositionsPaginatedInput,
+  ): Promise<GetPositionsPaginatedResponse> {
     const pageData = await this.positionsService.findPaginated(input);
     return {
-      metadata: createResponseMetadata(HttpStatus.OK, 'Lấy danh sách chức vụ thành công'),
+      metadata: createResponseMetadata(
+        HttpStatus.OK,
+        'Lấy danh sách chức vụ thành công',
+      ),
       data: pageData.data,
       totalCount: pageData.totalCount,
       hasNextPage: pageData.hasNextPage,
     };
   }
 
-  @Query(()=>GetPositionsResponse, {name: 'allPositionsByDepartmentId'})
-  async findByDepartmentId(@Args('departmentId', {type: ()=>Int}) departmentId:number): Promise<GetPositionsResponse>{
-    const positions = await this.positionsService.findByDepartmentId(departmentId)
+  @Query(() => GetPositionsResponse, { name: 'allPositionsByDepartmentId' })
+  async findByDepartmentId(
+    @Args('departmentId', { type: () => Int }) departmentId: number,
+  ): Promise<GetPositionsResponse> {
+    const positions =
+      await this.positionsService.findByDepartmentId(departmentId);
     return {
-      metadata: createResponseMetadata(HttpStatus.OK, "Lấy danh sách chức vụ thành công"),
+      metadata: createResponseMetadata(
+        HttpStatus.OK,
+        'Lấy danh sách chức vụ thành công',
+      ),
       data: {
-        positions 
-      }
-    }
+        positions,
+      },
+    };
   }
 
   @Query(() => GetAllPositionsResponse, { name: 'allPositions' })
   async findAllPositions(): Promise<GetAllPositionsResponse> {
     const data = await this.positionsService.findAll();
     return {
-      metadata: createResponseMetadata(HttpStatus.OK, 'Lấy tất cả chức vụ thành công'),
+      metadata: createResponseMetadata(
+        HttpStatus.OK,
+        'Lấy tất cả chức vụ thành công',
+      ),
       data,
     };
   }
 
   @Query(() => GetPositionResponse, { name: 'position' })
-  async findOne(@Args('id', { type: () => Int }) id: number): Promise<GetPositionResponse> {
+  async findOne(
+    @Args('id', { type: () => Int }) id: number,
+  ): Promise<GetPositionResponse> {
     const position = await this.positionsService.findOne(id);
     return {
-      metadata: createResponseMetadata(HttpStatus.OK, 'Lấy thông tin chức vụ thành công'),
+      metadata: createResponseMetadata(
+        HttpStatus.OK,
+        'Lấy thông tin chức vụ thành công',
+      ),
       data: { position },
     };
   }
 
   @Mutation(() => UpdatePositionResponse)
   @Roles(Role.SYSTEM_ADMIN)
-  async updatePosition(@Args('updatePositionInput') updatePositionInput: UpdatePositionInput): Promise<UpdatePositionResponse> {
-    const position = await this.positionsService.update(updatePositionInput.id, updatePositionInput);
+  async updatePosition(
+    @Args('updatePositionInput') updatePositionInput: UpdatePositionInput,
+  ): Promise<UpdatePositionResponse> {
+    const position = await this.positionsService.update(
+      updatePositionInput.id,
+      updatePositionInput,
+    );
     return {
-      metadata: createResponseMetadata(HttpStatus.ACCEPTED, 'Cập nhật chức vụ thành công'),
+      metadata: createResponseMetadata(
+        HttpStatus.ACCEPTED,
+        'Cập nhật chức vụ thành công',
+      ),
       data: { position },
     };
   }
 
   @Mutation(() => RemovePositionResponse)
   @Roles(Role.SYSTEM_ADMIN)
-  async removePosition(@Args('id', { type: () => Int }) id: number): Promise<RemovePositionResponse> {
+  async removePosition(
+    @Args('id', { type: () => Int }) id: number,
+  ): Promise<RemovePositionResponse> {
     const result = await this.positionsService.remove(id);
     return {
-      metadata: createResponseMetadata(HttpStatus.ACCEPTED, 'Xóa chức vụ thành công'),
+      metadata: createResponseMetadata(
+        HttpStatus.ACCEPTED,
+        'Xóa chức vụ thành công',
+      ),
       data: result,
     };
   }

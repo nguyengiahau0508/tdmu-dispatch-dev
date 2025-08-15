@@ -10,7 +10,6 @@ export default registerAs(
     refreshTokenSecret:
       process.env.JWT_REFRESH_TOKEN_SECRET_KEY ||
       'your-default-refresh-secret-key',
-    refreshTokenExpiresIn:
-      process.env.JWT_REFRESH_TOKEN_EXPIRATION || '7d',
+    refreshTokenExpiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRATION || '7d',
   }),
 );

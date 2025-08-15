@@ -1,4 +1,3 @@
-
 import { Injectable } from '@nestjs/common';
 import { drive_v3, google } from 'googleapis';
 import { GoogleOauth2Service } from '../google-oauth2/google-oauth2.service';
@@ -16,7 +15,9 @@ export class GoogleDriveService {
 
   private bufferToStream(buffer: any): Readable {
     // Chuyển đổi thành Buffer thực sự nếu chưa phải
-    const realBuffer = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer.data);
+    const realBuffer = Buffer.isBuffer(buffer)
+      ? buffer
+      : Buffer.from(buffer.data);
     const stream = new Readable();
     stream.push(realBuffer);
     stream.push(null); // Kết thúc stream
@@ -38,14 +39,13 @@ export class GoogleDriveService {
         { responseType: 'stream' }, // Trả về dạng stream
       );
 
-      const fileStream = response.data as Readable;
+      const fileStream = response.data;
       return fileStream;
     } catch (error) {
       console.error('Error getting file:', error.message);
       throw new Error('Could not get file from Google Drive');
     }
   }
-
 
   /**
    * Lấy metadata file từ Google Drive

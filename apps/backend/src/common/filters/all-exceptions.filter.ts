@@ -10,7 +10,8 @@ import { GraphQLError, GraphQLFormattedError } from 'graphql'; // Import GraphQL
 import { createErrorMetadata } from '../helpers/metadata.helper'; // Import helper của bạn
 
 @Catch()
-export class AllExceptionsFilter implements ExceptionFilter { // <<<< SỬA Ở ĐÂY
+export class AllExceptionsFilter implements ExceptionFilter {
+  // <<<< SỬA Ở ĐÂY
   catch(exception: unknown, host: ArgumentsHost): any {
     const gqlHost = GqlArgumentsHost.create(host);
     const info = gqlHost.getInfo(); // Kiểm tra xem có phải là context GraphQL không
@@ -24,7 +25,10 @@ export class AllExceptionsFilter implements ExceptionFilter { // <<<< SỬA Ở 
       if (exception instanceof HttpException) {
         throw exception; // Để NestJS xử lý lỗi HTTP mặc định nếu filter này chỉ cho GraphQL
       }
-      throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Internal Server Error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
 
     const path = info?.path;
@@ -47,8 +51,8 @@ export class AllExceptionsFilter implements ExceptionFilter { // <<<< SỬA Ở 
               error: (response as any).error,
               statusCode: (response as any).statusCode,
               message: (response as any).message, // message có thể là mảng
-            }
-          }
+            },
+          };
         }
       } else {
         message = exception.message;
@@ -60,9 +64,15 @@ export class AllExceptionsFilter implements ExceptionFilter { // <<<< SỬA Ở 
       // Cố gắng lấy statusCode từ extensions
       if (typeof responseExtensions?.status === 'number') {
         statusCode = responseExtensions.status;
-      } else if (typeof (responseExtensions?.http as any)?.status === 'number') { // Kiểm tra an toàn hơn
+      } else if (
+        typeof (responseExtensions?.http as any)?.status === 'number'
+      ) {
+        // Kiểm tra an toàn hơn
         statusCode = (responseExtensions.http as any).status;
-      } else if (responseExtensions?.code === 'BAD_USER_INPUT' || responseExtensions?.code === 'GRAPHQL_VALIDATION_FAILED') {
+      } else if (
+        responseExtensions?.code === 'BAD_USER_INPUT' ||
+        responseExtensions?.code === 'GRAPHQL_VALIDATION_FAILED'
+      ) {
         statusCode = HttpStatus.BAD_REQUEST;
       } else if (responseExtensions?.code === 'UNAUTHENTICATED') {
         statusCode = HttpStatus.UNAUTHORIZED;
@@ -87,19 +97,32 @@ export class AllExceptionsFilter implements ExceptionFilter { // <<<< SỬA Ở 
       ...responseExtensions, // Đặt extensions gốc trước
       customMetadata: errorMetadata, // Thêm metadata của chúng ta
       // Ghi đè hoặc thêm code nếu responseExtensions chưa có hoặc muốn chuẩn hóa
-      code: responseExtensions?.code || (statusCode >= 500 ? 'INTERNAL_SERVER_ERROR' : 'CUSTOM_ERROR'),
+      code:
+        responseExtensions?.code ||
+        (statusCode >= 500 ? 'INTERNAL_SERVER_ERROR' : 'CUSTOM_ERROR'),
     };
-
 
     // Tạo một GraphQLError mới với thông tin đã được chuẩn hóa
     const formattedError = new GraphQLError(
       errorMetadata.message || 'An error occurred', // Message chính của lỗi
       {
         nodes: exception instanceof GraphQLError ? exception.nodes : undefined,
-        source: exception instanceof GraphQLError ? exception.source : undefined,
-        positions: exception instanceof GraphQLError ? exception.positions : undefined,
-        path: exception instanceof GraphQLError ? exception.path : (path ? [path.key] : undefined),
-        originalError: exception instanceof GraphQLError ? exception.originalError : (exception instanceof Error ? exception : undefined),
+        source:
+          exception instanceof GraphQLError ? exception.source : undefined,
+        positions:
+          exception instanceof GraphQLError ? exception.positions : undefined,
+        path:
+          exception instanceof GraphQLError
+            ? exception.path
+            : path
+              ? [path.key]
+              : undefined,
+        originalError:
+          exception instanceof GraphQLError
+            ? exception.originalError
+            : exception instanceof Error
+              ? exception
+              : undefined,
         extensions: finalExtensions,
       },
     );

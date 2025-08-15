@@ -8,4 +8,4 @@ export class AddRoleInput {
 
   @Field(() => Role, { description: 'Role cần thêm cho user' })
   role: Role;
-} 
+}

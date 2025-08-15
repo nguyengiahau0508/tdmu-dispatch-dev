@@ -12,9 +12,9 @@ import { WorkflowTemplatesModule } from '../workflow-templates/workflow-template
     TypeOrmModule.forFeature([WorkflowInstance]),
     WorkflowStepsModule,
     WorkflowActionLogsModule,
-    WorkflowTemplatesModule
+    WorkflowTemplatesModule,
   ],
   providers: [WorkflowInstancesResolver, WorkflowInstancesService],
-  exports: [WorkflowInstancesService]
+  exports: [WorkflowInstancesService],
 })
 export class WorkflowInstancesModule {}

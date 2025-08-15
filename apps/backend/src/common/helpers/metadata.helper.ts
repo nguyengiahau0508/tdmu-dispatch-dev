@@ -80,6 +80,7 @@ export function createErrorMetadata(
   path?: string,
 ): Metadata {
   // Đảm bảo statusCode là lỗi
-  const finalStatusCode = statusCode < 400 ? HttpStatus.INTERNAL_SERVER_ERROR : statusCode;
+  const finalStatusCode =
+    statusCode < 400 ? HttpStatus.INTERNAL_SERVER_ERROR : statusCode;
   return createResponseMetadata(finalStatusCode, message, path);
 }

@@ -1,4 +1,3 @@
-
 import { Injectable, ExecutionContext } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GqlExecutionContext } from '@nestjs/graphql';
@@ -29,7 +28,7 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
     const request = this.getRequest(context);
     const user: User = request?.user;
 
-    if (!user.isActive) return false
+    if (!user.isActive) return false;
 
     // ✅ 4. Nếu không yêu cầu role -> chỉ cần JWT đúng là ok
     const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
@@ -40,7 +39,7 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
 
     // ✅ 5. Kiểm tra mảng roles
     const userRoles = user?.roles || [];
-    const hasRole = userRoles.some(role => requiredRoles.includes(role));
+    const hasRole = userRoles.some((role) => requiredRoles.includes(role));
 
     return hasRole;
   }
@@ -49,4 +48,3 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
     return GqlExecutionContext.create(context).getContext().req;
   }
 }
-

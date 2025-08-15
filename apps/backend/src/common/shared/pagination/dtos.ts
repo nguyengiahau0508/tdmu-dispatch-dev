@@ -1,7 +1,7 @@
-import { Field, InputType, Int } from "@nestjs/graphql";
-import { Type } from "class-transformer";
-import { IsEnum, IsInt, IsOptional, Max, Min } from "class-validator";
-import { Order } from "./constants";
+import { Field, InputType, Int } from '@nestjs/graphql';
+import { Type } from 'class-transformer';
+import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
+import { Order } from './constants';
 
 @InputType()
 export class PageOptionsDto {
@@ -17,7 +17,10 @@ export class PageOptionsDto {
   @IsOptional()
   readonly page?: number = 1;
 
-  @Field(() => Int, { nullable: true, description: 'Số lượng item trên mỗi trang' })
+  @Field(() => Int, {
+    nullable: true,
+    description: 'Số lượng item trên mỗi trang',
+  })
   @Type(() => Number)
   @IsInt()
   @Min(1)

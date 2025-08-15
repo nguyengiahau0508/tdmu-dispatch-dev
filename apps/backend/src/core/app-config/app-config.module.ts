@@ -1,7 +1,7 @@
-import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
-import * as configFactories from '../../config/factories'
-import { enviromentSchema } from "src/config/schemas";
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import * as configFactories from '../../config/factories';
+import { enviromentSchema } from 'src/config/schemas';
 
 @Module({
   imports: [
@@ -14,8 +14,8 @@ import { enviromentSchema } from "src/config/schemas";
       validationOptions: {
         allowUnknown: true,
         abortEarly: false,
-      }
-    })
-  ]
+      },
+    }),
+  ],
 })
-export default class AppConfigModule { }
+export default class AppConfigModule {}

@@ -5,4 +5,4 @@ import { InputType, Field, Int, PartialType } from '@nestjs/graphql';
 export class UpdateDepartmentInput extends PartialType(CreateDepartmentInput) {
   @Field(() => Int, { description: 'ID phòng ban' })
   id: number;
-} 
+}

@@ -1,5 +1,13 @@
 import { InputType, Int, Field } from '@nestjs/graphql';
-import { IsNotEmpty, IsOptional, IsString, IsInt, Min, IsEnum, IsBoolean } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsInt,
+  Min,
+  IsEnum,
+  IsBoolean,
+} from 'class-validator';
 import { StepType } from '../entities/workflow-step.entity';
 
 @InputType({ description: 'Dữ liệu đầu vào để tạo workflow step mới' })
@@ -9,7 +17,10 @@ export class CreateWorkflowStepInput {
   @IsNotEmpty({ message: 'Tên bước không được để trống' })
   name: string;
 
-  @Field(() => String, { nullable: true, description: 'Mô tả của workflow step' })
+  @Field(() => String, {
+    nullable: true,
+    description: 'Mô tả của workflow step',
+  })
   @IsString()
   @IsOptional()
   description?: string;
@@ -33,7 +44,11 @@ export class CreateWorkflowStepInput {
   @IsOptional()
   nextStepId?: number;
 
-  @Field(() => Boolean, { nullable: true, description: 'Trạng thái kích hoạt', defaultValue: true })
+  @Field(() => Boolean, {
+    nullable: true,
+    description: 'Trạng thái kích hoạt',
+    defaultValue: true,
+  })
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;

@@ -11,7 +11,7 @@ import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
 
 @Resolver(() => File)
 export class FilesResolver {
-  constructor(private readonly filesService: FilesService) { }
+  constructor(private readonly filesService: FilesService) {}
 
   @Mutation(() => File)
   createFile(@Args('createFileInput') createFileInput: CreateFileInput) {

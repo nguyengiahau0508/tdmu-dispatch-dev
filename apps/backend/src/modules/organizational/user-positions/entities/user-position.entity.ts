@@ -30,7 +30,9 @@ export class UserPosition {
   @Field(() => User)
   user: User;
 
-  @ManyToOne(() => Position, (position) => position.userPositions, { cascade: true })
+  @ManyToOne(() => Position, (position) => position.userPositions, {
+    cascade: true,
+  })
   @JoinColumn({ name: 'positionId' })
   @Field(() => Position)
   position: Position;

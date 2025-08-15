@@ -1,13 +1,16 @@
-
-import { Injectable, InternalServerErrorException, UnauthorizedException } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { JwtService } from "@nestjs/jwt";
-import { ErrorCode } from "src/common/enums/error-code.enum";
-import { Role } from "src/common/enums/role.enums";
-import { generateUniqueKey } from "src/common/utils/key-generator.util";
-import { IJwtConfig } from "src/config/interfaces";
-import { CacheKeyBuilder } from "src/integrations/cache/cache-key.builder";
-import { CacheService } from "src/integrations/cache/cache.service";
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { ErrorCode } from 'src/common/enums/error-code.enum';
+import { Role } from 'src/common/enums/role.enums';
+import { generateUniqueKey } from 'src/common/utils/key-generator.util';
+import { IJwtConfig } from 'src/config/interfaces';
+import { CacheKeyBuilder } from 'src/integrations/cache/cache-key.builder';
+import { CacheService } from 'src/integrations/cache/cache.service';
 
 export interface ITokenPayload {
   sub: number;
@@ -21,13 +24,13 @@ export interface ITokenPayload {
 export class TokenService {
   private readonly ACCESS_TOKEN_TTL_SECONDS = 900;
   private readonly REFRESH_TOKEN_TTL_SECONDS = 604800;
-  private readonly ONE_TIME_TOKEN_TTL_SECONS = 300
+  private readonly ONE_TIME_TOKEN_TTL_SECONS = 300;
   private readonly jwtConfig: IJwtConfig;
 
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    private readonly cacheService: CacheService
+    private readonly cacheService: CacheService,
   ) {
     const config = configService.get<IJwtConfig>('jwt');
     if (!config) {
@@ -39,7 +42,11 @@ export class TokenService {
   /**
    * Generates an access token and stores it in cache for validation/revocation.
    */
-  async generateAccessToken(payload: { sub: number; email: string; role: Role[] }): Promise<string> {
+  async generateAccessToken(payload: {
+    sub: number;
+    email: string;
+    role: Role[];
+  }): Promise<string> {
     const tokenId = generateUniqueKey();
     const tokenPayload: ITokenPayload = { ...payload, type: 'access', tokenId };
 
@@ -57,9 +64,17 @@ export class TokenService {
   /**
    * Generates a one-time token (revocable via cache).
    */
-  async generateAccessOneTimeToken(payload: { sub: number; email: string, role: Role[] }): Promise<string> {
+  async generateAccessOneTimeToken(payload: {
+    sub: number;
+    email: string;
+    role: Role[];
+  }): Promise<string> {
     const tokenId = generateUniqueKey();
-    const tokenPayload: ITokenPayload = { ...payload, type: 'onetime', tokenId };
+    const tokenPayload: ITokenPayload = {
+      ...payload,
+      type: 'onetime',
+      tokenId,
+    };
 
     const token = await this.jwtService.signAsync(tokenPayload, {
       secret: this.jwtConfig.secret,
@@ -75,9 +90,17 @@ export class TokenService {
   /**
    * Generates a refresh token and stores it in cache for validation/revocation.
    */
-  async generateRefreshToken(payload: { sub: number; email: string, role: Role[] }): Promise<string> {
+  async generateRefreshToken(payload: {
+    sub: number;
+    email: string;
+    role: Role[];
+  }): Promise<string> {
     const tokenId = generateUniqueKey();
-    const tokenPayload: ITokenPayload = { ...payload, type: 'refresh', tokenId };
+    const tokenPayload: ITokenPayload = {
+      ...payload,
+      type: 'refresh',
+      tokenId,
+    };
 
     const token = await this.jwtService.signAsync(tokenPayload, {
       secret: this.jwtConfig.secret,
@@ -109,21 +132,22 @@ export class TokenService {
 
   async extractToken(token: string) {
     const decode: ITokenPayload = await this.jwtService.verifyAsync(token, {
-      secret: this.jwtConfig.secret
-    })
-    if (!decode) throw new UnauthorizedException({
-      message: 'Có lổi xảy ra vui lòng thử lại',
-      code: ErrorCode.TOKEN_INVALID,
-    })
+      secret: this.jwtConfig.secret,
+    });
+    if (!decode)
+      throw new UnauthorizedException({
+        message: 'Có lổi xảy ra vui lòng thử lại',
+        code: ErrorCode.TOKEN_INVALID,
+      });
 
     const key = CacheKeyBuilder.token(decode.tokenId);
-    const existsToken = this.cacheService.get(key)
-    if (!existsToken) throw new UnauthorizedException({
-      message: 'Có lổi xảy ra vui lòng thử lại',
-      code: ErrorCode.TOKEN_INVALID,
-    })
+    const existsToken = this.cacheService.get(key);
+    if (!existsToken)
+      throw new UnauthorizedException({
+        message: 'Có lổi xảy ra vui lòng thử lại',
+        code: ErrorCode.TOKEN_INVALID,
+      });
 
-    return decode
+    return decode;
   }
 }
-

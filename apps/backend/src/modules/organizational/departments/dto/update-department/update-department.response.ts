@@ -4,5 +4,6 @@ import { ApiResponse } from 'src/common/graphql/api-response.dto';
 import { UpdateDepartmentOutput } from './update-department.output';
 
 @ObjectType()
-export class UpdateDepartmentResponse extends ApiResponse(UpdateDepartmentOutput) {
-} 
+export class UpdateDepartmentResponse extends ApiResponse(
+  UpdateDepartmentOutput,
+) {}

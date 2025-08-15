@@ -1,5 +1,12 @@
 import { InputType, Int, Field } from '@nestjs/graphql';
-import { IsNotEmpty, IsOptional, IsInt, Min, IsString, IsEnum } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsInt,
+  Min,
+  IsString,
+  IsEnum,
+} from 'class-validator';
 import { ActionType } from '../entities/workflow-action-log.entity';
 
 @InputType({ description: 'Dữ liệu đầu vào để tạo workflow action log mới' })
@@ -23,7 +30,10 @@ export class CreateWorkflowActionLogInput {
   @IsOptional()
   note?: string;
 
-  @Field(() => String, { nullable: true, description: 'Metadata bổ sung (JSON string)' })
+  @Field(() => String, {
+    nullable: true,
+    description: 'Metadata bổ sung (JSON string)',
+  })
   @IsString()
   @IsOptional()
   metadata?: string;

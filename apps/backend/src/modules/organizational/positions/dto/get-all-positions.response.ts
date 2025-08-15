@@ -9,4 +9,4 @@ export class GetAllPositionsResponse {
 
   @Field(() => Metadata)
   metadata: Metadata;
-} 
+}

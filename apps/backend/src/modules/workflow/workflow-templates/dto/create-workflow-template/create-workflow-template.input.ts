@@ -1,4 +1,3 @@
-
 import { InputType, Int, Field } from '@nestjs/graphql';
 import { IsNotEmpty, IsOptional, IsString, IsBoolean } from 'class-validator';
 
@@ -9,14 +8,20 @@ export class CreateWorkflowTemplateInput {
   @IsNotEmpty({ message: 'Tên quy trình không được để trống' })
   name: string;
 
-  @Field(() => String, { nullable: true, description: 'Mô tả của workflow template' })
+  @Field(() => String, {
+    nullable: true,
+    description: 'Mô tả của workflow template',
+  })
   @IsString()
   @IsOptional()
   description?: string;
 
-  @Field(() => Boolean, { nullable: true, description: 'Trạng thái kích hoạt', defaultValue: true })
+  @Field(() => Boolean, {
+    nullable: true,
+    description: 'Trạng thái kích hoạt',
+    defaultValue: true,
+  })
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
 }
-

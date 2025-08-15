@@ -1,6 +1,6 @@
-import { Field, InputType } from "@nestjs/graphql";
-import { IsOptional, IsString } from "class-validator";
-import { PageOptionsDto } from "src/common/shared/pagination/dtos";
+import { Field, InputType } from '@nestjs/graphql';
+import { IsOptional, IsString } from 'class-validator';
+import { PageOptionsDto } from 'src/common/shared/pagination/dtos';
 
 @InputType()
 export class GetDocumentsPaginatedInput extends PageOptionsDto {
@@ -8,4 +8,4 @@ export class GetDocumentsPaginatedInput extends PageOptionsDto {
   @IsString()
   @IsOptional()
   search?: string;
-} 
+}

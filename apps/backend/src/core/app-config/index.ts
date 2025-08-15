@@ -1,1 +1,1 @@
-export { default as AppConfigModule } from './app-config.module'
+export { default as AppConfigModule } from './app-config.module';

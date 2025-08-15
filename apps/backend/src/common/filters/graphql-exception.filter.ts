@@ -1,4 +1,3 @@
-
 import {
   ArgumentsHost,
   Catch,
@@ -25,7 +24,10 @@ export class GraphQLExceptionFilter implements ExceptionFilter {
     } else if (Array.isArray((response as any).message)) {
       message = (response as any).message.join(', ');
     } else {
-      message = (response as any).message || exception.message || 'Internal server error';
+      message =
+        (response as any).message ||
+        exception.message ||
+        'Internal server error';
     }
 
     // Mã lỗi tuỳ chỉnh nếu có
@@ -40,4 +42,3 @@ export class GraphQLExceptionFilter implements ExceptionFilter {
     });
   }
 }
-

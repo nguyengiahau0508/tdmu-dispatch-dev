@@ -6,13 +6,13 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 export class UnitType {
   @PrimaryGeneratedColumn()
   @Field(() => Int, { description: 'ID của loại đơn vị' })
-  id: number
+  id: number;
 
   @Column()
   @Field(() => String, { description: 'Tên của loại đơn vị' })
-  typeName: string
+  typeName: string;
 
   @Column({ nullable: true, type: 'text' })
   @Field(() => String, { nullable: true, description: 'Mô tả của loại đơn vị' })
-  description: string
+  description: string;
 }

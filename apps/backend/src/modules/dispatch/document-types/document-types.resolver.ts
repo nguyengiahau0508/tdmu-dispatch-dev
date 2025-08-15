@@ -17,19 +17,32 @@ export class DocumentTypesResolver {
   constructor(private readonly documentTypesService: DocumentTypesService) {}
 
   @Mutation(() => CreateDocumentTypeResponse)
-  async createDocumentType(@Args('createDocumentTypeInput') createDocumentTypeInput: CreateDocumentTypeInput): Promise<CreateDocumentTypeResponse> {
-    const documentType = await this.documentTypesService.create(createDocumentTypeInput);
+  async createDocumentType(
+    @Args('createDocumentTypeInput')
+    createDocumentTypeInput: CreateDocumentTypeInput,
+  ): Promise<CreateDocumentTypeResponse> {
+    const documentType = await this.documentTypesService.create(
+      createDocumentTypeInput,
+    );
     return {
-      metadata: createResponseMetadata(HttpStatus.ACCEPTED, "Tạo loại văn bản thành công"),
+      metadata: createResponseMetadata(
+        HttpStatus.ACCEPTED,
+        'Tạo loại văn bản thành công',
+      ),
       data: { documentType },
     };
   }
 
   @Query(() => GetDocumentTypesPaginatedResponse, { name: 'documentTypes' })
-  async findPaginated(@Args('input') input: GetDocumentTypesPaginatedInput): Promise<GetDocumentTypesPaginatedResponse> {
+  async findPaginated(
+    @Args('input') input: GetDocumentTypesPaginatedInput,
+  ): Promise<GetDocumentTypesPaginatedResponse> {
     const pageData = await this.documentTypesService.findPaginated(input);
     return {
-      metadata: createResponseMetadata(HttpStatus.OK, "Lấy danh sách loại văn bản thành công"),
+      metadata: createResponseMetadata(
+        HttpStatus.OK,
+        'Lấy danh sách loại văn bản thành công',
+      ),
       data: pageData.data,
       totalCount: pageData.meta.itemCount,
       hasNextPage: pageData.meta.hasNextPage,
@@ -37,28 +50,49 @@ export class DocumentTypesResolver {
   }
 
   @Query(() => GetDocumentTypeResponse, { name: 'documentType' })
-  async findOne(@Args('id', { type: () => Int }) id: number): Promise<GetDocumentTypeResponse> {
+  async findOne(
+    @Args('id', { type: () => Int }) id: number,
+  ): Promise<GetDocumentTypeResponse> {
     const documentType = await this.documentTypesService.findOne(id);
     return {
-      metadata: createResponseMetadata(HttpStatus.OK, "Lấy loại văn bản thành công"),
+      metadata: createResponseMetadata(
+        HttpStatus.OK,
+        'Lấy loại văn bản thành công',
+      ),
       data: { documentType },
     };
   }
 
   @Mutation(() => UpdateDocumentTypeResponse)
-  async updateDocumentType(@Args('updateDocumentTypeInput') updateDocumentTypeInput: UpdateDocumentTypeInput): Promise<UpdateDocumentTypeResponse> {
-    const documentType = await this.documentTypesService.update(updateDocumentTypeInput.id, updateDocumentTypeInput);
+  async updateDocumentType(
+    @Args('updateDocumentTypeInput')
+    updateDocumentTypeInput: UpdateDocumentTypeInput,
+  ): Promise<UpdateDocumentTypeResponse> {
+    const documentType = await this.documentTypesService.update(
+      updateDocumentTypeInput.id,
+      updateDocumentTypeInput,
+    );
     return {
-      metadata: createResponseMetadata(HttpStatus.OK, "Cập nhật loại văn bản thành công"),
+      metadata: createResponseMetadata(
+        HttpStatus.OK,
+        'Cập nhật loại văn bản thành công',
+      ),
       data: { documentType },
     };
   }
 
   @Mutation(() => RemoveDocumentTypeResponse)
-  async removeDocumentType(@Args('id', { type: () => Int }) id: number): Promise<RemoveDocumentTypeResponse> {
+  async removeDocumentType(
+    @Args('id', { type: () => Int }) id: number,
+  ): Promise<RemoveDocumentTypeResponse> {
     const result = await this.documentTypesService.remove(id);
     return {
-      metadata: createResponseMetadata(HttpStatus.OK, result.success ? "Xóa loại văn bản thành công" : "Không tìm thấy loại văn bản để xóa"),
+      metadata: createResponseMetadata(
+        HttpStatus.OK,
+        result.success
+          ? 'Xóa loại văn bản thành công'
+          : 'Không tìm thấy loại văn bản để xóa',
+      ),
       data: result,
     };
   }

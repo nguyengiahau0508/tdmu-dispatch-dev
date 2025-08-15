@@ -21,4 +21,4 @@ export * from './get-positions-paginated/get-positions-paginated.input';
 export * from './get-positions-paginated/get-positions-paginated.response';
 
 // Get All Positions DTOs
-export * from './get-all-positions.response'; 
+export * from './get-all-positions.response';

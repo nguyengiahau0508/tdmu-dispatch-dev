@@ -8,4 +8,4 @@ export class RemoveRoleInput {
 
   @Field(() => Role, { description: 'Role cần xóa khỏi user' })
   role: Role;
-} 
+}

@@ -9,33 +9,45 @@ import { GetAllByUserReponse } from './dto/get-all-by-user/get-all-by-user.respo
 
 @Resolver(() => UserPosition)
 export class UserPositionsResolver {
-  constructor(private readonly userPositionsService: UserPositionsService) { }
+  constructor(private readonly userPositionsService: UserPositionsService) {}
 
   @Mutation(() => CreateUserPositionResponse)
-  async createUserPosition(@Args('createUserPositionInput') createUserPositionInput: CreateUserPositionInput): Promise<CreateUserPositionResponse> {
-    const result = await this.userPositionsService.create(createUserPositionInput);
+  async createUserPosition(
+    @Args('createUserPositionInput')
+    createUserPositionInput: CreateUserPositionInput,
+  ): Promise<CreateUserPositionResponse> {
+    const result = await this.userPositionsService.create(
+      createUserPositionInput,
+    );
     return {
-      metadata: createResponseMetadata(HttpStatus.OK, "Tạo thành công"),
-      data: { userPosition: result }
-    }
+      metadata: createResponseMetadata(HttpStatus.OK, 'Tạo thành công'),
+      data: { userPosition: result },
+    };
   }
 
   @Query(() => GetAllByUserReponse)
-  async getAllByUser(@Args('userId', { type: () => Int }) userId: number): Promise<GetAllByUserReponse> {
-    const userPositions = await this.userPositionsService.getAllByUser(userId)
+  async getAllByUser(
+    @Args('userId', { type: () => Int }) userId: number,
+  ): Promise<GetAllByUserReponse> {
+    const userPositions = await this.userPositionsService.getAllByUser(userId);
     return {
-      metadata: createResponseMetadata(HttpStatus.OK, "Lấy thành công tất cả vị trí của người dùng"),
-      data: { userPositions }
-    }
+      metadata: createResponseMetadata(
+        HttpStatus.OK,
+        'Lấy thành công tất cả vị trí của người dùng',
+      ),
+      data: { userPositions },
+    };
   }
 
   @Mutation(() => CreateUserPositionResponse)
-  async endUserPosition(@Args('id', { type: () => Int }) id: number): Promise<CreateUserPositionResponse> {
-    const userPosition = await this.userPositionsService.endUserPosition(id)
+  async endUserPosition(
+    @Args('id', { type: () => Int }) id: number,
+  ): Promise<CreateUserPositionResponse> {
+    const userPosition = await this.userPositionsService.endUserPosition(id);
     return {
-      metadata: createResponseMetadata(HttpStatus.OK, "Cập nhật thành công"),
-      data: { userPosition }
-    }
+      metadata: createResponseMetadata(HttpStatus.OK, 'Cập nhật thành công'),
+      data: { userPosition },
+    };
   }
 
   // @Query(() => [UserPosition], { name: 'userPositions' })

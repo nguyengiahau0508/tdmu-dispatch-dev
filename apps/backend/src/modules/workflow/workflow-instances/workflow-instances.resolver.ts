@@ -12,43 +12,69 @@ import { User } from 'src/modules/users/entities/user.entity';
 @Resolver(() => WorkflowInstance)
 @UseGuards(GqlAuthGuard)
 export class WorkflowInstancesResolver {
-  constructor(private readonly workflowInstancesService: WorkflowInstancesService) {}
+  constructor(
+    private readonly workflowInstancesService: WorkflowInstancesService,
+  ) {}
 
-  @Mutation(() => WorkflowInstance, { description: 'Tạo workflow instance mới' })
+  @Mutation(() => WorkflowInstance, {
+    description: 'Tạo workflow instance mới',
+  })
   createWorkflowInstance(
-    @Args('createWorkflowInstanceInput') createWorkflowInstanceInput: CreateWorkflowInstanceInput,
-    @CurrentUser() user: User
+    @Args('createWorkflowInstanceInput')
+    createWorkflowInstanceInput: CreateWorkflowInstanceInput,
+    @CurrentUser() user: User,
   ) {
-    return this.workflowInstancesService.create(createWorkflowInstanceInput, user);
+    return this.workflowInstancesService.create(
+      createWorkflowInstanceInput,
+      user,
+    );
   }
 
-  @Query(() => [WorkflowInstance], { name: 'workflowInstances', description: 'Lấy tất cả workflow instances' })
+  @Query(() => [WorkflowInstance], {
+    name: 'workflowInstances',
+    description: 'Lấy tất cả workflow instances',
+  })
   findAll() {
     return this.workflowInstancesService.findAll();
   }
 
-  @Query(() => WorkflowInstance, { name: 'workflowInstance', description: 'Lấy workflow instance theo ID' })
+  @Query(() => WorkflowInstance, {
+    name: 'workflowInstance',
+    description: 'Lấy workflow instance theo ID',
+  })
   findOne(@Args('id', { type: () => Int }) id: number) {
     return this.workflowInstancesService.findOne(id);
   }
 
-  @Query(() => [WorkflowInstance], { name: 'myWorkflowInstances', description: 'Lấy workflow instances của user hiện tại' })
+  @Query(() => [WorkflowInstance], {
+    name: 'myWorkflowInstances',
+    description: 'Lấy workflow instances của user hiện tại',
+  })
   findMyInstances(@CurrentUser() user: User) {
     return this.workflowInstancesService.findByUser(user.id);
   }
 
-  @Query(() => [WorkflowInstance], { name: 'pendingWorkflows', description: 'Lấy workflow instances đang chờ xử lý theo role' })
+  @Query(() => [WorkflowInstance], {
+    name: 'pendingWorkflows',
+    description: 'Lấy workflow instances đang chờ xử lý theo role',
+  })
   findPendingWorkflows(@CurrentUser() user: User) {
     // Get the first role from user's roles array
     const userRole = user.roles[0];
     return this.workflowInstancesService.getPendingWorkflows(userRole);
   }
 
-  @Mutation(() => WorkflowInstance, { description: 'Cập nhật workflow instance' })
+  @Mutation(() => WorkflowInstance, {
+    description: 'Cập nhật workflow instance',
+  })
   updateWorkflowInstance(
-    @Args('updateWorkflowInstanceInput') updateWorkflowInstanceInput: UpdateWorkflowInstanceInput
+    @Args('updateWorkflowInstanceInput')
+    updateWorkflowInstanceInput: UpdateWorkflowInstanceInput,
   ) {
-    return this.workflowInstancesService.update(updateWorkflowInstanceInput.id, updateWorkflowInstanceInput);
+    return this.workflowInstancesService.update(
+      updateWorkflowInstanceInput.id,
+      updateWorkflowInstanceInput,
+    );
   }
 
   @Mutation(() => Boolean, { description: 'Xóa workflow instance' })
@@ -56,16 +82,26 @@ export class WorkflowInstancesResolver {
     return this.workflowInstancesService.remove(id);
   }
 
-  @Mutation(() => WorkflowInstance, { description: 'Thực hiện hành động trên workflow' })
+  @Mutation(() => WorkflowInstance, {
+    description: 'Thực hiện hành động trên workflow',
+  })
   executeWorkflowAction(
     @Args('workflowActionInput') workflowActionInput: WorkflowActionInput,
-    @CurrentUser() user: User
+    @CurrentUser() user: User,
   ) {
-    return this.workflowInstancesService.executeAction(workflowActionInput, user);
+    return this.workflowInstancesService.executeAction(
+      workflowActionInput,
+      user,
+    );
   }
 
-  @Query(() => WorkflowInstance, { name: 'workflowHistory', description: 'Lấy lịch sử workflow instance' })
-  getWorkflowHistory(@Args('instanceId', { type: () => Int }) instanceId: number) {
+  @Query(() => WorkflowInstance, {
+    name: 'workflowHistory',
+    description: 'Lấy lịch sử workflow instance',
+  })
+  getWorkflowHistory(
+    @Args('instanceId', { type: () => Int }) instanceId: number,
+  ) {
     return this.workflowInstancesService.getWorkflowHistory(instanceId);
   }
 }

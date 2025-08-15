@@ -12,18 +12,24 @@ import { GetWorkflowTemplatePaginatedInput } from './dto/get-workflow-template-p
 @Injectable()
 export class WorkflowTemplatesService {
   constructor(
-    @InjectRepository(WorkflowTemplate) private readonly repository: Repository<WorkflowTemplate>
-  ) { }
+    @InjectRepository(WorkflowTemplate)
+    private readonly repository: Repository<WorkflowTemplate>,
+  ) {}
 
-  async create(createWorkflowTemplateInput: CreateWorkflowTemplateInput, user: User): Promise<WorkflowTemplate> {
+  async create(
+    createWorkflowTemplateInput: CreateWorkflowTemplateInput,
+    user: User,
+  ): Promise<WorkflowTemplate> {
     const created = this.repository.create({
       ...createWorkflowTemplateInput,
-      createdByUser: user
+      createdByUser: user,
     });
     return this.repository.save(created);
   }
 
-  async findPaginated(input: GetWorkflowTemplatePaginatedInput): Promise<WorkflowTemplatePageDto> {
+  async findPaginated(
+    input: GetWorkflowTemplatePaginatedInput,
+  ): Promise<WorkflowTemplatePageDto> {
     const { search, order, skip, take } = input;
 
     const where: FindOptionsWhere<WorkflowTemplate>[] = [];
@@ -41,7 +47,7 @@ export class WorkflowTemplatesService {
       order: { id: order },
       skip,
       take,
-      relations: ['createdByUser', 'steps']
+      relations: ['createdByUser', 'steps'],
     });
 
     const pageMetaDto = new PageMetaDto({ pageOptionsDto: input, itemCount });
@@ -51,14 +57,14 @@ export class WorkflowTemplatesService {
   async findAll(): Promise<WorkflowTemplate[]> {
     return this.repository.find({
       relations: ['createdByUser', 'steps'],
-      where: { isActive: true }
+      where: { isActive: true },
     });
   }
 
   async findOne(id: number): Promise<WorkflowTemplate> {
     const template = await this.repository.findOne({
       where: { id },
-      relations: ['createdByUser', 'steps', 'instances']
+      relations: ['createdByUser', 'steps', 'instances'],
     });
 
     if (!template) {
@@ -68,7 +74,10 @@ export class WorkflowTemplatesService {
     return template;
   }
 
-  async update(id: number, updateWorkflowTemplateInput: UpdateWorkflowTemplateInput): Promise<WorkflowTemplate> {
+  async update(
+    id: number,
+    updateWorkflowTemplateInput: UpdateWorkflowTemplateInput,
+  ): Promise<WorkflowTemplate> {
     const template = await this.findOne(id);
 
     Object.assign(template, updateWorkflowTemplateInput);
@@ -89,7 +98,7 @@ export class WorkflowTemplatesService {
     return this.repository.find({
       where: { isActive: true },
       relations: ['steps'],
-      order: { id: 'ASC' }
+      order: { id: 'ASC' },
     });
   }
 }

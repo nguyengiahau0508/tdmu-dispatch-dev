@@ -1,5 +1,11 @@
 import { InputType, Field, registerEnumType } from '@nestjs/graphql';
-import { IsEmail, IsNotEmpty, MinLength, IsOptional, IsEnum } from 'class-validator'; // Thêm các validator
+import {
+  IsEmail,
+  IsNotEmpty,
+  MinLength,
+  IsOptional,
+  IsEnum,
+} from 'class-validator'; // Thêm các validator
 import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 import { Role } from 'src/common/enums/role.enums';
 
@@ -14,7 +20,9 @@ import { Role } from 'src/common/enums/role.enums';
 
 @InputType({ description: 'Dữ liệu đầu vào để tạo người dùng mới' })
 export class CreateUserInput {
-  @Field(() => String, { description: 'Email của người dùng (phải là duy nhất)' })
+  @Field(() => String, {
+    description: 'Email của người dùng (phải là duy nhất)',
+  })
   @IsNotEmpty({ message: 'Email không được để trống' })
   @IsEmail({}, { message: 'Email không đúng định dạng' })
   email: string;

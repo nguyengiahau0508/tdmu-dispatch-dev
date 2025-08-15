@@ -6,13 +6,14 @@ import { Role } from 'src/common/enums/role.enums';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) { }
+  constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<Role[]>( // <<<< SỬ DỤNG UserRole
-      ROLES_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
+      // <<<< SỬ DỤNG UserRole
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     if (!requiredRoles || requiredRoles.length === 0) {
       return true; // Nếu không có vai trò nào được yêu cầu, cho phép truy cập
@@ -32,7 +33,7 @@ export class RolesGuard implements CanActivate {
 
     // Lấy thông tin người dùng từ request
     // Giả sử entity User của bạn có thuộc tính `role` là một giá trị đơn lẻ từ enum UserRole
-    const user = request.user as { role: Role;[key: string]: any }; // Type assertion để TypeScript biết user có thuộc tính 'role'
+    const user = request.user as { role: Role; [key: string]: any }; // Type assertion để TypeScript biết user có thuộc tính 'role'
     // Kiểm tra xem user có thuộc tính 'role' không
     if (user && typeof user.role !== 'undefined') {
       // So sánh vai trò của người dùng với các vai trò được yêu cầu

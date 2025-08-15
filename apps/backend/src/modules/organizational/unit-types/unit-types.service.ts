@@ -15,42 +15,47 @@ import { PageDto } from 'src/common/shared/pagination/page.dto';
 @Injectable()
 export class UnitTypesService {
   constructor(
-    @InjectRepository(UnitType) private readonly repository: Repository<UnitType>
-  ) { }
-  async create(createUnitTypeInput: CreateUnitTypeInput): Promise<CreateUnitTypeOutput> {
+    @InjectRepository(UnitType)
+    private readonly repository: Repository<UnitType>,
+  ) {}
+  async create(
+    createUnitTypeInput: CreateUnitTypeInput,
+  ): Promise<CreateUnitTypeOutput> {
     const created = this.repository.create({
       typeName: createUnitTypeInput.typeName,
-      ...(createUnitTypeInput.description !== undefined && { description: createUnitTypeInput.description })
-    })
-    const saved = await this.repository.save(created)
-    if (!saved) throw new BadRequestException()
+      ...(createUnitTypeInput.description !== undefined && {
+        description: createUnitTypeInput.description,
+      }),
+    });
+    const saved = await this.repository.save(created);
+    if (!saved) throw new BadRequestException();
 
     return {
-      unitType: saved
+      unitType: saved,
+    };
+  }
+
+  async findAll(input: GetUnitTypesPaginatedInput): Promise<PageDto<UnitType>> {
+    const { search, take, order, skip } = input;
+
+    // Xây dựng điều kiện WHERE
+    const where: FindOptionsWhere<UnitType>[] = [];
+
+    if (search) {
+      where.push({ typeName: ILike(`%${search}%`) }); // PostgreSQL: ILike, MySQL: Like
     }
+
+    // Gọi findAndCount thay cho queryBuilder
+    const [data, itemCount] = await this.repository.findAndCount({
+      where: where.length > 0 ? where : undefined,
+      order: { id: order },
+      skip: skip,
+      take: take,
+    });
+
+    const pageMetaDto = new PageMetaDto({ pageOptionsDto: input, itemCount });
+    return new PageDto(data, pageMetaDto);
   }
-
-async findAll(input: GetUnitTypesPaginatedInput): Promise<PageDto<UnitType>> {
-  const { search, take, order, skip } = input;
-
-  // Xây dựng điều kiện WHERE
-  const where: FindOptionsWhere<UnitType>[] = [];
-
-  if (search) {
-    where.push({ typeName: ILike(`%${search}%`) }); // PostgreSQL: ILike, MySQL: Like
-  }
-
-  // Gọi findAndCount thay cho queryBuilder
-  const [data, itemCount] = await this.repository.findAndCount({
-    where: where.length > 0 ? where : undefined,
-    order: { id: order },
-    skip: skip,
-    take: take,
-  });
-
-  const pageMetaDto = new PageMetaDto({ pageOptionsDto: input, itemCount });
-  return new PageDto(data, pageMetaDto);
-}
 
   async findOne(id: number): Promise<GetUnitTypeOutput> {
     const unitType = await this.repository.findOne({ where: { id } });
@@ -59,11 +64,14 @@ async findAll(input: GetUnitTypesPaginatedInput): Promise<PageDto<UnitType>> {
     }
 
     return {
-      unitType: unitType
-    }
+      unitType: unitType,
+    };
   }
 
-  async update(id: number, updateUnitTypeInput: UpdateUnitTypeInput): Promise<UpdateUnitTypeOutput> {
+  async update(
+    id: number,
+    updateUnitTypeInput: UpdateUnitTypeInput,
+  ): Promise<UpdateUnitTypeOutput> {
     const unitType = await this.repository.findOne({ where: { id } });
     if (!unitType) {
       throw new BadRequestException(`UnitType with ID ${id} not found`);
@@ -81,8 +89,8 @@ async findAll(input: GetUnitTypesPaginatedInput): Promise<PageDto<UnitType>> {
     if (!updated) throw new BadRequestException();
 
     return {
-      unitType: updated
-    }
+      unitType: updated,
+    };
   }
 
   async remove(id: number): Promise<RemoveUnitTypeOutput> {
@@ -94,7 +102,7 @@ async findAll(input: GetUnitTypesPaginatedInput): Promise<PageDto<UnitType>> {
     const removed = await this.repository.remove(unitType);
     if (!removed) throw new BadRequestException();
     return {
-      unitType: null
-    }
+      unitType: null,
+    };
   }
 }

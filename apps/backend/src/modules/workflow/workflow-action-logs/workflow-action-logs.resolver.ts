@@ -12,51 +12,89 @@ import { ActionType } from './entities/workflow-action-log.entity';
 @Resolver(() => WorkflowActionLog)
 @UseGuards(GqlAuthGuard)
 export class WorkflowActionLogsResolver {
-  constructor(private readonly workflowActionLogsService: WorkflowActionLogsService) {}
+  constructor(
+    private readonly workflowActionLogsService: WorkflowActionLogsService,
+  ) {}
 
-  @Mutation(() => WorkflowActionLog, { description: 'Tạo workflow action log mới' })
+  @Mutation(() => WorkflowActionLog, {
+    description: 'Tạo workflow action log mới',
+  })
   createWorkflowActionLog(
-    @Args('createWorkflowActionLogInput') createWorkflowActionLogInput: CreateWorkflowActionLogInput,
-    @CurrentUser() user: User
+    @Args('createWorkflowActionLogInput')
+    createWorkflowActionLogInput: CreateWorkflowActionLogInput,
+    @CurrentUser() user: User,
   ) {
-    return this.workflowActionLogsService.create(createWorkflowActionLogInput, user);
+    return this.workflowActionLogsService.create(
+      createWorkflowActionLogInput,
+      user,
+    );
   }
 
-  @Query(() => [WorkflowActionLog], { name: 'workflowActionLogs', description: 'Lấy tất cả workflow action logs' })
+  @Query(() => [WorkflowActionLog], {
+    name: 'workflowActionLogs',
+    description: 'Lấy tất cả workflow action logs',
+  })
   findAll() {
     return this.workflowActionLogsService.findAll();
   }
 
-  @Query(() => [WorkflowActionLog], { name: 'workflowActionLogsByInstance', description: 'Lấy workflow action logs theo instance ID' })
-  findByInstanceId(@Args('instanceId', { type: () => Int }) instanceId: number) {
+  @Query(() => [WorkflowActionLog], {
+    name: 'workflowActionLogsByInstance',
+    description: 'Lấy workflow action logs theo instance ID',
+  })
+  findByInstanceId(
+    @Args('instanceId', { type: () => Int }) instanceId: number,
+  ) {
     return this.workflowActionLogsService.findByInstanceId(instanceId);
   }
 
-  @Query(() => [WorkflowActionLog], { name: 'workflowActionLogsByUser', description: 'Lấy workflow action logs theo user ID' })
+  @Query(() => [WorkflowActionLog], {
+    name: 'workflowActionLogsByUser',
+    description: 'Lấy workflow action logs theo user ID',
+  })
   findByUser(@Args('userId', { type: () => Int }) userId: number) {
     return this.workflowActionLogsService.findByUser(userId);
   }
 
-  @Query(() => WorkflowActionLog, { name: 'workflowActionLog', description: 'Lấy workflow action log theo ID' })
+  @Query(() => WorkflowActionLog, {
+    name: 'workflowActionLog',
+    description: 'Lấy workflow action log theo ID',
+  })
   findOne(@Args('id', { type: () => Int }) id: number) {
     return this.workflowActionLogsService.findOne(id);
   }
 
-  @Query(() => [WorkflowActionLog], { name: 'workflowTimeline', description: 'Lấy timeline của workflow instance' })
-  getWorkflowTimeline(@Args('instanceId', { type: () => Int }) instanceId: number) {
+  @Query(() => [WorkflowActionLog], {
+    name: 'workflowTimeline',
+    description: 'Lấy timeline của workflow instance',
+  })
+  getWorkflowTimeline(
+    @Args('instanceId', { type: () => Int }) instanceId: number,
+  ) {
     return this.workflowActionLogsService.getWorkflowTimeline(instanceId);
   }
 
-  @Query(() => [WorkflowActionLog], { name: 'recentWorkflowActions', description: 'Lấy các hành động workflow gần đây' })
-  getRecentActions(@Args('limit', { type: () => Int, defaultValue: 10 }) limit: number) {
+  @Query(() => [WorkflowActionLog], {
+    name: 'recentWorkflowActions',
+    description: 'Lấy các hành động workflow gần đây',
+  })
+  getRecentActions(
+    @Args('limit', { type: () => Int, defaultValue: 10 }) limit: number,
+  ) {
     return this.workflowActionLogsService.getRecentActions(limit);
   }
 
-  @Mutation(() => WorkflowActionLog, { description: 'Cập nhật workflow action log' })
+  @Mutation(() => WorkflowActionLog, {
+    description: 'Cập nhật workflow action log',
+  })
   updateWorkflowActionLog(
-    @Args('updateWorkflowActionLogInput') updateWorkflowActionLogInput: UpdateWorkflowActionLogInput
+    @Args('updateWorkflowActionLogInput')
+    updateWorkflowActionLogInput: UpdateWorkflowActionLogInput,
   ) {
-    return this.workflowActionLogsService.update(updateWorkflowActionLogInput.id, updateWorkflowActionLogInput);
+    return this.workflowActionLogsService.update(
+      updateWorkflowActionLogInput.id,
+      updateWorkflowActionLogInput,
+    );
   }
 
   @Mutation(() => Boolean, { description: 'Xóa workflow action log' })
@@ -64,14 +102,16 @@ export class WorkflowActionLogsResolver {
     return this.workflowActionLogsService.remove(id);
   }
 
-  @Mutation(() => WorkflowActionLog, { description: 'Ghi log hành động workflow' })
+  @Mutation(() => WorkflowActionLog, {
+    description: 'Ghi log hành động workflow',
+  })
   logWorkflowAction(
     @Args('instanceId', { type: () => Int }) instanceId: number,
     @Args('stepId', { type: () => Int }) stepId: number,
     @Args('actionType', { type: () => ActionType }) actionType: ActionType,
     @CurrentUser() user: User,
     @Args('note', { nullable: true }) note?: string,
-    @Args('metadata', { nullable: true }) metadata?: string
+    @Args('metadata', { nullable: true }) metadata?: string,
   ) {
     return this.workflowActionLogsService.logAction(
       instanceId,
@@ -79,7 +119,7 @@ export class WorkflowActionLogsResolver {
       actionType,
       user,
       note,
-      metadata ? JSON.parse(metadata) : null
+      metadata ? JSON.parse(metadata) : null,
     );
   }
 }
