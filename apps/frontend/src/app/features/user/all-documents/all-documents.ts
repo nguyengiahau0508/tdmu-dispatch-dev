@@ -54,6 +54,17 @@ import { DocumentDetailComponent } from '../document-detail/document-detail.comp
         <p>Đang tải danh sách công văn...</p>
       </div>
 
+      <!-- Debug Info -->
+      <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 4px;">
+        <p><strong>Debug Info:</strong></p>
+        <p>Loading: {{ isLoading }}</p>
+        <p>Documents length: {{ documents.length }}</p>
+        <p>Filtered documents length: {{ filteredDocuments.length }}</p>
+        <p>Search term: "{{ searchTerm }}"</p>
+        <p>Selected type: "{{ selectedDocumentType }}"</p>
+        <p>Selected status: "{{ selectedStatus }}"</p>
+      </div>
+
       <!-- Documents List -->
       <div *ngIf="!isLoading && filteredDocuments.length > 0" class="documents-list">
         <div class="document-item" *ngFor="let document of filteredDocuments" (click)="viewDetail(document)">
@@ -498,9 +509,18 @@ export class AllDocuments implements OnInit {
       order: 'DESC'
     }).subscribe({
       next: (response) => {
+        // console.log('Full response:', response);
+        // console.log('Response type:', typeof response);
+        // console.log('Response keys:', Object.keys(response));
+        
+        // Handle paginated response structure
         this.documents = response.data || [];
-        // Calculate total pages based on totalCount and pageSize
         this.totalPages = Math.ceil((response.totalCount || 0) / this.pageSize);
+        
+        // console.log('Documents array:', this.documents);
+        // console.log('Documents length:', this.documents.length);
+        // console.log('Total pages:', this.totalPages);
+        
         this.applyFilters();
         this.isLoading = false;
       },
@@ -512,12 +532,19 @@ export class AllDocuments implements OnInit {
   }
 
   applyFilters(): void {
+    // console.log('applyFilters called');
+    // console.log('this.documents:', this.documents);
+    // console.log('this.documents length:', this.documents?.length);
+    
     if (!this.documents) {
+      console.log('Documents is null/undefined, setting empty array');
       this.filteredDocuments = [];
       return;
     }
 
     this.filteredDocuments = this.documents.filter(document => {
+      // console.log('Filtering document:', document);
+      
       // Search filter
       const matchesSearch = !this.searchTerm || 
         document.title?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
@@ -531,8 +558,14 @@ export class AllDocuments implements OnInit {
       const matchesStatus = !this.selectedStatus || 
         (document.status || 'draft') === this.selectedStatus;
 
-      return matchesSearch && matchesType && matchesStatus;
+      const matches = matchesSearch && matchesType && matchesStatus;
+      // console.log(`Document ${document.id} matches:`, matches, 'search:', matchesSearch, 'type:', matchesType, 'status:', matchesStatus);
+      
+      return matches;
     });
+    
+    // console.log('Filtered documents:', this.filteredDocuments);
+    // console.log('Filtered documents length:', this.filteredDocuments.length);
   }
 
   changePage(page: number): void {

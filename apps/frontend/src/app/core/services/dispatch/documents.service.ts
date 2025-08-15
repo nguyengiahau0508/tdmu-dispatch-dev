@@ -219,12 +219,24 @@ export class DocumentsService {
 
   getDocumentsPaginated(input: GetDocumentsPaginatedInput): Observable<PaginatedResponse<Document>> {
     return this.apollo.watchQuery<{
-      documents: ApiResponse<PaginatedResponse<Document>>
+      documents: {
+        metadata: { statusCode: number; message: string };
+        data: Document[];
+        totalCount: number;
+        hasNextPage: boolean;
+      }
     }>({
       query: GET_DOCUMENTS_PAGINATED,
       variables: { input }
     }).valueChanges.pipe(
-      map(result => result.data.documents.data)
+      map(result => {
+        console.log('Service response:', result.data);
+        return {
+          data: result.data.documents.data,
+          totalCount: result.data.documents.totalCount,
+          hasNextPage: result.data.documents.hasNextPage
+        };
+      })
     );
   }
 
