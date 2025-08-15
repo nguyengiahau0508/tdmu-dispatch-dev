@@ -1,5 +1,5 @@
 import { Component, Renderer2 } from '@angular/core';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet, RouterLinkActive } from '@angular/router';
 import { UserState } from '../../core/state/user.state';
 import { IUser } from '../../core/interfaces/user.interface';
 import { Subscription } from 'rxjs';
@@ -10,7 +10,7 @@ import { FileService } from '../../core/services/file.service';
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [RouterOutlet, AppsLauncher],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, AppsLauncher],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.css'
 })

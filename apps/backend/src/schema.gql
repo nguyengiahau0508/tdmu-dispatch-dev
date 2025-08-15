@@ -305,15 +305,6 @@ type WorkflowTemplatePageDto {
   meta: PageMetaDto!
 }
 
-"""Paginated response for WorkflowInstance"""
-type WorkflowInstancePageDto {
-  """Array of workflow instances"""
-  data: [WorkflowInstance!]!
-
-  """Pagination metadata"""
-  meta: PageMetaDto!
-}
-
 """Paginated response for WorkflowStep"""
 type WorkflowStepPageDto {
   """Array of workflow steps"""
@@ -1170,26 +1161,17 @@ type Query {
   """Lấy tất cả workflow instances"""
   workflowInstances: [WorkflowInstance!]!
 
-  """Lấy danh sách workflow instances có phân trang"""
-  workflowInstancesPaginated(input: GetWorkflowInstancePaginatedInput!): WorkflowInstancePageDto!
-
   """Lấy workflow instance theo ID"""
   workflowInstance(id: Int!): WorkflowInstance!
 
-  """Lấy lịch sử workflow với logs"""
+  """Lấy workflow instances của user hiện tại"""
+  myWorkflowInstances: [WorkflowInstance!]!
+
+  """Lấy workflow instances đang chờ xử lý theo role"""
+  pendingWorkflows: [WorkflowInstance!]!
+
+  """Lấy lịch sử workflow instance"""
   workflowHistory(instanceId: Int!): WorkflowInstance!
-
-  """Lấy tất cả workflow templates"""
-  workflowTemplates: [WorkflowTemplate!]!
-
-  """Lấy danh sách workflow templates có phân trang"""
-  workflowTemplatesPaginated(input: GetWorkflowTemplatePaginatedInput!): WorkflowTemplatePageDto!
-
-  """Lấy workflow template theo ID"""
-  workflowTemplate(id: Int!): WorkflowTemplate!
-
-  """Lấy danh sách workflow templates đang hoạt động"""
-  activeWorkflowTemplates: [WorkflowTemplate!]!
 
   """Lấy tất cả workflow steps"""
   workflowSteps: [WorkflowStep!]!
@@ -1208,6 +1190,18 @@ type Query {
 
   """Lấy danh sách các vai trò có thể gán cho workflow step"""
   workflowRoles: [RoleDto!]!
+
+  """Lấy tất cả workflow templates"""
+  workflowTemplates: [WorkflowTemplate!]!
+
+  """Lấy danh sách workflow templates có phân trang"""
+  workflowTemplatesPaginated(input: GetWorkflowTemplatePaginatedInput!): WorkflowTemplatePageDto!
+
+  """Lấy workflow template theo ID"""
+  workflowTemplate(id: Int!): WorkflowTemplate!
+
+  """Lấy danh sách workflow templates đang hoạt động"""
+  activeWorkflowTemplates: [WorkflowTemplate!]!
   documents(input: GetDocumentsPaginatedInput!): GetDocumentsPaginatedResponse!
   document(id: Int!): GetDocumentResponse!
   documentTypes(input: GetDocumentTypesPaginatedInput!): GetDocumentTypesPaginatedResponse!
@@ -1313,25 +1307,13 @@ input GetDepartmentInput {
   id: Int!
 }
 
-"""Dữ liệu đầu vào để lấy danh sách workflow instances có phân trang"""
-input GetWorkflowInstancePaginatedInput {
-  """Thứ tự sắp xếp"""
-  order: Order = ASC
-
-  """Số trang hiện tại"""
-  page: Int = 1
-
-  """Số lượng item trên mỗi trang"""
-  take: Int = 10
-
-  """Từ khóa tìm kiếm"""
+input GetWorkflowStepPaginatedInput {
+  page: Int
+  take: Int
   search: String
-
-  """Lọc theo trạng thái"""
-  status: WorkflowStatus
-
-  """Lọc theo user ID"""
-  createdByUserId: Float
+  templateId: Int
+  type: String
+  order: String
 }
 
 """Dữ liệu đầu vào để lấy danh sách workflow template có phân trang"""
@@ -1347,15 +1329,6 @@ input GetWorkflowTemplatePaginatedInput {
 
   """Từ khóa tìm kiếm"""
   search: String
-}
-
-input GetWorkflowStepPaginatedInput {
-  page: Int
-  take: Int
-  search: String
-  templateId: Int
-  type: String
-  order: String
 }
 
 input GetDocumentsPaginatedInput {
@@ -1460,17 +1433,8 @@ type Mutation {
   """Xóa workflow instance"""
   removeWorkflowInstance(id: Int!): Boolean!
 
-  """Chuyển đến bước tiếp theo trong workflow"""
-  advanceToNextStep(instanceId: Int!): WorkflowInstance!
-
-  """Tạo workflow template mới"""
-  createWorkflowTemplate(createWorkflowTemplateInput: CreateWorkflowTemplateInput!): WorkflowTemplate!
-
-  """Cập nhật workflow template"""
-  updateWorkflowTemplate(updateWorkflowTemplateInput: UpdateWorkflowTemplateInput!): WorkflowTemplate!
-
-  """Xóa workflow template"""
-  removeWorkflowTemplate(id: Int!): Boolean!
+  """Thực hiện hành động trên workflow"""
+  executeWorkflowAction(workflowActionInput: WorkflowActionInput!): WorkflowInstance!
 
   """Tạo workflow step mới"""
   createWorkflowStep(createWorkflowStepInput: CreateWorkflowStepInput!): WorkflowStep!
@@ -1489,6 +1453,15 @@ type Mutation {
 
   """Sắp xếp lại thứ tự các workflow steps"""
   reorderWorkflowSteps(templateId: Int!): [WorkflowStep!]!
+
+  """Tạo workflow template mới"""
+  createWorkflowTemplate(createWorkflowTemplateInput: CreateWorkflowTemplateInput!): WorkflowTemplate!
+
+  """Cập nhật workflow template"""
+  updateWorkflowTemplate(updateWorkflowTemplateInput: UpdateWorkflowTemplateInput!): WorkflowTemplate!
+
+  """Xóa workflow template"""
+  removeWorkflowTemplate(id: Int!): Boolean!
   createDocument(createDocumentInput: CreateDocumentInput!, file: Upload): GetDocumentResponse!
   updateDocument(updateDocumentInput: UpdateDocumentInput!): GetDocumentResponse!
   removeDocument(id: Int!): RemoveDocumentResponse!
@@ -1783,58 +1756,23 @@ input UpdateWorkflowActionLogInput {
   id: Int!
 }
 
-"""Dữ liệu đầu vào để tạo workflow instance mới"""
 input CreateWorkflowInstanceInput {
-  """ID của workflow template"""
   templateId: Int!
-
-  """ID của document"""
   documentId: Int!
-
-  """Ghi chú cho workflow instance"""
   notes: String
 }
 
-"""Dữ liệu đầu vào để cập nhật workflow instance"""
 input UpdateWorkflowInstanceInput {
-  """ID của workflow template"""
-  templateId: Int
-
-  """ID của document"""
-  documentId: Int
-
-  """Ghi chú cho workflow instance"""
+  id: Int!
   notes: String
-
-  """ID của workflow instance cần cập nhật"""
-  id: Int!
 }
 
-"""Dữ liệu đầu vào để tạo workflow template mới"""
-input CreateWorkflowTemplateInput {
-  """Tên của workflow template"""
-  name: String!
-
-  """Mô tả của workflow template"""
-  description: String
-
-  """Trạng thái kích hoạt"""
-  isActive: Boolean = true
-}
-
-"""Dữ liệu đầu vào để cập nhật workflow template"""
-input UpdateWorkflowTemplateInput {
-  """Tên của workflow template"""
-  name: String
-
-  """Mô tả của workflow template"""
-  description: String
-
-  """Trạng thái kích hoạt"""
-  isActive: Boolean = true
-
-  """ID của workflow template cần cập nhật"""
-  id: Int!
+input WorkflowActionInput {
+  instanceId: Int!
+  stepId: Int!
+  actionType: ActionType!
+  note: String
+  metadata: String
 }
 
 """Dữ liệu đầu vào để tạo workflow step mới"""
@@ -1891,6 +1829,33 @@ input UpdateWorkflowStepInput {
   templateId: Int
 
   """ID của workflow step cần cập nhật"""
+  id: Int!
+}
+
+"""Dữ liệu đầu vào để tạo workflow template mới"""
+input CreateWorkflowTemplateInput {
+  """Tên của workflow template"""
+  name: String!
+
+  """Mô tả của workflow template"""
+  description: String
+
+  """Trạng thái kích hoạt"""
+  isActive: Boolean = true
+}
+
+"""Dữ liệu đầu vào để cập nhật workflow template"""
+input UpdateWorkflowTemplateInput {
+  """Tên của workflow template"""
+  name: String
+
+  """Mô tả của workflow template"""
+  description: String
+
+  """Trạng thái kích hoạt"""
+  isActive: Boolean = true
+
+  """ID của workflow template cần cập nhật"""
   id: Int!
 }
 

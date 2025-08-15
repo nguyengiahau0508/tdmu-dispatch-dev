@@ -12,13 +12,12 @@ import { DocumentCatalog } from './features/admin/document-catalog/document-cata
 import { documentCatalogRoutes } from './features/admin/document-catalog/document-catalog.routes';
 import { Workflow } from './features/admin/workflow/workflow';
 import { workflowRoutes } from './features/admin/workflow/workflow.routes';
+import { USER_ROUTES } from './features/user/user.routes';
 
 export const routes: Routes = [
   { path: 'auth', component: AuthLayout, children: authRoutes },
   {
-    path: '', component: MainLayout, canActivate: [AuthGuard], children: [
-
-    ]
+    path: '', component: MainLayout, canActivate: [AuthGuard], children: USER_ROUTES
   },
   {
     path: 'admin', component: AdminLayout, canActivate: [AdminGuard], children: [

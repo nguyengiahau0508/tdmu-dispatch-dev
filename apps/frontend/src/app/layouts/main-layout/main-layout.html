@@ -7,21 +7,17 @@
 
     <!-- Menu chính -->
     <div class="sidebar__menu">
-      <div class="sidebar__menu-item">
-        <img src="/icons/dashboard.svg" alt="" title="Bảng điều khiển">
-        <span class="sidebar__tooltip">Bảng điều khiển</span>
-      </div>
-      <div class="sidebar__menu-item">
-        <img src="/icons/report.svg" alt="" title="Báo cáo">
-        <span class="sidebar__tooltip">Báo cáo</span>
-      </div>
-      <div class="sidebar__menu-item">
+      <div class="sidebar__menu-item" routerLink="/incoming-documents" routerLinkActive="active">
         <img src="/icons/incoming.svg" alt="" title="Công văn đến">
         <span class="sidebar__tooltip">Công văn đến</span>
       </div>
-      <div class="sidebar__menu-item">
+      <div class="sidebar__menu-item" routerLink="/outgoing-documents" routerLinkActive="active">
         <img src="/icons/outgoing.svg" alt="" title="Công văn đi">
         <span class="sidebar__tooltip">Công văn đi</span>
+      </div>
+      <div class="sidebar__menu-item" routerLink="/workflow-instances" routerLinkActive="active">
+        <img src="/icons/workflow.svg" alt="" title="Quy trình xử lý">
+        <span class="sidebar__tooltip">Quy trình xử lý</span>
       </div>
     </div>
 

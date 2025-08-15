@@ -1,7 +1,8 @@
   
 import { IWorkflowStep } from '../../workflow-steps/interfaces/workflow-step.interfaces';
-import { IWorkflowInstances } from '../../workflow-instances/interfaces/workflow-instance.interfaces';
+
 import { IUser } from '../../../../interfaces/user.interface';
+import { IWorkflowInstance } from '../../workflow-instances/interfaces/workflow-instance.interfaces';
 
 export interface IWorkflowTemplate {
   id: number
@@ -13,7 +14,7 @@ export interface IWorkflowTemplate {
   createdAt: Date
   updatedAt: Date
   steps: IWorkflowStep[]
-  instances: IWorkflowInstances[]
+  instances: IWorkflowInstance[]
 }
 
 export interface ICreateWorkflowTemplateInput {

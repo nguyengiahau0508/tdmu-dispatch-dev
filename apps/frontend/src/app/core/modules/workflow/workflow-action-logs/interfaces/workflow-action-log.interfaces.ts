@@ -1,5 +1,5 @@
 import { IUser } from "../../../../interfaces/user.interface"
-import { IWorkflowInstances } from "../../workflow-instances/interfaces/workflow-instance.interfaces"
+import { IWorkflowInstance } from "../../workflow-instances/interfaces/workflow-instance.interfaces"
 import { IWorkflowStep } from "../../workflow-steps/interfaces/workflow-step.interfaces"
 
 export interface IWorkflowActionLog {
@@ -12,7 +12,7 @@ export interface IWorkflowActionLog {
   note?: string
   metadata?: any
   createdAt: Date
-  instance: IWorkflowInstances
+  instance: IWorkflowInstance
   step: IWorkflowStep
   actionByUser: IUser
 }
