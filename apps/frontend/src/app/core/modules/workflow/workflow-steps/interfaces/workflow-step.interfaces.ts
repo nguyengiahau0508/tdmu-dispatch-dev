@@ -10,10 +10,36 @@ export enum StepType {
 export interface IWorkflowStep {
   id: number
   name: string
-  type: StepType
-  assignedRole: string;
-  orderNumber: number;
-  nextStepId?: number;
+  description?: string
+  type: string
+  assignedRole: string
+  orderNumber: number
+  nextStepId?: number
+  isActive: boolean
   templateId: number
-  template: IWorkflowTemplate;
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ICreateWorkflowStepInput {
+  name: string
+  description?: string
+  type: string
+  assignedRole: string
+  orderNumber: number
+  nextStepId?: number
+  isActive?: boolean
+  templateId: number
+}
+
+export interface IUpdateWorkflowStepInput {
+  id: number
+  name?: string
+  description?: string
+  type?: string
+  assignedRole?: string
+  orderNumber?: number
+  nextStepId?: number
+  isActive?: boolean
+  templateId?: number
 }

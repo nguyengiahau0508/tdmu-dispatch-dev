@@ -1,13 +1,13 @@
-<div class="users">
-  <div class="users__header">
+<div class="workflow">
+  <div class="workflow__header">
     <div class="header__group">
       <div class="header__search">
-        <input type="text" placeholder="Tìm loại đơn vị..." />
+        <input type="text" placeholder="Tìm quy trình..." />
       </div>
       <div class="header__add">
-        <button (click)="toggleUserCreate()">
+        <button (click)="toggleWorkflowTemplateCreate()">
           <img src="/icons/add.svg" alt="Thêm" />
-          Thêm
+          Thêm quy trình
         </button>
       </div>
     </div>
@@ -16,34 +16,64 @@
         (pageSizeChange)="onPageSizeChange($event)" (orderChange)="onOrderChange($event)"></app-pagination>
     </div>
   </div>
-  <div class="users__main">
+  
+  <div class="workflow__main">
     @if (workflowTemplates.length > 0) {
-    <table class="users__table">
+    <table class="workflow__table">
       <thead>
         <tr>
           <th>ID</th>
-          <th>Ảnh</th>
-          <th>Họ và tên</th>
-          <th>Email</th>
+          <th>Tên quy trình</th>
+          <th>Mô tả</th>
           <th>Trạng thái</th>
+          <th>Số bước</th>
+          <th>Người tạo</th>
           <th>Ngày tạo</th>
-          <th>
-          <th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
         @for (workflowTemplate of workflowTemplates; track workflowTemplate.id) {
-        <tr class="user-row">
+        <tr class="workflow-row">
           <td>{{ workflowTemplate.id }}</td>
-
-
+          <td>
+            <div class="workflow-name">
+              <span class="name">{{ workflowTemplate.name }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="description">{{ workflowTemplate.description || 'Không có mô tả' }}</span>
+          </td>
+          <td>
+            <span class="status-badge" [class]="getStatusClass(workflowTemplate.isActive)">
+              {{ getStatusLabel(workflowTemplate.isActive) }}
+            </span>
+          </td>
+          <td>
+            <span class="steps-count">{{ workflowTemplate.steps.length || 0 }} bước</span>
+          </td>
+          <td>
+            <span class="creator">{{ workflowTemplate.createdByUser.fullName || 'N/A' }}</span>
+          </td>
+          <td>{{ workflowTemplate.createdAt | date:'dd/MM/yyyy' }}</td>
           <td class="row-actions">
             <div class="actions-menu">
               <button class="menu-button" (click)="toggleMenu(workflowTemplate.id)">⋮</button>
 
               @if (selectedMenuId === workflowTemplate.id) {
               <div class="dropdown-menu" (mouseleave)="toggleMenu(workflowTemplate.id)">
-
+                <button class="menu-item" (click)="viewWorkflowTemplateDetail(workflowTemplate)">
+                  <img src="/icons/eye.svg" alt="Xem" />
+                  Xem chi tiết
+                </button>
+                <button class="menu-item" (click)="editWorkflowTemplate(workflowTemplate)">
+                  <img src="/icons/edit.svg" alt="Sửa" />
+                  Chỉnh sửa
+                </button>
+                <button class="menu-item menu-item--danger" (click)="deleteWorkflowTemplate(workflowTemplate)">
+                  <img src="/icons/delete.svg" alt="Xóa" />
+                  Xóa
+                </button>
               </div>
               }
             </div>
@@ -53,29 +83,38 @@
       </tbody>
     </table>
     } @else {
-    <p>Chưa có dữ liệu.</p>
+    <div class="empty-state">
+      <img src="/icons/empty.svg" alt="Không có dữ liệu" />
+      <p>Chưa có quy trình nào được tạo.</p>
+      <button class="btn btn-primary" (click)="toggleWorkflowTemplateCreate()">
+        Tạo quy trình đầu tiên
+      </button>
+    </div>
     }
   </div>
 </div>
 
-<!-- <app-user-create [isOpen]="isUserCreateOpen" (close)="isUserCreateOpen = false" -->
-<!--   (createdSuccessfully)="refreshUsers()" /> -->
-<!---->
-<!-- @if(selectedUser){ -->
-<!-- <app-user-update [isOpen]="isUserUpdateOpen" [user]="selectedUser" (close)="toggleUserUpdate()" -->
-<!--   (updatedSuccessfully)="onUserUpdated()" /> -->
-<!-- } -->
-<!---->
-<!-- @if(selectedUserRoles){ -->
-<!-- <app-user-roles [isOpen]="isUserRolesOpen" [user]="selectedUserRoles" (close)="toggleUserRoles()" -->
-<!--   (updated)="onUserRolesUpdated()" /> -->
-<!-- } -->
-<!---->
-<!-- @if(selectedUserPoitions){ -->
-<!-- <app-user-poitions [userId]="selectedUserPoitions.id" [isOpen]="isUserPoitionsOpen" [user]="selectedUserPoitions" (close)="toggleUserPoitions()" -->
-<!--   (updated)="onUserPoitionsUpdated()" /> -->
-<!-- } -->
-<!---->
-<!-- @if(selectedUserDetailId){ -->
-<!-- <app-user-detail [isOpen]="isUserDetailOpen" [userId]="selectedUserDetailId" (close)="toggleUserDetail()" /> -->
-<!-- } -->
+<!-- Workflow Template Create Modal -->
+@if (isWorkflowTemplateCreateOpen) {
+<app-workflow-template-create 
+  [isOpen]="isWorkflowTemplateCreateOpen" 
+  (closeModal)="toggleWorkflowTemplateCreate()"
+  (createdSuccessfully)="onWorkflowTemplateCreated()" />
+}
+
+<!-- Workflow Template Update Modal -->
+@if (isWorkflowTemplateUpdateOpen && selectedWorkflowTemplate) {
+<app-workflow-template-update 
+  [isOpen]="isWorkflowTemplateUpdateOpen" 
+  [workflowTemplate]="selectedWorkflowTemplate"
+  (closeModal)="toggleWorkflowTemplateUpdate()"
+  (updatedSuccessfully)="onWorkflowTemplateUpdated()" />
+}
+
+<!-- Workflow Template Detail Modal -->
+@if (isWorkflowTemplateDetailOpen && selectedWorkflowTemplate) {
+<app-workflow-template-detail 
+  [isOpen]="isWorkflowTemplateDetailOpen" 
+  [workflowTemplateId]="selectedWorkflowTemplate.id"
+  (closeModal)="toggleWorkflowTemplateDetail()" />
+}
