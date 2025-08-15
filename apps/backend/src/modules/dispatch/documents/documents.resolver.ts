@@ -93,4 +93,12 @@ export class DocumentsResolver {
       data: result,
     };
   }
+
+  // Debug mutation to test file upload
+  @Mutation(() => String)
+  async testFileUpload(
+    @Args({ name: 'file', type: () => GraphQLUpload }) file: FileUpload,
+  ): Promise<string> {
+    return await this.documentsService.testFileUpload(file);
+  }
 }

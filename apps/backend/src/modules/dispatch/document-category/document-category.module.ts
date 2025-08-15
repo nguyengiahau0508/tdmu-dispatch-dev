@@ -7,5 +7,6 @@ import { DocumentCategory } from './entities/document-category.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([DocumentCategory])],
   providers: [DocumentCategoryResolver, DocumentCategoryService],
+  exports: [DocumentCategoryService],
 })
 export class DocumentCategoryModule {}

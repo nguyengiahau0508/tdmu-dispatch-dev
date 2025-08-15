@@ -44,7 +44,7 @@ export class Document {
   @Column()
   documentCategoryId: number;
 
-  @Field(() => DocumentCategory)
+  @Field(() => DocumentCategory, { nullable: true })
   @ManyToOne(() => DocumentCategory)
   @JoinColumn({ name: 'documentCategoryId' })
   documentCategory: DocumentCategory;

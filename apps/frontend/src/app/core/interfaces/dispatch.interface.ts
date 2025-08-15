@@ -12,14 +12,15 @@ export interface IDocumentCategory {
     documentType: IDocumentType;
 }
 
+export type DocumentTypeEnum = 'OUTGOING' | 'INCOMING' | 'INTERNAL';
+
 export interface IDocument {
     id: number;
     title: string;
     content?: string;
-    documentTypeId: number;
-    documentType: IDocumentType;
+    documentType: DocumentTypeEnum;
     documentCategoryId: number;
-    documentCategory: IDocumentCategory;
+    documentCategory?: IDocumentCategory;
     fileId?: number;
     file?: any; // Replace 'any' with the actual file type if available
     status?: string;

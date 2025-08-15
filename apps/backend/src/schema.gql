@@ -935,7 +935,7 @@ type Document {
   content: String
   documentType: DocumentTypeEnum!
   documentCategoryId: Int!
-  documentCategory: DocumentCategory!
+  documentCategory: DocumentCategory
   file: File
   fileId: Int
   status: String
@@ -1204,11 +1204,11 @@ type Query {
   activeWorkflowTemplates: [WorkflowTemplate!]!
   documents(input: GetDocumentsPaginatedInput!): GetDocumentsPaginatedResponse!
   document(id: Int!): GetDocumentResponse!
-  documentTypes(input: GetDocumentTypesPaginatedInput!): GetDocumentTypesPaginatedResponse!
-  documentType(id: Int!): GetDocumentTypeResponse!
   documentCategories(input: GetDocumentCategoriesPaginatedInput!): GetDocumentCategoriesPaginatedResponse!
   documentCategory(id: Int!): GetDocumentCategoryResponse!
   allDocumentCategories: [DocumentCategory!]!
+  documentTypes(input: GetDocumentTypesPaginatedInput!): GetDocumentTypesPaginatedResponse!
+  documentType(id: Int!): GetDocumentTypeResponse!
 }
 
 input GetUsersPaginatedInput {
@@ -1343,9 +1343,12 @@ input GetDocumentsPaginatedInput {
 
   """Từ khóa tìm kiếm"""
   search: String
+
+  """Loại văn bản"""
+  documentType: DocumentTypeEnum
 }
 
-input GetDocumentTypesPaginatedInput {
+input GetDocumentCategoriesPaginatedInput {
   """Thứ tự sắp xếp"""
   order: Order = ASC
 
@@ -1359,7 +1362,7 @@ input GetDocumentTypesPaginatedInput {
   search: String
 }
 
-input GetDocumentCategoriesPaginatedInput {
+input GetDocumentTypesPaginatedInput {
   """Thứ tự sắp xếp"""
   order: Order = ASC
 
@@ -1465,12 +1468,13 @@ type Mutation {
   createDocument(createDocumentInput: CreateDocumentInput!, file: Upload): GetDocumentResponse!
   updateDocument(updateDocumentInput: UpdateDocumentInput!): GetDocumentResponse!
   removeDocument(id: Int!): RemoveDocumentResponse!
-  createDocumentType(createDocumentTypeInput: CreateDocumentTypeInput!): CreateDocumentTypeResponse!
-  updateDocumentType(updateDocumentTypeInput: UpdateDocumentTypeInput!): UpdateDocumentTypeResponse!
-  removeDocumentType(id: Int!): RemoveDocumentTypeResponse!
+  testFileUpload(file: Upload!): String!
   createDocumentCategory(createDocumentCategoryInput: CreateDocumentCategoryInput!): GetDocumentCategoryResponse!
   updateDocumentCategory(updateDocumentCategoryInput: UpdateDocumentCategoryInput!): GetDocumentCategoryResponse!
   removeDocumentCategory(id: Int!): RemoveDocumentCategoryResponse!
+  createDocumentType(createDocumentTypeInput: CreateDocumentTypeInput!): CreateDocumentTypeResponse!
+  updateDocumentType(updateDocumentTypeInput: UpdateDocumentTypeInput!): UpdateDocumentTypeResponse!
+  removeDocumentType(id: Int!): RemoveDocumentTypeResponse!
 }
 
 input SignInInput {
@@ -1900,17 +1904,6 @@ input UpdateDocumentInput {
   id: Int!
 }
 
-input CreateDocumentTypeInput {
-  name: String!
-  description: String
-}
-
-input UpdateDocumentTypeInput {
-  id: Float!
-  name: String
-  description: String
-}
-
 input CreateDocumentCategoryInput {
   """Tên nhóm văn bản"""
   name: String!
@@ -1926,4 +1919,15 @@ input UpdateDocumentCategoryInput {
   """Mô tả"""
   description: String
   id: Int!
+}
+
+input CreateDocumentTypeInput {
+  name: String!
+  description: String
+}
+
+input UpdateDocumentTypeInput {
+  id: Float!
+  name: String
+  description: String
 }

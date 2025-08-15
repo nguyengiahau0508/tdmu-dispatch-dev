@@ -1,9 +1,15 @@
 import { Routes } from '@angular/router';
 import { IncomingDocuments } from './incoming-documents/incoming-documents';
 import { OutgoingDocuments } from './outgoing-documents/outgoing-documents';
+import { AllDocuments } from './all-documents/all-documents';
 import { WorkflowInstances } from './workflow/workflow-instances';
 
 export const USER_ROUTES: Routes = [
+  {
+    path: 'all-documents',
+    component: AllDocuments,
+    title: 'Tất cả công văn'
+  },
   {
     path: 'incoming-documents',
     component: IncomingDocuments,
@@ -21,7 +27,7 @@ export const USER_ROUTES: Routes = [
   },
   {
     path: '',
-    redirectTo: 'incoming-documents',
+    redirectTo: 'all-documents',
     pathMatch: 'full'
   }
 ];

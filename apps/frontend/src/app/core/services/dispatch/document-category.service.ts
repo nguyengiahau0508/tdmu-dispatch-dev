@@ -32,9 +32,9 @@ export class DocumentCategoryService {
     );
   }
 
-  getAllDocumentCategories(): Observable<IApiResponse<IDocumentCategory[]>> {
+  getAllDocumentCategories(): Observable<IDocumentCategory[]> {
     return this.apollo.query<{
-      allDocumentCategories: IApiResponse<IDocumentCategory[]>
+      allDocumentCategories: IDocumentCategory[]
     }>({
       query: GET_ALL_DOCUMENT_CATEGORIES_QUERY
     }).pipe(

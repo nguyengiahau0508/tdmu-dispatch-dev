@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DocumentsService, Document } from '../../../core/services/dispatch/documents.service';
+import { DocumentFormComponent } from '../document-form/document-form.component';
+import { DocumentDetailComponent } from '../document-detail/document-detail.component';
 
 @Component({
   selector: 'app-outgoing-documents',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DocumentFormComponent, DocumentDetailComponent],
   template: `
     <div class="outgoing-documents">
       <div class="header">
@@ -35,32 +38,26 @@ import { FormsModule } from '@angular/forms';
           <div class="document-card">
             <div class="document-header">
               <span class="document-id">#{{ document.id }}</span>
-              <span class="status-badge" [class]="getStatusClass(document.status)">
-                {{ getStatusLabel(document.status) }}
+              <span class="status-badge" [class]="getStatusClass(document.status || 'draft')">
+                {{ getStatusLabel(document.status || 'draft') }}
               </span>
             </div>
             
             <div class="document-body">
               <h4>{{ document.title }}</h4>
-              <p>Đến: {{ document.recipient }}</p>
-              <p>Số: {{ document.documentNumber }}</p>
-              <p>Ngày: {{ document.createdDate | date:'dd/MM/yyyy' }}</p>
+              <p>Loại: {{ document.documentCategory?.name || 'Chưa phân loại' }}</p>
+              <p>Ngày tạo: {{ document.createdAt | date:'dd/MM/yyyy' }}</p>
+              <p>Trạng thái: {{ getStatusLabel(document.status || 'draft') }}</p>
               
-              @if (document.workflowInstance) {
-                <div class="workflow-info">
-                  <span>Quy trình: {{ document.workflowInstance.template.name }}</span>
-                </div>
+              @if (document.content) {
+                <p class="content-preview">{{ document.content | slice:0:100 }}{{ document.content.length > 100 ? '...' : '' }}</p>
               }
             </div>
             
             <div class="document-actions">
               <button class="btn btn-secondary" (click)="viewDetail(document)">Chi tiết</button>
-              @if (document.status === 'draft') {
-                <button class="btn btn-primary" (click)="submitForApproval(document)">Gửi phê duyệt</button>
-              }
-              @if (document.status === 'approved') {
-                <button class="btn btn-success" (click)="sendDocument(document)">Gửi</button>
-              }
+              <button class="btn btn-primary" (click)="editDocument(document)">Chỉnh sửa</button>
+              <button class="btn btn-danger" (click)="deleteDocument(document)">Xóa</button>
             </div>
           </div>
         }
@@ -73,6 +70,22 @@ import { FormsModule } from '@angular/forms';
         </div>
       }
     </div>
+
+    @if (showDocumentForm) {
+      <app-document-form
+        [documentType]="'OUTGOING'"
+        (saved)="onDocumentSaved($event)"
+        (cancelled)="onDocumentFormCancelled()"
+      ></app-document-form>
+    }
+
+    @if (selectedDocument) {
+      <app-document-detail
+        [document]="selectedDocument"
+        (closed)="onDocumentDetailClosed()"
+        (editRequested)="onEditDocument($event)"
+      ></app-document-detail>
+    }
   `,
   styles: [`
     .outgoing-documents {
@@ -165,6 +178,12 @@ import { FormsModule } from '@angular/forms';
       font-size: 14px;
     }
 
+    .content-preview {
+      margin-top: 8px !important;
+      font-style: italic;
+      color: #9ca3af !important;
+    }
+
     .workflow-info {
       margin-top: 12px;
       padding: 8px 12px;
@@ -209,47 +228,49 @@ import { FormsModule } from '@angular/forms';
       background: #10b981;
       color: white;
     }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
   `]
 })
 export class OutgoingDocuments implements OnInit {
-  documents: any[] = [];
-  filteredDocuments: any[] = [];
+  documents: Document[] = [];
+  filteredDocuments: Document[] = [];
   searchTerm = '';
   statusFilter = '';
+  showDocumentForm = false;
+  selectedDocument?: Document;
+  isLoading = false;
+
+  constructor(private documentsService: DocumentsService) {
+    // Initialize arrays to prevent undefined errors
+    this.documents = [];
+    this.filteredDocuments = [];
+  }
 
   ngOnInit(): void {
     this.loadDocuments();
   }
 
   loadDocuments(): void {
-    // Mock data
-    this.documents = [
-      {
-        id: 1,
-        title: 'Công văn trả lời về việc tổ chức họp',
-        recipient: 'Phòng Tổ chức - Hành chính',
-        documentNumber: 'CV-001/2024',
-        createdDate: new Date('2024-01-15'),
-        status: 'draft'
+    this.isLoading = true;
+    this.documentsService.getOutgoingDocuments(1, 20, this.searchTerm || '').subscribe({
+      next: (response) => {
+        this.documents = response.data;
+        this.applyFilters();
+        this.isLoading = false;
       },
-      {
-        id: 2,
-        title: 'Báo cáo kết quả công việc tháng 1',
-        recipient: 'Ban Giám hiệu',
-        documentNumber: 'CV-002/2024',
-        createdDate: new Date('2024-01-20'),
-        status: 'approved',
-        workflowInstance: {
-          template: { name: 'Quy trình phê duyệt báo cáo' },
-          status: 'COMPLETED'
-        }
+      error: (error) => {
+        console.error('Error loading documents:', error);
+        this.isLoading = false;
       }
-    ];
-    this.filteredDocuments = this.documents;
+    });
   }
 
   onSearch(): void {
-    this.applyFilters();
+    this.loadDocuments();
   }
 
   onFilterChange(): void {
@@ -257,28 +278,62 @@ export class OutgoingDocuments implements OnInit {
   }
 
   applyFilters(): void {
+    if (!this.documents) {
+      this.filteredDocuments = [];
+      return;
+    }
+    
     this.filteredDocuments = this.documents.filter(doc => {
       const matchesSearch = !this.searchTerm || 
         doc.title.toLowerCase().includes(this.searchTerm.toLowerCase());
-      const matchesStatus = !this.statusFilter || doc.status === this.statusFilter;
+      const matchesStatus = !this.statusFilter || (doc.status || 'draft') === this.statusFilter;
       return matchesSearch && matchesStatus;
     });
   }
 
   createDocument(): void {
-    console.log('Create outgoing document');
+    this.showDocumentForm = true;
   }
 
-  viewDetail(document: any): void {
-    console.log('View outgoing document detail:', document);
+  editDocument(document: Document): void {
+    // TODO: Implement edit functionality
+    console.log('Edit document:', document);
   }
 
-  submitForApproval(document: any): void {
-    console.log('Submit for approval:', document);
+  deleteDocument(document: Document): void {
+    if (confirm('Bạn có chắc chắn muốn xóa văn bản này?')) {
+      this.documentsService.removeDocument(document.id).subscribe({
+        next: () => {
+          this.loadDocuments();
+        },
+        error: (error) => {
+          console.error('Error deleting document:', error);
+        }
+      });
+    }
   }
 
-  sendDocument(document: any): void {
-    console.log('Send document:', document);
+  viewDetail(document: Document): void {
+    this.selectedDocument = document;
+  }
+
+  onDocumentSaved(document: Document): void {
+    this.showDocumentForm = false;
+    this.loadDocuments();
+  }
+
+  onDocumentFormCancelled(): void {
+    this.showDocumentForm = false;
+  }
+
+  onDocumentDetailClosed(): void {
+    this.selectedDocument = undefined;
+  }
+
+  onEditDocument(document: Document): void {
+    this.selectedDocument = undefined;
+    // TODO: Implement edit functionality
+    console.log('Edit document:', document);
   }
 
   getStatusLabel(status: string): string {

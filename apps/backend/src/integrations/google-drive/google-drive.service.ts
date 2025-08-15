@@ -48,6 +48,34 @@ export class GoogleDriveService {
   }
 
   /**
+   * Download file từ Google Drive (alias cho getFile)
+   * @param fileId ID của file cần tải
+   * @returns Readable Stream chứa nội dung file
+   */
+  async downloadFile(fileId: string): Promise<Readable> {
+    return this.getFile(fileId);
+  }
+
+  /**
+   * Lấy thông tin file từ Google Drive
+   * @param fileId ID của file
+   * @returns Thông tin file
+   */
+  async getFileInfo(fileId: string): Promise<{ name: string; mimeType: string; size?: string }> {
+    try {
+      const metadata = await this.getFileMetadata(fileId);
+      return {
+        name: metadata.name || 'unknown',
+        mimeType: metadata.mimeType || 'application/octet-stream',
+        size: metadata.size || undefined,
+      };
+    } catch (error) {
+      console.error('Error getting file info:', error.message);
+      throw new Error('Could not get file info from Google Drive');
+    }
+  }
+
+  /**
    * Lấy metadata file từ Google Drive
    */
   async getFileMetadata(fileId: string): Promise<drive_v3.Schema$File> {
