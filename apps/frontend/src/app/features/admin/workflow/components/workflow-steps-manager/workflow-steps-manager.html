@@ -1,0 +1,144 @@
+<div class="workflow-steps-manager">
+  <!-- Header -->
+  <div class="steps-header">
+    <h3>Quản lý các bước trong quy trình</h3>
+    <button class="btn btn-primary" (click)="toggleAddStep()">
+      <span class="btn-icon">+</span>
+      Thêm bước mới
+    </button>
+  </div>
+
+  <!-- Steps List -->
+  <div class="steps-list">
+    @if (steps.length > 0) {
+      @for (step of steps; track step.id) {
+        <div class="step-item">
+          <div class="step-content">
+            <div class="step-info">
+              <div class="step-order">{{ step.orderNumber }}</div>
+              <div class="step-details">
+                <h4>{{ step.name }}</h4>
+                <p>{{ step.description || 'Không có mô tả' }}</p>
+                <div class="step-meta">
+                  <span class="step-type">{{ getStepTypeLabel(step.type) }}</span>
+                  <span class="step-role">{{ getRoleLabel(step.assignedRole) }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="step-actions">
+              <button class="btn btn-icon" (click)="editStep(step)" title="Chỉnh sửa">
+                <span class="btn-icon">✏️</span>
+              </button>
+              <button class="btn btn-icon" (click)="duplicateStep(step)" title="Sao chép">
+                <span class="btn-icon">📋</span>
+              </button>
+              <button class="btn btn-icon btn-danger" (click)="deleteStep(step)" title="Xóa">
+                <span class="btn-icon">🗑️</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    } @else {
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <p>Chưa có bước nào trong quy trình này.</p>
+        <button class="btn btn-primary" (click)="toggleAddStep()">Thêm bước đầu tiên</button>
+      </div>
+    }
+  </div>
+
+  <!-- Add/Edit Step Modal -->
+  @if (isModalOpen) {
+    <div class="modal-overlay" (click)="closeModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>{{ isEditing ? 'Chỉnh sửa bước' : 'Thêm bước mới' }}</h3>
+          <button class="btn btn-icon" (click)="closeModal()">
+            <span class="btn-icon">✕</span>
+          </button>
+        </div>
+        
+        <form [formGroup]="stepForm" (ngSubmit)="onSubmit()" class="modal-body">
+          <div class="form-group">
+            <label for="name">Tên bước *</label>
+            <input 
+              type="text" 
+              id="name" 
+              formControlName="name" 
+              placeholder="Nhập tên bước"
+              class="form-control"
+            />
+            @if (stepForm.get('name')?.invalid && stepForm.get('name')?.touched) {
+              <div class="error-message">Tên bước là bắt buộc</div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="description">Mô tả</label>
+            <textarea 
+              id="description" 
+              formControlName="description" 
+              placeholder="Nhập mô tả bước"
+              class="form-control"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="type">Loại bước *</label>
+            <select id="type" formControlName="type" class="form-control">
+              <option value="">Chọn loại bước</option>
+              @for (type of stepTypes; track type.value) {
+                <option [value]="type.value">{{ type.label }}</option>
+              }
+            </select>
+            @if (stepForm.get('type')?.invalid && stepForm.get('type')?.touched) {
+              <div class="error-message">Loại bước là bắt buộc</div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="assignedRole">Vai trò được gán *</label>
+            <select id="assignedRole" formControlName="assignedRole" class="form-control">
+              <option value="">Chọn vai trò</option>
+              @for (role of roles; track role.value) {
+                <option [value]="role.value">{{ role.label }}</option>
+              }
+            </select>
+            @if (stepForm.get('assignedRole')?.invalid && stepForm.get('assignedRole')?.touched) {
+              <div class="error-message">Vai trò được gán là bắt buộc</div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="orderNumber">Thứ tự</label>
+            <input 
+              type="number" 
+              id="orderNumber" 
+              formControlName="orderNumber" 
+              placeholder="Thứ tự bước"
+              class="form-control"
+              min="1"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="isActive" />
+              <span class="checkmark"></span>
+              Bước đang hoạt động
+            </label>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">Hủy</button>
+            <button type="submit" class="btn btn-primary" [disabled]="stepForm.invalid || isSubmitting">
+              {{ isSubmitting ? 'Đang xử lý...' : (isEditing ? 'Cập nhật' : 'Thêm') }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

@@ -19,7 +19,8 @@ export class PageDto<T> {
 
 // Import entity types
 import { WorkflowTemplate } from "../../../modules/workflow/workflow-templates/entities/workflow-template.entity";
-import { WorkflowInstance } from "../../../modules/workflow/workflow-instances/entities/workflow-instance.entity";  
+import { WorkflowInstance } from "../../../modules/workflow/workflow-instances/entities/workflow-instance.entity";
+import { WorkflowStep } from "../../../modules/workflow/workflow-steps/entities/workflow-step.entity";
 
 // Create specific PageDto classes for each entity type
 @ObjectType({ description: 'Paginated response for WorkflowTemplate' })
@@ -47,6 +48,21 @@ export class WorkflowInstancePageDto {
   readonly meta: PageMetaDto;
 
   constructor(data: WorkflowInstance[], meta: PageMetaDto) {
+    this.data = data;
+    this.meta = meta;
+  }
+}
+
+@ObjectType({ description: 'Paginated response for WorkflowStep' })
+export class WorkflowStepPageDto {
+  @Field(() => [WorkflowStep], { description: 'Array of workflow steps' })
+  @IsArray()
+  readonly data: WorkflowStep[];
+
+  @Field(() => PageMetaDto, { description: 'Pagination metadata' })
+  readonly meta: PageMetaDto;
+
+  constructor(data: WorkflowStep[], meta: PageMetaDto) {
     this.data = data;
     this.meta = meta;
   }

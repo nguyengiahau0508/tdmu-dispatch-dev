@@ -7,6 +7,7 @@ import { IWorkflowTemplate } from '../../../core/modules/workflow/workflow-templ
 import { WorkflowTemplateCreate } from './components/workflow-template-create/workflow-template-create';
 import { WorkflowTemplateUpdate } from './components/workflow-template-update/workflow-template-update';
 import { WorkflowTemplateDetail } from './components/workflow-template-detail/workflow-template-detail';
+import { Order, IPageOptions } from '../../../core/interfaces/page-options.interface';
 
 @Component({
   selector: 'app-workflow',
@@ -16,13 +17,16 @@ import { WorkflowTemplateDetail } from './components/workflow-template-detail/wo
   styleUrl: './workflow.css'
 })
 export class Workflow implements OnInit {
+  // Export Order enum để có thể sử dụng trong template
+  Order = Order;
+  
   workflowTemplates: IWorkflowTemplate[] = []
   totalCount = 0
-  pageOptions = {
+  pageOptions: IPageOptions & { search?: string } = {
     page: 1,
     take: 10,
     search: '',
-    order: 'DESC' as 'ASC' | 'DESC'
+    order: Order.DESC
   }
   selectedMenuId: number | null = null
   selectedWorkflowTemplate: IWorkflowTemplate | null = null
@@ -49,7 +53,7 @@ export class Workflow implements OnInit {
   toggleWorkflowTemplateDetail() { this.isWorkflowTemplateDetailOpen = !this.isWorkflowTemplateDetailOpen }
 
   onPageSizeChange(take: number) { this.pageOptions.take = take; this.pageOptions.page = 1; this.refreshWorkflowTemplates() }
-  onOrderChange(order: 'ASC' | 'DESC') { this.pageOptions.order = order; this.refreshWorkflowTemplates() }
+  onOrderChange(order: Order) { this.pageOptions.order = order; this.refreshWorkflowTemplates() }
   onPageChange(page: number) { this.pageOptions.page = page; this.refreshWorkflowTemplates() }
 
   refreshWorkflowTemplates() {

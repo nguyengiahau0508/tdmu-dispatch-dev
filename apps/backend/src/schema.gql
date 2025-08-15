@@ -314,6 +314,15 @@ type WorkflowInstancePageDto {
   meta: PageMetaDto!
 }
 
+"""Paginated response for WorkflowStep"""
+type WorkflowStepPageDto {
+  """Array of workflow steps"""
+  data: [WorkflowStep!]!
+
+  """Pagination metadata"""
+  meta: PageMetaDto!
+}
+
 type SignInOtpOutput {
   accessToken: String!
 }
@@ -1102,6 +1111,16 @@ type UpdateDocumentTypeResponse {
   metadata: Metadata!
 }
 
+type StepTypeDto {
+  value: String!
+  label: String!
+}
+
+type RoleDto {
+  value: String!
+  label: String!
+}
+
 type Query {
   users: [User!]!
   user(id: Int!): User
@@ -1175,14 +1194,20 @@ type Query {
   """Lấy tất cả workflow steps"""
   workflowSteps: [WorkflowStep!]!
 
-  """Lấy workflow steps theo template ID"""
-  workflowStepsByTemplate(templateId: Int!): [WorkflowStep!]!
+  """Lấy danh sách workflow steps có phân trang"""
+  workflowStepsPaginated(input: GetWorkflowStepPaginatedInput!): WorkflowStepPageDto!
 
   """Lấy workflow step theo ID"""
   workflowStep(id: Int!): WorkflowStep!
 
-  """Lấy workflow step tiếp theo"""
-  nextWorkflowStep(currentStepId: Int!): WorkflowStep
+  """Lấy workflow steps theo template ID"""
+  workflowStepsByTemplate(templateId: Int!): [WorkflowStep!]!
+
+  """Lấy danh sách các loại workflow step"""
+  workflowStepTypes: [StepTypeDto!]!
+
+  """Lấy danh sách các vai trò có thể gán cho workflow step"""
+  workflowRoles: [RoleDto!]!
   documents(input: GetDocumentsPaginatedInput!): GetDocumentsPaginatedResponse!
   document(id: Int!): GetDocumentResponse!
   documentTypes(input: GetDocumentTypesPaginatedInput!): GetDocumentTypesPaginatedResponse!
@@ -1324,6 +1349,15 @@ input GetWorkflowTemplatePaginatedInput {
   search: String
 }
 
+input GetWorkflowStepPaginatedInput {
+  page: Int
+  take: Int
+  search: String
+  templateId: Int
+  type: String
+  order: String
+}
+
 input GetDocumentsPaginatedInput {
   """Thứ tự sắp xếp"""
   order: Order = ASC
@@ -1447,8 +1481,14 @@ type Mutation {
   """Xóa workflow step"""
   removeWorkflowStep(id: Int!): Boolean!
 
+  """Di chuyển workflow step đến vị trí mới"""
+  moveWorkflowStep(stepId: Int!, newOrder: Int!): [WorkflowStep!]!
+
+  """Sao chép workflow step"""
+  duplicateWorkflowStep(stepId: Int!): WorkflowStep!
+
   """Sắp xếp lại thứ tự các workflow steps"""
-  reorderWorkflowSteps(templateId: Int!, stepIds: [Int!]!): [WorkflowStep!]!
+  reorderWorkflowSteps(templateId: Int!): [WorkflowStep!]!
   createDocument(createDocumentInput: CreateDocumentInput!, file: Upload): GetDocumentResponse!
   updateDocument(updateDocumentInput: UpdateDocumentInput!): GetDocumentResponse!
   removeDocument(id: Int!): RemoveDocumentResponse!

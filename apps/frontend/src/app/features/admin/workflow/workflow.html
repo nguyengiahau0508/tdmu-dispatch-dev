@@ -1,12 +1,10 @@
 <div class="workflow">
   <div class="workflow__header">
-    <div class="header__group">
-      <div class="header__search">
-        <input type="text" placeholder="Tìm quy trình..." />
-      </div>
-      <div class="header__add">
-        <button (click)="toggleWorkflowTemplateCreate()">
-          <img src="/icons/add.svg" alt="Thêm" />
+    <div class="header__group header__group--block">
+      <div class="header__title">
+        <h2>Quản lý quy trình</h2>
+        <button class="btn btn-primary" (click)="toggleWorkflowTemplateCreate()">
+          <span class="btn-icon">+</span>
           Thêm quy trình
         </button>
       </div>
@@ -63,15 +61,15 @@
               @if (selectedMenuId === workflowTemplate.id) {
               <div class="dropdown-menu" (mouseleave)="toggleMenu(workflowTemplate.id)">
                 <button class="menu-item" (click)="viewWorkflowTemplateDetail(workflowTemplate)">
-                  <img src="/icons/eye.svg" alt="Xem" />
+                  <span class="btn-icon">👁️</span>
                   Xem chi tiết
                 </button>
                 <button class="menu-item" (click)="editWorkflowTemplate(workflowTemplate)">
-                  <img src="/icons/edit.svg" alt="Sửa" />
+                  <span class="btn-icon">✏️</span>
                   Chỉnh sửa
                 </button>
                 <button class="menu-item menu-item--danger" (click)="deleteWorkflowTemplate(workflowTemplate)">
-                  <img src="/icons/delete.svg" alt="Xóa" />
+                  <span class="btn-icon">🗑️</span>
                   Xóa
                 </button>
               </div>
@@ -84,7 +82,7 @@
     </table>
     } @else {
     <div class="empty-state">
-      <img src="/icons/empty.svg" alt="Không có dữ liệu" />
+      <span class="empty-icon">📋</span>
       <p>Chưa có quy trình nào được tạo.</p>
       <button class="btn btn-primary" (click)="toggleWorkflowTemplateCreate()">
         Tạo quy trình đầu tiên
@@ -116,5 +114,5 @@
 <app-workflow-template-detail 
   [isOpen]="isWorkflowTemplateDetailOpen" 
   [workflowTemplateId]="selectedWorkflowTemplate.id"
-  (closeModal)="toggleWorkflowTemplateDetail()" />
+  (closeModal)="onWorkflowTemplateDetailClosed()" />
 }
