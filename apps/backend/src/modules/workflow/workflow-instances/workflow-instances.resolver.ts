@@ -1,5 +1,5 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, BadRequestException } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { WorkflowInstancesService } from './workflow-instances.service';
@@ -7,7 +7,8 @@ import { WorkflowInstance } from './entities/workflow-instance.entity';
 import { CreateWorkflowInstanceInput } from './dto/create-workflow-instance/create-workflow-instance.input';
 import { UpdateWorkflowInstanceInput } from './dto/update-workflow-instance/update-workflow-instance.input';
 import { WorkflowActionInput } from './dto/workflow-action/workflow-action.input';
-import { WorkflowActionGuard } from '../guards/workflow-action.guard';
+import { WorkflowPermissionsService } from '../workflow-permissions/workflow-permissions.service';
+import { WorkflowStepsService } from '../workflow-steps/workflow-steps.service';
 import { User } from 'src/modules/users/entities/user.entity';
 import { ActionType } from '../workflow-action-logs/entities/workflow-action-log.entity';
 
@@ -16,6 +17,8 @@ import { ActionType } from '../workflow-action-logs/entities/workflow-action-log
 export class WorkflowInstancesResolver {
   constructor(
     private readonly workflowInstancesService: WorkflowInstancesService,
+    private readonly workflowPermissionsService: WorkflowPermissionsService,
+    private readonly workflowStepsService: WorkflowStepsService,
   ) {}
 
   @Mutation(() => WorkflowInstance, {
@@ -106,11 +109,53 @@ export class WorkflowInstancesResolver {
   @Mutation(() => WorkflowInstance, {
     description: 'Thực hiện hành động trên workflow',
   })
-  @UseGuards(WorkflowActionGuard)
-  executeWorkflowAction(
+  async executeWorkflowAction(
     @Args('workflowActionInput') workflowActionInput: WorkflowActionInput,
     @CurrentUser() user: User,
   ) {
+    console.log('Executing workflow action:', {
+      instanceId: workflowActionInput.instanceId,
+      stepId: workflowActionInput.stepId,
+      actionType: workflowActionInput.actionType,
+      userId: user.id
+    });
+
+    // Validate input
+    if (!workflowActionInput.instanceId) {
+      throw new BadRequestException('instanceId is required');
+    }
+    if (!workflowActionInput.stepId) {
+      throw new BadRequestException('stepId is required');
+    }
+    if (!workflowActionInput.actionType) {
+      throw new BadRequestException('actionType is required');
+    }
+
+    // Kiểm tra quyền trực tiếp trong resolver
+    const instance = await this.workflowInstancesService.findOne(
+      workflowActionInput.instanceId,
+    );
+    
+    if (!instance.currentStep) {
+      throw new BadRequestException('Workflow instance does not have a current step');
+    }
+    
+    const step = await this.workflowStepsService.findOne(
+      workflowActionInput.stepId,
+    );
+    
+    const canPerform = this.workflowPermissionsService.canPerformAction(
+      user,
+      step,
+      workflowActionInput.actionType as ActionType,
+    );
+    
+    if (!canPerform) {
+      throw new BadRequestException(
+        `User does not have permission to perform ${workflowActionInput.actionType} on this workflow step`,
+      );
+    }
+    
     return this.workflowInstancesService.executeAction(
       workflowActionInput,
       user,

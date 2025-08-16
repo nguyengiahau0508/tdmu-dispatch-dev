@@ -215,7 +215,7 @@ type WorkflowInstance {
   templateId: Int!
   template: WorkflowTemplate!
   documentId: Int!
-  currentStepId: Int!
+  currentStepId: Int
   currentStep: WorkflowStep
   status: WorkflowStatus!
   createdByUserId: Int!
@@ -1837,23 +1837,14 @@ input CreateWorkflowActionLogInput {
 
 """Dữ liệu đầu vào để cập nhật workflow action log"""
 input UpdateWorkflowActionLogInput {
-  """ID của workflow instance"""
-  instanceId: Int
-
-  """ID của workflow step"""
-  stepId: Int
-
-  """Loại hành động"""
-  actionType: ActionType
+  """ID của workflow action log cần cập nhật"""
+  id: Int!
 
   """Ghi chú cho hành động"""
   note: String
 
   """Metadata bổ sung (JSON string)"""
   metadata: String
-
-  """ID của workflow action log cần cập nhật"""
-  id: Int!
 }
 
 input CreateWorkflowInstanceInput {

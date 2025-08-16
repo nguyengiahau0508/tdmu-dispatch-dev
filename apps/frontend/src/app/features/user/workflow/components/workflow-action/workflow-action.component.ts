@@ -314,8 +314,11 @@ export class WorkflowActionComponent implements OnInit {
     this.isLoading = true;
     this.error = null;
 
+    console.log('Loading workflow instance:', workflowId);
+
     this.workflowApolloService.getWorkflowInstance(workflowId).subscribe({
       next: (workflow: WorkflowInstance) => {
+        console.log('Workflow instance loaded:', workflow);
         this.workflowInstance = workflow;
         this.loadWorkflowData();
       },
@@ -355,10 +358,28 @@ export class WorkflowActionComponent implements OnInit {
 
   async onSubmit(): Promise<void> {
     if (this.actionForm.invalid || !this.workflowInstance?.currentStep) {
+      console.error('Form validation failed:', {
+        formValid: this.actionForm.valid,
+        workflowInstance: !!this.workflowInstance,
+        currentStep: !!this.workflowInstance?.currentStep
+      });
       return;
     }
 
     this.isSubmitting = true;
+
+    // Validate required fields
+    if (!this.workflowInstance.id) {
+      console.error('Workflow instance ID is missing');
+      this.isSubmitting = false;
+      return;
+    }
+
+    if (!this.workflowInstance.currentStep.id) {
+      console.error('Current step ID is missing');
+      this.isSubmitting = false;
+      return;
+    }
 
     const actionInput: WorkflowActionInput = {
       instanceId: this.workflowInstance.id,
@@ -367,6 +388,8 @@ export class WorkflowActionComponent implements OnInit {
       note: this.actionForm.value.note,
       metadata: ''
     };
+
+    console.log('Submitting workflow action:', actionInput);
 
     try {
       this.workflowApolloService.executeWorkflowAction(actionInput).subscribe({

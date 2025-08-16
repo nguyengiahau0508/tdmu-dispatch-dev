@@ -46,8 +46,8 @@ export class WorkflowInstance {
   @Column()
   documentId: number;
 
-  @Column()
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
+  @Column({ nullable: true })
   currentStepId: number;
 
   @Field(() => WorkflowStep, { nullable: true })

@@ -91,10 +91,19 @@ export class WorkflowActionLogsResolver {
     @Args('updateWorkflowActionLogInput')
     updateWorkflowActionLogInput: UpdateWorkflowActionLogInput,
   ) {
-    return this.workflowActionLogsService.update(
+    console.log('=== UPDATE WORKFLOW ACTION LOG MUTATION ===');
+    console.log('Mutation called with input:', updateWorkflowActionLogInput);
+    console.log('Calling service update method...');
+    
+    const result = this.workflowActionLogsService.update(
       updateWorkflowActionLogInput.id,
       updateWorkflowActionLogInput,
     );
+    
+    console.log('Service update method called');
+    console.log('=== MUTATION COMPLETE ===');
+    
+    return result;
   }
 
   @Mutation(() => Boolean, { description: 'Xóa workflow action log' })

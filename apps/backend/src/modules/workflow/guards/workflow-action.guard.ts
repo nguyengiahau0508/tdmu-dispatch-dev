@@ -9,6 +9,7 @@ import { WorkflowPermissionsService } from '../workflow-permissions/workflow-per
 import { WorkflowInstancesService } from '../workflow-instances/workflow-instances.service';
 import { WorkflowStepsService } from '../workflow-steps/workflow-steps.service';
 import { ActionType } from '../workflow-action-logs/entities/workflow-action-log.entity';
+import { User } from 'src/modules/users/entities/user.entity';
 
 @Injectable()
 export class WorkflowActionGuard implements CanActivate {
@@ -20,10 +21,11 @@ export class WorkflowActionGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
-    const { args, context: gqlContext } = ctx.getContext();
+    const { req } = ctx.getContext();
+    const args = ctx.getArgs();
     
     // Lấy user từ context
-    const user = gqlContext.req?.user;
+    const user = req?.user as User;
     if (!user) {
       throw new BadRequestException('User not authenticated');
     }

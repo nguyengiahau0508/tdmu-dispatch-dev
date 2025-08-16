@@ -107,23 +107,69 @@ export class WorkflowInstancesService {
   }
 
   async findOne(id: number): Promise<WorkflowInstance> {
-    const instance = await this.repository.findOne({
-      where: { id },
-      relations: [
-        'template',
-        'currentStep',
-        'createdByUser',
-        'logs',
-        'logs.actionByUser',
-        'logs.step',
-      ],
-    });
+    console.log('Finding workflow instance:', id);
+    
+    try {
+      // First, load the instance without relations to ensure basic data integrity
+      const basicInstance = await this.repository.findOne({
+        where: { id },
+      });
 
-    if (!instance) {
-      throw new NotFoundException(`Workflow instance with ID ${id} not found`);
+      if (!basicInstance) {
+        throw new NotFoundException(`Workflow instance with ID ${id} not found`);
+      }
+
+      console.log('Basic instance found:', {
+        id: basicInstance.id,
+        currentStepId: basicInstance.currentStepId,
+        status: basicInstance.status
+      });
+
+      // Then load with relations separately to avoid cascade issues
+      const instance = await this.repository.findOne({
+        where: { id },
+        relations: [
+          'template',
+          'currentStep',
+          'createdByUser',
+        ],
+      });
+
+      if (!instance) {
+        throw new NotFoundException(`Workflow instance with ID ${id} not found`);
+      }
+
+      // Load logs separately to avoid relation cascade issues
+      const logs = await this.workflowActionLogsService.findByInstanceId(id);
+      
+      // Validate logs to ensure instanceId is not null
+      const validLogs = logs.filter(log => {
+        if (!log.instanceId) {
+          console.error('Found log with null instanceId:', log);
+          return false;
+        }
+        return true;
+      });
+
+      // Assign logs to instance
+      instance.logs = validLogs;
+
+      console.log('Found workflow instance:', {
+        id: instance.id,
+        logsCount: instance.logs?.length,
+        logs: instance.logs?.map(log => ({
+          id: log.id,
+          instanceId: log.instanceId,
+          stepId: log.stepId,
+          actionType: log.actionType
+        }))
+      });
+
+      return instance;
+    } catch (error) {
+      console.error('Error in findOne:', error);
+      throw error;
     }
-
-    return instance;
   }
 
   async findByUser(userId: number): Promise<WorkflowInstance[]> {
@@ -172,11 +218,22 @@ export class WorkflowInstancesService {
     actionInput: WorkflowActionInput,
     user: User,
   ): Promise<WorkflowInstance> {
+    console.log('=== EXECUTE WORKFLOW ACTION START ===');
+    console.log('Executing workflow action:', {
+      instanceId: actionInput.instanceId,
+      stepId: actionInput.stepId,
+      actionType: actionInput.actionType,
+      userId: user.id
+    });
+
+    console.log('Finding workflow instance...');
     const instance = await this.findOne(actionInput.instanceId);
+    console.log('Finding current step...');
     const currentStep = await this.workflowStepsService.findOne(
       actionInput.stepId,
     );
 
+    console.log('Checking permissions...');
     // Validate user can perform action on this step using permissions service
     if (!this.workflowPermissionsService.canPerformAction(user, currentStep, actionInput.actionType)) {
       throw new BadRequestException(
@@ -184,7 +241,10 @@ export class WorkflowInstancesService {
       );
     }
 
+    console.log('Permissions check passed');
+
     // Log the action
+    console.log('Logging the action...');
     await this.workflowActionLogsService.logAction(
       actionInput.instanceId,
       actionInput.stepId,
@@ -193,53 +253,134 @@ export class WorkflowInstancesService {
       actionInput.note,
       actionInput.metadata,
     );
+    console.log('Action logged successfully');
 
     // Process the action
+    console.log('Processing the action...');
+    let result: WorkflowInstance;
     switch (actionInput.actionType) {
       case ActionType.APPROVE:
-        return this.handleApproveAction(instance, currentStep);
+        console.log('Handling APPROVE action...');
+        result = await this.handleApproveAction(instance, currentStep);
+        break;
       case ActionType.REJECT:
-        return this.handleRejectAction(instance);
+        console.log('Handling REJECT action...');
+        result = await this.handleRejectAction(instance);
+        break;
       case ActionType.TRANSFER:
-        return this.handleTransferAction(instance, currentStep, actionInput);
+        console.log('Handling TRANSFER action...');
+        result = await this.handleTransferAction(instance, currentStep, actionInput);
+        break;
       case ActionType.CANCEL:
-        return this.handleCancelAction(instance);
+        console.log('Handling CANCEL action...');
+        result = await this.handleCancelAction(instance);
+        break;
       case ActionType.COMPLETE:
-        return this.handleCompleteAction(instance);
+        console.log('Handling COMPLETE action...');
+        result = await this.handleCompleteAction(instance);
+        break;
       default:
         throw new BadRequestException('Invalid action type');
     }
+
+    console.log('=== EXECUTE WORKFLOW ACTION COMPLETE ===');
+    return result;
   }
 
   private async handleApproveAction(
     instance: WorkflowInstance,
     currentStep: any,
   ): Promise<WorkflowInstance> {
+    console.log('Handling approve action for instance:', instance.id);
+    
     // Find next step
     const nextStep = await this.workflowStepsService.findNextStep(
       currentStep.id,
     );
 
+    console.log('Next step found:', nextStep?.id || 'No next step');
+
     if (nextStep) {
       // Move to next step
-      instance.currentStepId = nextStep.id;
-      await this.repository.save(instance);
+      console.log('Moving to next step:', nextStep.id);
+      console.log('Instance before update:', {
+        id: instance.id,
+        currentStepId: instance.currentStepId,
+        logsCount: instance.logs?.length
+      });
+      
+      // Update only the necessary fields to avoid relation issues
+      const updateData = {
+        currentStepId: nextStep.id,
+        updatedAt: new Date()
+      };
+      
+      console.log('About to save instance with new step...');
+      try {
+        // Use update instead of save to avoid relation loading issues
+        await this.repository.update(instance.id, updateData);
+        console.log('Instance updated with new step successfully');
+      } catch (error) {
+        console.error('Error updating instance:', error);
+        throw error;
+      }
     } else {
       // No next step, complete workflow
-      instance.status = WorkflowStatus.COMPLETED;
-      instance.currentStepId = 0;
-      await this.repository.save(instance);
+      console.log('Completing workflow');
+      console.log('Instance before completion:', {
+        id: instance.id,
+        currentStepId: instance.currentStepId,
+        status: instance.status,
+        logsCount: instance.logs?.length
+      });
+      
+      const updateData = {
+        status: WorkflowStatus.COMPLETED,
+        currentStepId: undefined, // Use undefined instead of null
+        updatedAt: new Date()
+      };
+      
+      console.log('About to save instance as completed...');
+      try {
+        // Use update instead of save to avoid relation loading issues
+        await this.repository.update(instance.id, updateData);
+        console.log('Instance updated as completed successfully');
+      } catch (error) {
+        console.error('Error updating instance as completed:', error);
+        throw error;
+      }
     }
 
-    return this.findOne(instance.id);
+    console.log('About to return updated instance...');
+    try {
+      // Load fresh instance with relations after update
+      const updatedInstance = await this.findOne(instance.id);
+      console.log('Successfully returned updated instance');
+      return updatedInstance;
+    } catch (error) {
+      console.error('Error returning updated instance:', error);
+      throw error;
+    }
   }
 
   private async handleRejectAction(
     instance: WorkflowInstance,
   ): Promise<WorkflowInstance> {
-    instance.status = WorkflowStatus.REJECTED;
-    await this.repository.save(instance);
-    return this.findOne(instance.id);
+    console.log('Handling reject action for instance:', instance.id);
+    
+    const updateData = {
+      status: WorkflowStatus.REJECTED,
+      updatedAt: new Date()
+    };
+    
+    try {
+      await this.repository.update(instance.id, updateData);
+      console.log('Instance rejected successfully');
+      return this.findOne(instance.id);
+    } catch (error) {
+      console.error('Error rejecting instance:', error);
+      throw error;
+    }
   }
 
   private async handleTransferAction(
@@ -255,18 +396,42 @@ export class WorkflowInstancesService {
   private async handleCancelAction(
     instance: WorkflowInstance,
   ): Promise<WorkflowInstance> {
-    instance.status = WorkflowStatus.CANCELLED;
-    await this.repository.save(instance);
-    return this.findOne(instance.id);
+    console.log('Handling cancel action for instance:', instance.id);
+    
+    const updateData = {
+      status: WorkflowStatus.CANCELLED,
+      updatedAt: new Date()
+    };
+    
+    try {
+      await this.repository.update(instance.id, updateData);
+      console.log('Instance cancelled successfully');
+      return this.findOne(instance.id);
+    } catch (error) {
+      console.error('Error cancelling instance:', error);
+      throw error;
+    }
   }
 
   private async handleCompleteAction(
     instance: WorkflowInstance,
   ): Promise<WorkflowInstance> {
-    instance.status = WorkflowStatus.COMPLETED;
-    instance.currentStepId = 0;
-    await this.repository.save(instance);
-    return this.findOne(instance.id);
+    console.log('Handling complete action for instance:', instance.id);
+    
+    const updateData = {
+      status: WorkflowStatus.COMPLETED,
+      currentStepId: undefined, // Use undefined instead of null
+      updatedAt: new Date()
+    };
+    
+    try {
+      await this.repository.update(instance.id, updateData);
+      console.log('Instance completed successfully');
+      return this.findOne(instance.id);
+    } catch (error) {
+      console.error('Error completing instance:', error);
+      throw error;
+    }
   }
 
   async getWorkflowHistory(instanceId: number): Promise<WorkflowInstance> {
