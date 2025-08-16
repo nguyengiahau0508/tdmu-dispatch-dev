@@ -14,6 +14,13 @@
           <span class="notification-badge">{{ pendingWorkflowCount }}</span>
         }
       </div>
+      <div class="sidebar__menu-item" routerLink="/document-processing" routerLinkActive="active" (click)="refreshPendingDocumentCount()">
+        <img src="/icons/grading.svg" alt="" title="Xử lý văn bản">
+        <span class="sidebar__tooltip">Xử lý văn bản</span>
+        @if (pendingDocumentCount > 0) {
+          <span class="notification-badge">{{ pendingDocumentCount }}</span>
+        }
+      </div>
       <div class="sidebar__menu-item" routerLink="/all-documents" routerLinkActive="active">
         <img src="/icons/attach_email.svg" alt="" title="Tất cả công văn">
         <span class="sidebar__tooltip">Tất cả công văn</span>

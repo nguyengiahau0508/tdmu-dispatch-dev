@@ -979,17 +979,237 @@ type GetDocumentResponse {
   metadata: Metadata!
 }
 
-type RemoveDocumentOutput {
+type RemoveDocumentData {
   """Kết quả xóa"""
   success: Boolean!
 }
 
-type RemoveDocumentResponse {
-  """Dữ liệu trả về"""
-  data: RemoveDocumentOutput
-
+type RemoveDocumentOutput {
   """Thông tin metadata của response"""
   metadata: Metadata!
+
+  """Dữ liệu trả về"""
+  data: RemoveDocumentData!
+}
+
+type AssignWorkflowData {
+  """ID của document"""
+  documentId: Int!
+
+  """ID của workflow instance"""
+  workflowInstanceId: Int!
+
+  """Trạng thái workflow"""
+  workflowStatus: String!
+
+  """Bước hiện tại"""
+  currentStep: String
+
+  """Thông báo"""
+  message: String!
+}
+
+type AssignWorkflowOutput {
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+
+  """Dữ liệu trả về"""
+  data: AssignWorkflowData!
+}
+
+type RemoveWorkflowData {
+  """ID của document"""
+  documentId: Int!
+
+  """Thông báo"""
+  message: String!
+}
+
+type RemoveWorkflowOutput {
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+
+  """Dữ liệu trả về"""
+  data: RemoveWorkflowData!
+}
+
+type DocumentNeedingWorkflow {
+  """ID của document"""
+  id: Int!
+
+  """Tiêu đề document"""
+  title: String!
+
+  """Loại document"""
+  documentType: DocumentTypeEnum!
+
+  """Trạng thái document"""
+  status: String
+
+  """Tên category"""
+  documentCategory: String
+
+  """Thời gian tạo"""
+  createdAt: DateTime!
+}
+
+type DocumentsNeedingWorkflowResponse {
+  """Danh sách documents"""
+  documents: [DocumentNeedingWorkflow!]!
+}
+
+type DocumentWorkflowInfo {
+  """ID của document"""
+  documentId: Int!
+
+  """Tiêu đề document"""
+  documentTitle: String!
+
+  """Loại document"""
+  documentType: String!
+
+  """ID của workflow instance"""
+  workflowInstanceId: Int
+
+  """Trạng thái workflow"""
+  workflowStatus: String
+
+  """Bước hiện tại"""
+  currentStep: String
+
+  """Có workflow đang hoạt động không"""
+  hasActiveWorkflow: Boolean!
+}
+
+type SuitableWorkflowTemplate {
+  """ID của template"""
+  id: Int!
+
+  """Tên template"""
+  name: String!
+
+  """Mô tả template"""
+  description: String
+
+  """Template có đang hoạt động không"""
+  isActive: Boolean!
+}
+
+type SuitableWorkflowTemplatesResponse {
+  """Danh sách templates"""
+  templates: [SuitableWorkflowTemplate!]!
+}
+
+type DocumentProcessingInfo {
+  """ID của document"""
+  documentId: Int!
+
+  """Tiêu đề document"""
+  documentTitle: String!
+
+  """Loại document"""
+  documentType: String!
+
+  """Category của document"""
+  documentCategory: String!
+
+  """Trạng thái document"""
+  status: String!
+
+  """Thời gian tạo"""
+  createdAt: DateTime!
+
+  """ID của workflow instance"""
+  workflowInstanceId: Int
+
+  """ID của step hiện tại"""
+  currentStepId: Int
+
+  """Tên step hiện tại"""
+  currentStepName: String
+
+  """Trạng thái workflow"""
+  workflowStatus: String
+
+  """Cần xử lý không"""
+  requiresAction: Boolean!
+
+  """Loại action có sẵn"""
+  actionType: String
+
+  """Deadline"""
+  deadline: DateTime
+
+  """Mức độ ưu tiên"""
+  priority: PriorityEnum!
+}
+
+"""Mức độ ưu tiên của document"""
+enum PriorityEnum {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+type DocumentsForProcessingResponse {
+  """Danh sách documents cần xử lý"""
+  documents: [DocumentProcessingInfo!]!
+}
+
+type ProcessedDocumentsResponse {
+  """Danh sách documents đã xử lý"""
+  documents: [DocumentProcessingInfo!]!
+}
+
+type ProcessingStatistics {
+  """Tổng số documents"""
+  totalDocuments: Int!
+
+  """Số documents đang chờ xử lý"""
+  pendingCount: Int!
+
+  """Số documents đã hoàn thành"""
+  completedCount: Int!
+
+  """Số documents đang xử lý"""
+  inProgressCount: Int!
+
+  """Tỷ lệ hoàn thành (%)"""
+  completionRate: Float!
+}
+
+type ProcessingStatisticsResponse {
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+
+  """Thống kê xử lý"""
+  data: ProcessingStatistics!
+}
+
+type ProcessDocumentData {
+  """ID của document"""
+  documentId: Int!
+
+  """ID của workflow instance"""
+  workflowInstanceId: Int!
+
+  """Loại action đã thực hiện"""
+  actionType: String!
+
+  """Thông báo kết quả"""
+  message: String!
+
+  """Trạng thái workflow sau khi xử lý"""
+  workflowStatus: String!
+}
+
+type ProcessDocumentOutput {
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+
+  """Dữ liệu kết quả xử lý"""
+  data: ProcessDocumentData!
 }
 
 type GetDocumentCategoriesPaginatedResponse {
@@ -1030,6 +1250,51 @@ type RemoveDocumentCategoryResponse {
 
   """Thông tin metadata của response"""
   metadata: Metadata!
+}
+
+type StepTypeDto {
+  value: String!
+  label: String!
+}
+
+type RoleDto {
+  value: String!
+  label: String!
+}
+
+type WorkflowPermissionDto {
+  instanceId: Int!
+  stepId: Int!
+  actionType: String!
+  canPerform: Boolean!
+  reason: String
+}
+
+type WorkflowViewPermissionDto {
+  instanceId: Int!
+  canView: Boolean!
+  reason: String
+}
+
+type WorkflowCreatePermissionDto {
+  templateId: Int!
+  canCreate: Boolean!
+  reason: String
+}
+
+type AvailableActionsDto {
+  stepId: Int!
+  availableActions: [String!]!
+}
+
+type RoleLabelDto {
+  role: String!
+  label: String!
+}
+
+type ActionTypeLabelDto {
+  actionType: String!
+  label: String!
 }
 
 type DocumentType {
@@ -1100,51 +1365,6 @@ type UpdateDocumentTypeResponse {
 
   """Thông tin metadata của response"""
   metadata: Metadata!
-}
-
-type StepTypeDto {
-  value: String!
-  label: String!
-}
-
-type RoleDto {
-  value: String!
-  label: String!
-}
-
-type WorkflowPermissionDto {
-  instanceId: Int!
-  stepId: Int!
-  actionType: String!
-  canPerform: Boolean!
-  reason: String
-}
-
-type WorkflowViewPermissionDto {
-  instanceId: Int!
-  canView: Boolean!
-  reason: String
-}
-
-type WorkflowCreatePermissionDto {
-  templateId: Int!
-  canCreate: Boolean!
-  reason: String
-}
-
-type AvailableActionsDto {
-  stepId: Int!
-  availableActions: [String!]!
-}
-
-type RoleLabelDto {
-  role: String!
-  label: String!
-}
-
-type ActionTypeLabelDto {
-  actionType: String!
-  label: String!
 }
 
 type Query {
@@ -1286,6 +1506,33 @@ type Query {
   actionTypeLabel(actionType: String!): String!
   documents(input: GetDocumentsPaginatedInput!): GetDocumentsPaginatedResponse!
   document(id: Int!): GetDocumentResponse!
+
+  """Lấy danh sách documents cần gán workflow"""
+  documentsNeedingWorkflow: DocumentsNeedingWorkflowResponse!
+
+  """Lấy thông tin workflow của document"""
+  documentWorkflowInfo(documentId: Int!): DocumentWorkflowInfo!
+
+  """Lấy danh sách workflow templates phù hợp"""
+  suitableWorkflowTemplates(documentType: String!): SuitableWorkflowTemplatesResponse!
+
+  """Lấy danh sách documents với workflow status"""
+  documentsWithWorkflowStatus: [DocumentWorkflowInfo!]!
+
+  """Lấy danh sách documents cần xử lý"""
+  documentsForProcessing: DocumentsForProcessingResponse!
+
+  """Lấy danh sách documents đã xử lý"""
+  processedDocuments: ProcessedDocumentsResponse!
+
+  """Lấy thống kê xử lý document"""
+  processingStatistics: ProcessingStatisticsResponse!
+
+  """Lấy documents theo priority"""
+  documentsByPriority(priority: String!): DocumentsForProcessingResponse!
+
+  """Lấy documents sắp hết hạn"""
+  urgentDocuments: DocumentsForProcessingResponse!
   documentCategories(input: GetDocumentCategoriesPaginatedInput!): GetDocumentCategoriesPaginatedResponse!
   documentCategory(id: Int!): GetDocumentCategoryResponse!
   allDocumentCategories: [DocumentCategory!]!
@@ -1563,8 +1810,16 @@ type Mutation {
   removeWorkflowTemplate(id: Int!): Boolean!
   createDocument(createDocumentInput: CreateDocumentInput!, file: Upload): GetDocumentResponse!
   updateDocument(updateDocumentInput: UpdateDocumentInput!): GetDocumentResponse!
-  removeDocument(id: Int!): RemoveDocumentResponse!
-  testFileUpload(file: Upload!): String!
+  removeDocument(id: Int!): RemoveDocumentOutput!
+
+  """Gán workflow cho document"""
+  assignWorkflowToDocument(documentId: Int!, templateId: Int!, notes: String): AssignWorkflowOutput!
+
+  """Xóa workflow khỏi document"""
+  removeWorkflowFromDocument(documentId: Int!): RemoveWorkflowOutput!
+
+  """Xử lý document action"""
+  processDocumentAction(input: DocumentActionInput!): ProcessDocumentOutput!
   createDocumentCategory(createDocumentCategoryInput: CreateDocumentCategoryInput!): GetDocumentCategoryResponse!
   updateDocumentCategory(updateDocumentCategoryInput: UpdateDocumentCategoryInput!): GetDocumentCategoryResponse!
   removeDocumentCategory(id: Int!): RemoveDocumentCategoryResponse!
@@ -1989,6 +2244,20 @@ input UpdateDocumentInput {
   """Trạng thái"""
   status: String
   id: Int!
+}
+
+input DocumentActionInput {
+  """ID của document"""
+  documentId: Int!
+
+  """Loại action"""
+  actionType: ActionType!
+
+  """Ghi chú"""
+  notes: String
+
+  """ID user chuyển tiếp (cho TRANSFER action)"""
+  transferToUserId: Int
 }
 
 input CreateDocumentCategoryInput {

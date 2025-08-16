@@ -7,6 +7,7 @@ import { AppsLauncher } from '../components/apps-launcher/apps-launcher';
 import { AuthService } from '../../core/services/auth.service';
 import { FileService } from '../../core/services/file.service';
 import { WorkflowApolloService } from '../../features/user/workflow/services/workflow-apollo.service';
+import { DocumentProcessingApolloService } from '../../features/user/document-processing/services/document-processing-apollo.service';
 
 @Component({
   selector: 'app-main-layout',
@@ -23,6 +24,7 @@ export class MainLayout implements OnInit, OnDestroy {
 
   avatarUrl: string | null = null
   pendingWorkflowCount = 0;
+  pendingDocumentCount = 0;
   private subscriptions = new Subscription();
   constructor(
     private renderer: Renderer2,
@@ -30,7 +32,8 @@ export class MainLayout implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private fileService: FileService,
-    private workflowApolloService: WorkflowApolloService
+    private workflowApolloService: WorkflowApolloService,
+    private documentProcessingApolloService: DocumentProcessingApolloService
   ) {
     const storedTheme = localStorage.getItem('theme');
     this.isDarkMode = storedTheme === 'dark';
@@ -52,10 +55,12 @@ export class MainLayout implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadPendingWorkflowCount();
+    this.loadPendingDocumentCount();
     
-    // Auto-refresh pending workflow count every 30 seconds
+    // Auto-refresh pending counts every 30 seconds
     setInterval(() => {
       this.loadPendingWorkflowCount();
+      this.loadPendingDocumentCount();
     }, 30000);
   }
 
@@ -72,6 +77,20 @@ export class MainLayout implements OnInit, OnDestroy {
         error: (error) => {
           console.error('Error loading pending workflows:', error);
           this.pendingWorkflowCount = 0;
+        }
+      })
+    );
+  }
+
+  private loadPendingDocumentCount(): void {
+    this.subscriptions.add(
+      this.documentProcessingApolloService.getPendingDocumentCount().subscribe({
+        next: (count) => {
+          this.pendingDocumentCount = count;
+        },
+        error: (error) => {
+          console.error('Error loading pending document count:', error);
+          this.pendingDocumentCount = 0;
         }
       })
     );
@@ -105,5 +124,9 @@ export class MainLayout implements OnInit, OnDestroy {
 
   refreshPendingWorkflowCount(): void {
     this.loadPendingWorkflowCount();
+  }
+
+  refreshPendingDocumentCount(): void {
+    this.loadPendingDocumentCount();
   }
 }
