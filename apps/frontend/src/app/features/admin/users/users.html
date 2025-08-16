@@ -1,21 +1,21 @@
 <div class="users">
   <div class="users__header">
     <div class="header__group">
-      <div class="header__search">
-        <input type="text" placeholder="Tìm loại đơn vị..." />
+      <div class="header__title">
+        <h2>Quản lý người dùng</h2>
+        
       </div>
-      <div class="header__add">
-        <button (click)="toggleUserCreate()">
-          <img src="/icons/add.svg" alt="Thêm" />
-          Thêm
-        </button>
-      </div>
+      <button class="btn btn-primary" (click)="toggleUserCreate()">
+        <span class="btn-icon">+</span>
+        Thêm người dùng
+      </button>
     </div>
     <div class="header__group header__group--block">
       <app-pagination [totalCount]="totalCount || 0" [pageOptions]="pageOptions" (pageChange)="onPageChange($event)"
         (pageSizeChange)="onPageSizeChange($event)" (orderChange)="onOrderChange($event)"></app-pagination>
     </div>
   </div>
+  
   <div class="users__main">
     @if (users.length > 0) {
     <table class="users__table">
@@ -45,13 +45,17 @@
             </div>
           </td>
           <td>
-            {{user.fullName}}
+            <div class="user-name">
+              <span class="name">{{ user.fullName }}</span>
+            </div>
           </td>
           <td>
-            {{user.email}}
+            <span class="user-email">{{ user.email }}</span>
           </td>
           <td>
-            {{user.isActive ? 'Hoạt động': 'Bị khóa'}}
+            <span class="status-badge" [class]="user.isActive ? 'status-active' : 'status-inactive'">
+              {{ user.isActive ? 'Hoạt động' : 'Bị khóa' }}
+            </span>
           </td>
           <td>
             {{ user.createdAt | date:'dd/MM/yyyy' }}
@@ -62,11 +66,26 @@
 
               @if (selectedMenuId === user.id) {
               <div class="dropdown-menu" (mouseleave)="toggleMenu(user.id)">
-                <button (click)="onViewDetailUser(user)">Xem chi tiết</button>
-                <button (click)="onUpdateUser(user)">Cập nhật thông tin</button>
-                <button (click)="onBlockUserAccount(user)">Khóa tài khoản</button>
-                <button (click)="onManageUserRole(user)">Phân quyền</button>
-                <button (click)="onManageUserPosition(user)">Chức danh </button>
+                <button class="menu-item" (click)="onViewDetailUser(user)">
+                  <span class="btn-icon">👁️</span>
+                  Xem chi tiết
+                </button>
+                <button class="menu-item" (click)="onUpdateUser(user)">
+                  <span class="btn-icon">✏️</span>
+                  Cập nhật thông tin
+                </button>
+                <button class="menu-item" (click)="onBlockUserAccount(user)">
+                  <span class="btn-icon">🔒</span>
+                  Khóa tài khoản
+                </button>
+                <button class="menu-item" (click)="onManageUserRole(user)">
+                  <span class="btn-icon">👥</span>
+                  Phân quyền
+                </button>
+                <button class="menu-item" (click)="onManageUserPosition(user)">
+                  <span class="btn-icon">🏢</span>
+                  Chức danh
+                </button>
               </div>
               }
             </div>
@@ -76,7 +95,13 @@
       </tbody>
     </table>
     } @else {
-    <p>Chưa có dữ liệu loại đơn vị.</p>
+    <div class="empty-state">
+      <span class="empty-icon">👥</span>
+      <p>Chưa có người dùng nào.</p>
+      <button class="btn btn-primary" (click)="toggleUserCreate()">
+        Tạo người dùng đầu tiên
+      </button>
+    </div>
     }
   </div>
 </div>

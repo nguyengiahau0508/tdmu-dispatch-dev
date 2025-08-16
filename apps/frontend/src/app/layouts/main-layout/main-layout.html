@@ -7,8 +7,15 @@
 
     <!-- Menu chính -->
     <div class="sidebar__menu">
+      <div class="sidebar__menu-item" routerLink="/workflow" routerLinkActive="active" (click)="refreshPendingWorkflowCount()">
+        <img src="/icons/conversion_path.svg" alt="" title="Quy trình xử lý">
+        <span class="sidebar__tooltip">Quy trình xử lý</span>
+        @if (pendingWorkflowCount > 0) {
+          <span class="notification-badge">{{ pendingWorkflowCount }}</span>
+        }
+      </div>
       <div class="sidebar__menu-item" routerLink="/all-documents" routerLinkActive="active">
-        <img src="/icons/documents.svg" alt="" title="Tất cả công văn">
+        <img src="/icons/attach_email.svg" alt="" title="Tất cả công văn">
         <span class="sidebar__tooltip">Tất cả công văn</span>
       </div>
       <div class="sidebar__menu-item" routerLink="/incoming-documents" routerLinkActive="active">
@@ -18,10 +25,6 @@
       <div class="sidebar__menu-item" routerLink="/outgoing-documents" routerLinkActive="active">
         <img src="/icons/outgoing.svg" alt="" title="Công văn đi">
         <span class="sidebar__tooltip">Công văn đi</span>
-      </div>
-      <div class="sidebar__menu-item" routerLink="/workflow-instances" routerLinkActive="active">
-        <img src="/icons/workflow.svg" alt="" title="Quy trình xử lý">
-        <span class="sidebar__tooltip">Quy trình xử lý</span>
       </div>
     </div>
 

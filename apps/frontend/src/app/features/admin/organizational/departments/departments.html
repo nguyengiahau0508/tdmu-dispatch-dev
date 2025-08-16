@@ -1,13 +1,16 @@
 <div class="departments">
   <div class="departments__header">
     <div class="header__group">
+      <!-- <div class="header__title">
+        <h2>Quản lý phòng ban</h2>
+      </div> -->
       <div class="header__search">
         <input type="text" placeholder="Tìm phòng ban..." />
       </div>
       <div class="header__add">
-        <button (click)="toggleCreateDepartment()">
-          <img src="/icons/add.svg" alt="Thêm" />
-          Thêm
+        <button class="btn btn-primary" (click)="toggleCreateDepartment()">
+          <span class="btn-icon">+</span>
+          Thêm phòng ban
         </button>
       </div>
     </div>
@@ -25,6 +28,7 @@
              <th>ID</th>
              <th>Tên phòng ban</th>
              <th>Phòng ban cha</th>
+             <th>Trạng thái</th>
              <th></th>
            </tr>
          </thead>
@@ -33,20 +37,32 @@
            @for (department of departments; track department.id) {
            <tr class="department-row">
              <td>{{ department.id }}</td>
-             <td [title]="department.name" class="department-name-cell">
-               {{ department.name }}
+             <td class="department-name-cell">
+               <div class="department-name">{{ department.name }}</div>
+               <div class="department-description">{{ department.description || 'Không có mô tả' }}</div>
              </td>
              <td>{{ department.parentDepartment?.name || '-' }}</td>
-
+             <td>
+               <span class="status-badge status-active">Hoạt động</span>
+             </td>
              <td class="row-actions">
                <div class="actions-menu">
                  <button class="menu-button" (click)="toggleMenu(department.id)">⋮</button>
 
                  @if (selectedMenuId === department.id) {
                  <div class="dropdown-menu" (mouseleave)="toggleMenu(department.id)">
-                   <button (click)="onEditDepartment(department)">Cập nhật thông tin</button>
-                    <button (click)="onManagePositions(department)">Quản lí chức vụ</button>
-                   <button (click)="onDeleteDepartment(department)">Xóa</button>
+                   <button class="menu-item" (click)="onEditDepartment(department)">
+                     <span class="btn-icon">✏️</span>
+                     Chỉnh sửa
+                   </button>
+                   <button class="menu-item" (click)="onManagePositions(department)">
+                     <span class="btn-icon">👥</span>
+                     Quản lý chức vụ
+                   </button>
+                   <button class="menu-item" (click)="onDeleteDepartment(department)">
+                     <span class="btn-icon">🗑️</span>
+                     Xóa
+                   </button>
                  </div>
                  }
                </div>
@@ -56,7 +72,14 @@
          </tbody>
        </table>
     } @else {
-    <p>Chưa có dữ liệu phòng ban.</p>
+    <div class="empty-state">
+      <span class="empty-icon">🏢</span>
+      <p>Chưa có dữ liệu phòng ban.</p>
+      <button class="btn btn-primary" (click)="toggleCreateDepartment()">
+        <span class="btn-icon">+</span>
+        Thêm phòng ban đầu tiên
+      </button>
+    </div>
     }
   </div>
 </div>

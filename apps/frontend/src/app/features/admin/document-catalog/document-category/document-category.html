@@ -1,12 +1,15 @@
 <div class="document-categories">
   <div class="document-categories__header">
     <div class="header__group">
+      <!-- <div class="header__title">
+        <h2>Quản lý phân loại công văn</h2>
+      </div> -->
       <div class="header__search">
         <input type="text" placeholder="Tìm nhóm văn bản..." />
       </div>
       <div class="header__add">
-        <button (click)="toggleCreate()">
-          <img src="/icons/add.svg" alt="Thêm" />
+        <button class="btn btn-primary" (click)="toggleCreate()">
+          <span class="btn-icon">+</span>
           Thêm nhóm văn bản
         </button>
       </div>
@@ -25,22 +28,35 @@
           <th>ID</th>
           <th>Tên nhóm văn bản</th>
           <th>Mô tả</th>
+          <th>Trạng thái</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
         @for (category of documentCategories; track category.id) {
-        <tr class="document-category-row">
+        <tr class="category-row">
           <td>{{ category.id }}</td>
-          <td>{{ category.name }}</td>
-          <td>{{ category.description }}</td>
+          <td class="category-name-cell">
+            <div class="category-name">{{ category.name }}</div>
+            <div class="category-description">{{ category.description || 'Không có mô tả' }}</div>
+          </td>
+          <td>{{ category.description || '-' }}</td>
+          <td>
+            <span class="status-badge status-active">Hoạt động</span>
+          </td>
           <td class="row-actions">
             <div class="actions-menu">
               <button class="menu-button" (click)="toggleMenu(category.id)">⋮</button>
               @if (selectedMenuId === category.id) {
               <div class="dropdown-menu" (mouseleave)="toggleMenu(category.id)">
-                <button (click)="onEdit(category)">Sửa</button>
-                <button (click)="onDelete(category)">Xóa</button>
+                <button class="menu-item" (click)="onEdit(category)">
+                  <span class="btn-icon">✏️</span>
+                  Chỉnh sửa
+                </button>
+                <button class="menu-item" (click)="onDelete(category)">
+                  <span class="btn-icon">🗑️</span>
+                  Xóa
+                </button>
               </div>
               }
             </div>
@@ -50,7 +66,14 @@
       </tbody>
     </table>
     } @else {
-    <p>Chưa có dữ liệu nhóm văn bản.</p>
+    <div class="empty-state">
+      <span class="empty-icon">📁</span>
+      <p>Chưa có dữ liệu nhóm văn bản.</p>
+      <button class="btn btn-primary" (click)="toggleCreate()">
+        <span class="btn-icon">+</span>
+        Thêm nhóm văn bản đầu tiên
+      </button>
+    </div>
     }
   </div>
 </div>

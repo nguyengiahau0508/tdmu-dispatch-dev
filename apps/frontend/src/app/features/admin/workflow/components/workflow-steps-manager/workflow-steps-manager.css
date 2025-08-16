@@ -11,7 +11,7 @@
 
 .steps-header h3 {
   margin: 0;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .steps-list {
@@ -21,15 +21,15 @@
 }
 
 .step-item {
-  background: white;
-  border: 1px solid #e0e0e0;
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 16px;
   transition: all 0.2s ease;
 }
 
 .step-item:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-default);
 }
 
 .step-content {
@@ -48,8 +48,8 @@
 .step-order {
   width: 40px;
   height: 40px;
-  background: #007bff;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -60,12 +60,12 @@
 
 .step-details h4 {
   margin: 0 0 4px 0;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .step-details p {
   margin: 0 0 8px 0;
-  color: #666;
+  color: var(--color-text-secondary);
   font-size: 14px;
 }
 
@@ -75,11 +75,11 @@
 }
 
 .step-type, .step-role {
-  background: #f8f9fa;
+  background: var(--color-background-secondary);
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
-  color: #666;
+  color: var(--color-text-secondary);
 }
 
 .step-actions {
@@ -99,16 +99,18 @@
   background: transparent;
   cursor: pointer;
   font-size: 16px;
+  color: var(--color-text-secondary);
 }
 
 .btn-icon:hover {
-  background: #f8f9fa;
+  background: var(--color-background-secondary);
+  color: var(--color-primary);
 }
 
 .empty-state {
   text-align: center;
   padding: 40px;
-  color: #666;
+  color: var(--color-text-secondary);
 }
 
 .empty-icon {
@@ -131,7 +133,7 @@
 }
 
 .modal-content {
-  background: white;
+  background: var(--color-background-primary);
   border-radius: 8px;
   width: 90%;
   max-width: 500px;
@@ -144,11 +146,24 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .modal-header h3 {
   margin: 0;
+  color: var(--color-text-primary);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+}
+
+.close-btn:hover {
+  color: var(--color-text-primary);
 }
 
 .modal-body {
@@ -163,21 +178,23 @@
   display: block;
   margin-bottom: 6px;
   font-weight: 500;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .form-control {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   font-size: 14px;
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-primary);
 }
 
 .form-control:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 25%, transparent);
 }
 
 .error-message {
@@ -191,6 +208,7 @@
   align-items: center;
   gap: 8px;
   cursor: pointer;
+  color: var(--color-text-primary);
 }
 
 .modal-footer {
@@ -198,7 +216,7 @@
   justify-content: flex-end;
   gap: 12px;
   padding: 20px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--color-border);
 }
 
 .btn {
@@ -214,21 +232,21 @@
 }
 
 .btn-primary {
-  background: #007bff;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
 }
 
 .btn-primary:hover {
-  background: #0056b3;
+  background: color-mix(in srgb, var(--color-primary) 80%, black);
 }
 
 .btn-secondary {
-  background: #6c757d;
-  color: white;
+  background: var(--color-text-secondary);
+  color: var(--color-text-on-primary);
 }
 
 .btn-secondary:hover {
-  background: #545b62;
+  background: color-mix(in srgb, var(--color-text-secondary) 80%, black);
 }
 
 .btn-danger {
@@ -243,4 +261,6 @@
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  background: var(--color-background-disabled);
+  color: var(--color-text-secondary);
 }

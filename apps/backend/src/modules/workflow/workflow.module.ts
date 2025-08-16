@@ -2,6 +2,7 @@ import { WorkflowTemplatesModule } from './workflow-templates/workflow-templates
 import { WorkflowStepsModule } from './workflow-steps/workflow-steps.module';
 import { WorkflowInstancesModule } from './workflow-instances/workflow-instances.module';
 import { WorkflowActionLogsModule } from './workflow-action-logs/workflow-action-logs.module';
+import { WorkflowPermissionsModule } from './workflow-permissions/workflow-permissions.module';
 import { Module } from '@nestjs/common';
 
 @Module({
@@ -10,6 +11,7 @@ import { Module } from '@nestjs/common';
     WorkflowInstancesModule,
     WorkflowStepsModule,
     WorkflowTemplatesModule,
+    WorkflowPermissionsModule,
   ],
 })
 export class WorkflowModule {}

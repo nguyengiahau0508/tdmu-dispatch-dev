@@ -2,7 +2,7 @@
 .user-poitions__backdrop {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -11,9 +11,135 @@
   box-sizing: border-box;
 }
 
-.actions{
-  margin-top: 5px;
+/* ===== Container chính ===== */
+.user-poitions {
+  background-color: var(--color-background-primary);
+  padding: 2.5rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow-default);
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===== Form ===== */
+.positions-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.positions-form__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.positions-form__subtitle {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group__label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.form-group__select {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.95rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  box-sizing: border-box;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group__select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
+/* ===== Actions ===== */
+.actions {
+  margin-top: 1rem;
   display: flex;
   justify-content: flex-end;
+  gap: 1rem;
+}
+
+.positions-form__submit-button,
+.positions-form__cancel-button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.positions-form__submit-button {
+  background-color: var(--color-primary);
+  color: var(--color-text-on-primary);
+}
+
+.positions-form__submit-button:hover {
+  background: color-mix(in srgb, var(--color-primary) 80%, black);
+}
+
+.positions-form__submit-button:active {
+  transform: scale(0.98);
+}
+
+.positions-form__cancel-button {
+  background-color: var(--color-text-secondary);
+  color: var(--color-text-on-primary);
+}
+
+.positions-form__cancel-button:hover {
+  background: color-mix(in srgb, var(--color-text-secondary) 80%, black);
+}
+
+/* ===== Responsive nhỏ gọn ===== */
+@media (max-width: 640px) {
+  .user-poitions {
+    padding: 1.5rem;
+  }
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .positions-form__submit-button,
+  .positions-form__cancel-button {
+    width: 100%;
+  }
 }
 

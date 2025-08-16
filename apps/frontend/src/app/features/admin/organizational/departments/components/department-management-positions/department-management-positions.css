@@ -1,8 +1,8 @@
-/* ===== Backdrop (Warp ngoài) ===== */
+/* ===== Backdrop (Wrapper ngoài) ===== */
 .department-management-positions__backdrop {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -11,7 +11,148 @@
   box-sizing: border-box;
 }
 
-.department-management-positions_action{  
+/* ===== Container chính ===== */
+.department-management-positions {
+  background-color: var(--color-background-primary);
+  padding: 2.5rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow-default);
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===== Form ===== */
+.department-management-positions__form {
+  display: flex;
+  flex-direction: column;
+}
+
+.department-management-positions__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.department-management-positions__subtitle {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+/* ===== Group Input ===== */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group__label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.form-group__input,
+.form-group__textarea,
+.form-group__select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  box-sizing: border-box;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group__input:focus,
+.form-group__textarea:focus,
+.form-group__select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
+.form-group__textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* ===== Action Buttons ===== */
+.department-management-positions__actions {
   display: flex;
   justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.department-management-positions__submit-button,
+.department-management-positions__cancel-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+/* Nút "Lưu" */
+.department-management-positions__submit-button {
+  background-color: var(--color-primary);
+  color: var(--color-text-on-primary);
+}
+
+.department-management-positions__submit-button:hover {
+  background: color-mix(in srgb, var(--color-primary) 80%, black);
+}
+
+.department-management-positions__submit-button:active {
+  transform: scale(0.98);
+}
+
+/* Nút "Hủy" */
+.department-management-positions__cancel-button {
+  background-color: var(--color-text-secondary);
+  color: var(--color-text-on-primary);
+}
+
+.department-management-positions__cancel-button:hover {
+  background: color-mix(in srgb, var(--color-text-secondary) 80%, black);
+}
+
+/* ===== Responsive nhỏ gọn ===== */
+@media (max-width: 480px) {
+  .department-management-positions {
+    padding: 1.5rem;
+  }
+
+  .department-management-positions__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .department-management-positions__submit-button,
+  .department-management-positions__cancel-button {
+    width: 100%;
+  }
 }

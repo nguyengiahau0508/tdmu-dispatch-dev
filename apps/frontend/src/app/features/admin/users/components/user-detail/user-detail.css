@@ -1,7 +1,7 @@
 .user-detail__backdrop {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -11,10 +11,10 @@
 }
 
 .user-detail__modal {
-  background-color: var(--color-background-primary, #fff);
+  background-color: var(--color-background-primary);
   padding: 2.5rem;
-  border-radius: 12px;
-  box-shadow: var(--shadow-default, 0 2px 8px rgba(0,0,0,0.15));
+  border-radius: 8px;
+  box-shadow: var(--shadow-default);
   width: 100%;
   max-width: 800px;
   max-height: 90vh;
@@ -40,7 +40,7 @@
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
-  color: var(--color-text-primary, #222);
+  color: var(--color-text-primary);
 }
 
 .user-detail__content {
@@ -58,7 +58,7 @@
   justify-content: center;
   border-radius: 50%;
   overflow: hidden;
-  background: #f3f3f3;
+  background: var(--color-background-secondary);
   margin-right: 1rem;
 }
 
@@ -85,15 +85,19 @@
 
 .label {
   font-weight: 500;
-  color: var(--color-text-secondary, #666);
+  color: var(--color-text-secondary);
   min-width: 120px;
   display: inline-block;
 }
 
+.value {
+  color: var(--color-text-primary);
+}
+
 .role-badge {
   display: inline-block;
-  background: #e0e7ff;
-  color: #3730a3;
+  background: color-mix(in srgb, var(--color-primary) 15%, var(--color-background-secondary));
+  color: var(--color-primary);
   border-radius: 6px;
   padding: 0.15em 0.7em;
   font-size: 0.95em;
@@ -112,11 +116,11 @@
 
 .unit {
   font-weight: 500;
-  color: #2563eb;
+  color: var(--color-primary);
 }
 
 .position {
-  color: #374151;
+  color: var(--color-text-primary);
 }
 
 .user-detail__actions {
@@ -126,8 +130,8 @@
 }
 
 .close-btn {
-  background: #e5e7eb;
-  color: #222;
+  background: var(--color-text-secondary);
+  color: var(--color-text-on-primary);
   border: none;
   border-radius: 6px;
   padding: 0.6em 1.5em;
@@ -135,6 +139,7 @@
   cursor: pointer;
   transition: background 0.2s;
 }
+
 .close-btn:hover {
-  background: #d1d5db;
+  background: color-mix(in srgb, var(--color-text-secondary) 80%, black);
 }

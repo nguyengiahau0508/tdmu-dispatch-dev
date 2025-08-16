@@ -66,11 +66,10 @@ import { IWorkflowTemplate } from '../../../../../core/modules/workflow/workflow
     </div>
   `,
   styles: [`
-    .workflow-steps {
-      padding: 20px;
-      background: white;
+    .steps-container {
+      background: var(--color-background-primary);
       border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 20px;
     }
 
     .steps-header {
@@ -78,24 +77,21 @@ import { IWorkflowTemplate } from '../../../../../core/modules/workflow/workflow
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #eee;
     }
 
-    .steps-header h3 {
-      margin: 0;
+    .steps-title {
       font-size: 18px;
       font-weight: 600;
-      color: #333;
+      color: var(--color-text-primary);
     }
 
     .btn {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 16px;
+      padding: 10px 16px;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
       font-size: 14px;
       font-weight: 500;
@@ -103,12 +99,12 @@ import { IWorkflowTemplate } from '../../../../../core/modules/workflow/workflow
     }
 
     .btn-primary {
-      background: #007bff;
-      color: white;
+      background: var(--color-primary);
+      color: var(--color-text-on-primary);
     }
 
     .btn-primary:hover {
-      background: #0056b3;
+      background: color-mix(in srgb, var(--color-primary) 80%, black);
     }
 
     .btn img {
@@ -123,16 +119,16 @@ import { IWorkflowTemplate } from '../../../../../core/modules/workflow/workflow
     }
 
     .step-item {
-      border: 1px solid #ddd;
+      border: 1px solid var(--color-border);
       border-radius: 8px;
       padding: 20px;
-      background: #f8f9fa;
+      background: var(--color-background-secondary);
       transition: all 0.2s;
     }
 
     .step-item.active {
-      border-color: #28a745;
-      background: #d4edda;
+      border-color: var(--color-primary);
+      background: color-mix(in srgb, var(--color-primary) 10%, var(--color-background-secondary));
     }
 
     .step-header {
@@ -151,8 +147,8 @@ import { IWorkflowTemplate } from '../../../../../core/modules/workflow/workflow
       justify-content: center;
       width: 40px;
       height: 40px;
-      background: #007bff;
-      color: white;
+      background: var(--color-primary);
+      color: var(--color-text-on-primary);
       border-radius: 50%;
       font-weight: 600;
       font-size: 16px;
@@ -164,13 +160,13 @@ import { IWorkflowTemplate } from '../../../../../core/modules/workflow/workflow
 
     .step-name {
       font-weight: 600;
-      color: #333;
+      color: var(--color-text-primary);
       font-size: 16px;
       margin-bottom: 4px;
     }
 
     .step-description {
-      color: #666;
+      color: var(--color-text-secondary);
       font-size: 14px;
     }
 
@@ -182,8 +178,8 @@ import { IWorkflowTemplate } from '../../../../../core/modules/workflow/workflow
     }
 
     .step-type {
-      background: #6c757d;
-      color: white;
+      background: var(--color-text-secondary);
+      color: var(--color-text-on-primary);
       padding: 4px 8px;
       border-radius: 12px;
       font-size: 11px;
@@ -192,7 +188,7 @@ import { IWorkflowTemplate } from '../../../../../core/modules/workflow/workflow
     }
 
     .step-role {
-      color: #666;
+      color: var(--color-text-secondary);
       font-size: 12px;
       font-weight: 500;
     }
@@ -209,10 +205,12 @@ import { IWorkflowTemplate } from '../../../../../core/modules/workflow/workflow
       cursor: pointer;
       border-radius: 4px;
       transition: background-color 0.2s;
+      color: var(--color-text-secondary);
     }
 
     .btn-icon:hover {
-      background: rgba(0, 0, 0, 0.1);
+      background: var(--color-background-secondary);
+      color: var(--color-primary);
     }
 
     .btn-icon img {
@@ -230,11 +228,11 @@ import { IWorkflowTemplate } from '../../../../../core/modules/workflow/workflow
     .connector-line {
       width: 2px;
       height: 20px;
-      background: #ddd;
+      background: var(--color-border);
     }
 
     .connector-arrow {
-      color: #666;
+      color: var(--color-text-secondary);
       font-size: 16px;
       margin-top: 5px;
     }
@@ -242,12 +240,11 @@ import { IWorkflowTemplate } from '../../../../../core/modules/workflow/workflow
     .empty-steps {
       text-align: center;
       padding: 40px 20px;
-      color: #666;
+      color: var(--color-text-secondary);
     }
 
-    .empty-steps img {
-      width: 60px;
-      height: 60px;
+    .empty-steps .empty-icon {
+      font-size: 3rem;
       margin-bottom: 15px;
       opacity: 0.5;
     }

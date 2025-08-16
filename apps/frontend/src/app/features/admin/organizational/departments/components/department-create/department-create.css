@@ -1,8 +1,8 @@
-/* ===== Backdrop (Warp ngoài) ===== */
+/* ===== Backdrop (Wrapper ngoài) ===== */
 .department-create__backdrop {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -15,19 +15,16 @@
 .department-create {
   background-color: var(--color-background-primary);
   padding: 2.5rem;
-  border-radius: 12px;
+  border-radius: 8px;
   box-shadow: var(--shadow-default);
   width: 100%;
-  max-width: 480px;
-  height: 600px;
+  max-width: 600px;
   max-height: 90vh;
-  min-height: 400px;
+  overflow-y: auto;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   animation: fadeIn 0.25s ease-in-out;
-  overflow-y: auto;
-  overflow-x: hidden;
 }
 
 @keyframes fadeIn {
@@ -48,16 +45,16 @@
 }
 
 .department-form__title {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--color-text-primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .department-form__subtitle {
   font-size: 1rem;
   color: var(--color-text-secondary);
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .form-group {
@@ -68,7 +65,7 @@
   display: block;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
   margin-bottom: 0.5rem;
 }
 
@@ -121,7 +118,7 @@
 }
 
 .department-form__submit-button:hover {
-  opacity: 0.9;
+  background: color-mix(in srgb, var(--color-primary) 80%, black);
 }
 
 .department-form__submit-button:active {
@@ -129,12 +126,12 @@
 }
 
 .department-form__cancel-button {
-  background-color: #e0e0e0;
-  color: var(--color-text-secondary);
+  background-color: var(--color-text-secondary);
+  color: var(--color-text-on-primary);
 }
 
 .department-form__cancel-button:hover {
-  opacity: 0.85;
+  background: color-mix(in srgb, var(--color-text-secondary) 80%, black);
 }
 
 @media (max-width: 480px) {

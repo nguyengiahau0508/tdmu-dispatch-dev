@@ -7,7 +7,9 @@ import { WorkflowInstance } from './entities/workflow-instance.entity';
 import { CreateWorkflowInstanceInput } from './dto/create-workflow-instance/create-workflow-instance.input';
 import { UpdateWorkflowInstanceInput } from './dto/update-workflow-instance/update-workflow-instance.input';
 import { WorkflowActionInput } from './dto/workflow-action/workflow-action.input';
+import { WorkflowActionGuard } from '../guards/workflow-action.guard';
 import { User } from 'src/modules/users/entities/user.entity';
+import { ActionType } from '../workflow-action-logs/entities/workflow-action-log.entity';
 
 @Resolver(() => WorkflowInstance)
 @UseGuards(GqlAuthGuard)
@@ -64,6 +66,25 @@ export class WorkflowInstancesResolver {
     return this.workflowInstancesService.getPendingWorkflows(userRole);
   }
 
+  @Query(() => [WorkflowInstance], {
+    name: 'myPendingWorkflows',
+    description: 'Lấy workflow instances mà user hiện tại có thể xử lý',
+  })
+  findMyPendingWorkflows(@CurrentUser() user: User) {
+    return this.workflowInstancesService.getMyPendingWorkflows(user);
+  }
+
+  @Query(() => [String], {
+    name: 'availableActions',
+    description: 'Lấy danh sách actions có thể thực hiện cho workflow instance',
+  })
+  getAvailableActions(
+    @Args('instanceId', { type: () => Int }) instanceId: number,
+    @CurrentUser() user: User,
+  ) {
+    return this.workflowInstancesService.getAvailableActions(instanceId, user);
+  }
+
   @Mutation(() => WorkflowInstance, {
     description: 'Cập nhật workflow instance',
   })
@@ -85,6 +106,7 @@ export class WorkflowInstancesResolver {
   @Mutation(() => WorkflowInstance, {
     description: 'Thực hiện hành động trên workflow',
   })
+  @UseGuards(WorkflowActionGuard)
   executeWorkflowAction(
     @Args('workflowActionInput') workflowActionInput: WorkflowActionInput,
     @CurrentUser() user: User,

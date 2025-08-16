@@ -157,7 +157,7 @@ import { IDocumentCategory } from '../../../core/interfaces/dispatch.interface';
     }
 
     .document-form-modal {
-      background: white;
+      background: var(--color-background-primary);
       border-radius: 8px;
       width: 90%;
       max-width: 600px;
@@ -170,13 +170,14 @@ import { IDocumentCategory } from '../../../core/interfaces/dispatch.interface';
       justify-content: space-between;
       align-items: center;
       padding: 20px;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid var(--color-border);
     }
 
     .modal-header h3 {
       margin: 0;
       font-size: 1.25rem;
       font-weight: 600;
+      color: var(--color-text-primary);
     }
 
     .close-btn {
@@ -184,11 +185,11 @@ import { IDocumentCategory } from '../../../core/interfaces/dispatch.interface';
       border: none;
       font-size: 1.5rem;
       cursor: pointer;
-      color: #6b7280;
+      color: var(--color-text-secondary);
     }
 
     .close-btn:hover {
-      color: #374151;
+      color: var(--color-text-primary);
     }
 
     .form-content {
@@ -203,21 +204,23 @@ import { IDocumentCategory } from '../../../core/interfaces/dispatch.interface';
       display: block;
       margin-bottom: 8px;
       font-weight: 500;
-      color: #374151;
+      color: var(--color-text-primary);
     }
 
     .form-control {
       width: 100%;
       padding: 10px 12px;
-      border: 1px solid #d1d5db;
+      border: 1px solid var(--color-border);
       border-radius: 6px;
       font-size: 14px;
+      background-color: var(--color-background-secondary);
+      color: var(--color-text-primary);
     }
 
     .form-control:focus {
       outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
     }
 
     .error-message {
@@ -228,10 +231,10 @@ import { IDocumentCategory } from '../../../core/interfaces/dispatch.interface';
 
     .loading-categories {
       padding: 10px 12px;
-      background: #f3f4f6;
-      border: 1px solid #d1d5db;
+      background: var(--color-background-secondary);
+      border: 1px solid var(--color-border);
       border-radius: 6px;
-      color: #6b7280;
+      color: var(--color-text-secondary);
       font-size: 14px;
       font-style: italic;
     }
@@ -242,9 +245,10 @@ import { IDocumentCategory } from '../../../core/interfaces/dispatch.interface';
       align-items: center;
       margin-top: 8px;
       padding: 8px 12px;
-      background: #f3f4f6;
+      background: var(--color-background-secondary);
       border-radius: 6px;
       font-size: 14px;
+      color: var(--color-text-secondary);
     }
 
     .remove-file-btn {
@@ -263,7 +267,7 @@ import { IDocumentCategory } from '../../../core/interfaces/dispatch.interface';
       justify-content: flex-end;
       margin-top: 30px;
       padding-top: 20px;
-      border-top: 1px solid #e5e7eb;
+      border-top: 1px solid var(--color-border);
     }
 
     .btn {
@@ -281,16 +285,18 @@ import { IDocumentCategory } from '../../../core/interfaces/dispatch.interface';
     .btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
+      background-color: var(--color-background-disabled);
+      color: var(--color-text-secondary);
     }
 
     .btn-primary {
-      background: #3b82f6;
-      color: white;
+      background: var(--color-primary);
+      color: var(--color-text-on-primary);
     }
 
     .btn-secondary {
-      background: #6b7280;
-      color: white;
+      background: var(--color-text-secondary);
+      color: var(--color-text-on-primary);
     }
 
     .btn-sm {
@@ -301,7 +307,7 @@ import { IDocumentCategory } from '../../../core/interfaces/dispatch.interface';
     .loading-spinner {
       width: 16px;
       height: 16px;
-      border: 2px solid #ffffff;
+      border: 2px solid var(--color-text-on-primary);
       border-top: 2px solid transparent;
       border-radius: 50%;
       animation: spin 1s linear infinite;

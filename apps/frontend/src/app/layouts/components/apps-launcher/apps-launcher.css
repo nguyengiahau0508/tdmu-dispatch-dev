@@ -2,21 +2,23 @@
 .apps-launcher-backdrop {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
   display: flex;
   justify-content: center;
   align-items: center;
+  backdrop-filter: blur(4px);
 }
 
 /* Container chính của ứng dụng */
 .apps-launcher {
   background-color: var(--color-background-primary);
   color: var(--color-text-primary);
-  padding: 24px 32px;
+  padding: 32px;
   border-radius: 16px;
   box-shadow: var(--shadow-default);
-  max-width: 500px;
+  border: 1px solid var(--color-border);
+  max-width: 600px;
   width: 90%;
   position: relative;
   animation: fadeInScale 0.3s ease-out;
@@ -24,63 +26,79 @@
 
 /* Tiêu đề */
 .apps-launcher__title {
-  font-size: 20px;
+  font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 24px;
   text-align: center;
+  color: var(--color-text-primary);
 }
 
 /* Nút đóng (×) */
 .apps-launcher__close-btn {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: transparent;
+  top: 16px;
+  right: 16px;
+  background: none;
   border: none;
   font-size: 24px;
   font-weight: bold;
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: color 0.2s;
+  transition: all 0.2s ease;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .apps-launcher__close-btn:hover {
   color: var(--color-primary);
+  background-color: var(--color-background-secondary);
 }
 
 /* Grid chứa các mục ứng dụng */
 .apps-launcher__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 16px;
 }
 
 /* Mỗi ô ứng dụng */
 .apps-launcher__item {
   background-color: var(--color-background-secondary);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
-  padding: 16px 12px;
+  padding: 20px 16px;
   text-align: center;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.2s;
+  transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  gap: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .apps-launcher__item:hover {
-  background-color: var(--color-background-layout);
+  background-color: color-mix(in srgb, var(--color-primary) 5%, var(--color-background-secondary));
+  border-color: var(--color-primary);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-default);
 }
 
 /* Icon ứng dụng */
 .apps-launcher__item img {
-  width: 32px;
-  height: 32px;
-  margin-bottom: 8px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
-  filter: grayscale(100%) brightness(0.5);
+  filter: brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+  transition: filter 0.2s ease;
+}
+
+.apps-launcher__item:hover img {
+  filter: brightness(0) saturate(100%) invert(27%) sepia(87%) saturate(5091%) hue-rotate(202deg) brightness(94%) contrast(101%);
 }
 
 /* Tên ứng dụng */
@@ -90,17 +108,76 @@
   color: var(--color-text-primary);
   word-break: break-word;
   line-height: 1.4;
+  transition: color 0.2s ease;
 }
 
+.apps-launcher__item:hover span {
+  color: var(--color-primary);
+}
 
 @keyframes fadeInScale {
   0% {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.95) translateY(20px);
   }
 
   100% {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .apps-launcher {
+    padding: 24px;
+    max-width: 500px;
+  }
+  
+  .apps-launcher__grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+  }
+  
+  .apps-launcher__item {
+    padding: 16px 12px;
+  }
+  
+  .apps-launcher__item img {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .apps-launcher__item span {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .apps-launcher {
+    padding: 20px;
+    width: 95%;
+  }
+  
+  .apps-launcher__grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+  }
+  
+  .apps-launcher__item {
+    padding: 12px 8px;
+  }
+  
+  .apps-launcher__item img {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .apps-launcher__item span {
+    font-size: 12px;
+  }
+  
+  .apps-launcher__title {
+    font-size: 1.25rem;
   }
 }

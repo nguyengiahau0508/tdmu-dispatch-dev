@@ -1,24 +1,43 @@
-import { Component, Input, Output, EventEmitter, OnInit, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { WorkflowInstancesService } from '../../../../../core/modules/workflow/workflow-instances/workflow-instances.service';
-import { IWorkflowInstance, IWorkflowActionInput } from '../../../../../core/modules/workflow/workflow-instances/interfaces/workflow-instance.interfaces';
+import { ActivatedRoute, Router } from '@angular/router';
+import { WorkflowApolloService } from '../../services/workflow-apollo.service';
+import { WorkflowNavigationService } from '../../services/workflow-navigation.service';
+import { WorkflowInstance } from '../../models/workflow-instance.model';
+import { WorkflowActionInput } from '../../models/workflow-action-input.model';
 
 @Component({
   selector: 'app-workflow-instance-detail',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  providers: [WorkflowInstancesService],
+  providers: [WorkflowApolloService],
   template: `
-    <div class="modal-overlay" (click)="close()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h3>Chi tiết quy trình #{{ workflowInstance?.id }}</h3>
-          <button class="btn btn-icon" (click)="close()">✕</button>
+    <div class="workflow-detail">
+      @if (isLoading) {
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Đang tải thông tin workflow...</p>
         </div>
+      } @else if (error) {
+        <div class="error-state">
+          <h3>Lỗi</h3>
+          <p>{{ error }}</p>
+          <button class="btn btn-primary" (click)="goBack()">Quay lại</button>
+        </div>
+      } @else if (workflowInstance) {
+        <div class="detail-content">
+          <div class="detail-header">
+            <h3>Chi tiết quy trình #{{ workflowInstance.id }}</h3>
+            <div class="header-actions">
+              <button class="btn btn-secondary" (click)="goBack()">Quay lại</button>
+              @if (workflowInstance.currentStep) {
+                <button class="btn btn-primary" (click)="goToProcess()">Xử lý ngay</button>
+              }
+            </div>
+          </div>
         
-        <div class="modal-body">
-          @if (workflowInstance) {
+                  <div class="detail-body">
             <div class="info-section">
               <h4>Thông tin cơ bản</h4>
               <div class="info-grid">
@@ -82,7 +101,7 @@ import { IWorkflowInstance, IWorkflowActionInput } from '../../../../../core/mod
                           <span class="action-type">{{ getActionTypeLabel(log.actionType) }}</span>
                           <span class="action-date">{{ log.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
                         </div>
-                        <p class="action-user">{{ log.actionByUser.fullName }}</p>
+                        <p class="action-user">{{ log.actionByUser ? log.actionByUser.fullName : 'Không xác định' }}</p>
                         @if (log.note) {
                           <p class="action-note">{{ log.note }}</p>
                         }
@@ -92,50 +111,80 @@ import { IWorkflowInstance, IWorkflowActionInput } from '../../../../../core/mod
                 </div>
               </div>
             }
-          }
+          </div>
         </div>
-      </div>
+      }
     </div>
   `,
   styles: [`
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-
-    .modal-content {
+    .workflow-detail {
+      padding: 24px;
       background: white;
       border-radius: 8px;
-      width: 90%;
-      max-width: 600px;
-      max-height: 90vh;
-      overflow-y: auto;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    .modal-header {
+    .loading-state,
+    .error-state {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f4f6;
+      border-top: 4px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error-state h3 {
+      color: #dc2626;
+      margin: 0 0 8px 0;
+    }
+
+    .error-state p {
+      color: #6b7280;
+      margin: 0 0 16px 0;
+    }
+
+    .detail-content {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .detail-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px;
+      padding-bottom: 16px;
       border-bottom: 1px solid #e5e7eb;
     }
 
-    .modal-header h3 {
+    .detail-header h3 {
       margin: 0;
       font-size: 1.25rem;
       font-weight: 600;
+      color: #1f2937;
     }
 
-    .modal-body {
-      padding: 20px;
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .detail-body {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
     }
 
     .info-section {
@@ -278,20 +327,23 @@ import { IWorkflowInstance, IWorkflowActionInput } from '../../../../../core/mod
     }
   `]
 })
-export class WorkflowInstanceDetail implements OnInit {
-  @Input() workflowInstanceId?: number;
-  @Input() isOpen = false;
+export class WorkflowInstanceDetailComponent implements OnInit {
+  @Input() workflowInstance?: WorkflowInstance;
   @Output() closeModal = new EventEmitter<void>();
   @Output() actionCompleted = new EventEmitter<void>();
 
-  workflowInstance?: IWorkflowInstance;
   actionForm: FormGroup;
   isSubmitting = false;
+  isLoading = true;
+  error: string | null = null;
 
-  private fb = inject(FormBuilder);
-  private workflowInstancesService = inject(WorkflowInstancesService);
-
-  constructor() {
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private workflowApolloService: WorkflowApolloService,
+    private navigationService: WorkflowNavigationService
+  ) {
     this.actionForm = this.fb.group({
       actionType: ['', Validators.required],
       note: ['']
@@ -299,40 +351,61 @@ export class WorkflowInstanceDetail implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.workflowInstanceId) {
-      this.loadWorkflowInstance();
+    // Nếu có workflowInstance từ Input, sử dụng nó
+    if (this.workflowInstance?.id) {
+      this.isLoading = false;
+    } else {
+      // Nếu không có, load từ route parameter
+      this.loadWorkflowFromRoute();
     }
   }
 
-  loadWorkflowInstance(): void {
-    if (this.workflowInstanceId) {
-      this.workflowInstancesService.findOne(this.workflowInstanceId).subscribe({
-        next: (instance) => {
-          this.workflowInstance = instance;
-        },
-        error: (error) => {
-          console.error('Error loading workflow instance:', error);
-        }
-      });
-    }
+  private loadWorkflowFromRoute(): void {
+    this.route.params.subscribe(params => {
+      const workflowId = +params['id'];
+      if (workflowId) {
+        this.loadWorkflowInstance(workflowId);
+      } else {
+        this.error = 'Không tìm thấy ID workflow';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  private loadWorkflowInstance(workflowId: number): void {
+    this.isLoading = true;
+    this.error = null;
+
+    this.workflowApolloService.getWorkflowInstance(workflowId).subscribe({
+      next: (workflow: WorkflowInstance) => {
+        this.workflowInstance = workflow;
+        this.isLoading = false;
+      },
+      error: (error: any) => {
+        console.error('Error loading workflow instance:', error);
+        this.error = 'Không thể tải thông tin workflow';
+        this.isLoading = false;
+      }
+    });
   }
 
   onSubmitAction(): void {
     if (this.actionForm.valid && this.workflowInstance?.currentStep) {
       this.isSubmitting = true;
       
-      const input: IWorkflowActionInput = {
+      const actionInput: WorkflowActionInput = {
         instanceId: this.workflowInstance.id,
         stepId: this.workflowInstance.currentStep.id,
         actionType: this.actionForm.value.actionType,
-        note: this.actionForm.value.note || undefined
+        note: this.actionForm.value.note,
+        metadata: ''
       };
 
-      this.workflowInstancesService.executeAction(input).subscribe({
-        next: () => {
+      this.workflowApolloService.executeWorkflowAction(actionInput).subscribe({
+        next: (updatedInstance: WorkflowInstance) => {
           this.isSubmitting = false;
           this.actionForm.reset();
-          this.loadWorkflowInstance();
+          this.workflowInstance = updatedInstance;
           this.actionCompleted.emit();
         },
         error: (error) => {
@@ -343,21 +416,51 @@ export class WorkflowInstanceDetail implements OnInit {
     }
   }
 
+  goBack(): void {
+    this.navigationService.goBack();
+  }
+
+  goToProcess(): void {
+    if (this.workflowInstance?.id) {
+      this.navigationService.navigateToWorkflowProcess(this.workflowInstance.id);
+    }
+  }
+
   canPerformAction(assignedRole: string): boolean {
     const userRoles = ['DEPARTMENT_HEAD', 'SYSTEM_ADMIN'];
     return userRoles.includes(assignedRole);
   }
 
   getStatusLabel(status: string): string {
-    return this.workflowInstancesService.getStatusLabel(status);
+    const statusLabels: { [key: string]: string } = {
+      'IN_PROGRESS': 'Đang xử lý',
+      'COMPLETED': 'Hoàn thành',
+      'CANCELLED': 'Đã hủy',
+      'REJECTED': 'Từ chối'
+    };
+    return statusLabels[status] || status;
   }
 
   getStatusClass(status: string): string {
-    return this.workflowInstancesService.getStatusClass(status);
+    const statusClasses: { [key: string]: string } = {
+      'IN_PROGRESS': 'status-IN_PROGRESS',
+      'COMPLETED': 'status-COMPLETED',
+      'CANCELLED': 'status-CANCELLED',
+      'REJECTED': 'status-REJECTED'
+    };
+    return statusClasses[status] || '';
   }
 
   getActionTypeLabel(actionType: string): string {
-    return this.workflowInstancesService.getActionTypeLabel(actionType);
+    const actionLabels: { [key: string]: string } = {
+      'APPROVE': 'Phê duyệt',
+      'REJECT': 'Từ chối',
+      'TRANSFER': 'Chuyển tiếp',
+      'CANCEL': 'Hủy bỏ',
+      'START': 'Bắt đầu',
+      'COMPLETE': 'Hoàn thành',
+    };
+    return actionLabels[actionType] || actionType;
   }
 
   close(): void {

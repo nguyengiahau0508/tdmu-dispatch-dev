@@ -58,7 +58,7 @@ export class WorkflowActionLog {
   @Column()
   actionByUserId: number;
 
-  @Field(() => User)
+  @Field(() => User, { nullable: true })
   @ManyToOne(() => User)
   @JoinColumn({ name: 'actionByUserId' })
   actionByUser: User;

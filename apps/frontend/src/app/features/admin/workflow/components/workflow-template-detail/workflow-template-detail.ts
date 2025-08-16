@@ -98,7 +98,7 @@ import { WorkflowStepsManager } from '../workflow-steps-manager/workflow-steps-m
     }
 
     .modal-content {
-      background: white;
+      background: var(--color-background-primary);
       border-radius: 8px;
       width: 95%;
       max-width: 800px;
@@ -111,12 +111,24 @@ import { WorkflowStepsManager } from '../workflow-steps-manager/workflow-steps-m
       justify-content: space-between;
       align-items: center;
       padding: 20px;
-      border-bottom: 1px solid #e0e0e0;
+      border-bottom: 1px solid var(--color-border);
     }
 
     .modal-header h3 {
       margin: 0;
-      color: #333;
+      color: var(--color-text-primary);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--color-text-secondary);
+    }
+
+    .close-btn:hover {
+      color: var(--color-text-primary);
     }
 
     .modal-body {
@@ -129,7 +141,7 @@ import { WorkflowStepsManager } from '../workflow-steps-manager/workflow-steps-m
 
     .info-section h4, .stats-section h4 {
       margin: 0 0 16px 0;
-      color: #333;
+      color: var(--color-text-primary);
       font-size: 18px;
     }
 
@@ -147,12 +159,12 @@ import { WorkflowStepsManager } from '../workflow-steps-manager/workflow-steps-m
 
     .info-item label {
       font-weight: 500;
-      color: #666;
+      color: var(--color-text-secondary);
       font-size: 14px;
     }
 
     .info-item span {
-      color: #333;
+      color: var(--color-text-primary);
       font-size: 16px;
     }
 
@@ -167,13 +179,13 @@ import { WorkflowStepsManager } from '../workflow-steps-manager/workflow-steps-m
     }
 
     .status-active {
-      background: #d4edda;
-      color: #155724;
+      background: color-mix(in srgb, var(--color-primary) 15%, var(--color-background-secondary));
+      color: var(--color-primary);
     }
 
     .status-inactive {
-      background: #f8d7da;
-      color: #721c24;
+      background: color-mix(in srgb, #dc3545 15%, var(--color-background-secondary));
+      color: #dc3545;
     }
 
     .stats-grid {
@@ -183,7 +195,7 @@ import { WorkflowStepsManager } from '../workflow-steps-manager/workflow-steps-m
     }
 
     .stat-item {
-      background: #f8f9fa;
+      background: var(--color-background-secondary);
       padding: 20px;
       border-radius: 8px;
       text-align: center;
@@ -191,20 +203,20 @@ import { WorkflowStepsManager } from '../workflow-steps-manager/workflow-steps-m
 
     .stat-label {
       font-size: 14px;
-      color: #666;
+      color: var(--color-text-secondary);
       margin-bottom: 8px;
     }
 
     .stat-number {
       font-size: 24px;
       font-weight: bold;
-      color: #007bff;
+      color: var(--color-primary);
     }
 
     .loading {
       text-align: center;
       padding: 40px;
-      color: #666;
+      color: var(--color-text-secondary);
     }
 
     .btn-icon {
@@ -222,7 +234,7 @@ import { WorkflowStepsManager } from '../workflow-steps-manager/workflow-steps-m
     }
 
     .btn-icon:hover {
-      background: #f8f9fa;
+      background: var(--color-background-secondary);
     }
   `]
 })

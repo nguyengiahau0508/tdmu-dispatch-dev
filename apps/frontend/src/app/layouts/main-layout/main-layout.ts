@@ -1,4 +1,4 @@
-import { Component, Renderer2 } from '@angular/core';
+import { Component, Renderer2, OnInit, OnDestroy } from '@angular/core';
 import { Router, RouterLink, RouterOutlet, RouterLinkActive } from '@angular/router';
 import { UserState } from '../../core/state/user.state';
 import { IUser } from '../../core/interfaces/user.interface';
@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { AppsLauncher } from '../components/apps-launcher/apps-launcher';
 import { AuthService } from '../../core/services/auth.service';
 import { FileService } from '../../core/services/file.service';
+import { WorkflowApolloService } from '../../features/user/workflow/services/workflow-apollo.service';
 
 @Component({
   selector: 'app-main-layout',
@@ -14,20 +15,22 @@ import { FileService } from '../../core/services/file.service';
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.css'
 })
-export class MainLayout {
+export class MainLayout implements OnInit, OnDestroy {
   isDarkMode = false;
   currentUser: IUser | null = null
 
   isAppsLauncherOpen = false
 
   avatarUrl: string | null = null
+  pendingWorkflowCount = 0;
   private subscriptions = new Subscription();
   constructor(
     private renderer: Renderer2,
     private userState: UserState,
     private authService: AuthService,
     private router: Router,
-    private fileService: FileService
+    private fileService: FileService,
+    private workflowApolloService: WorkflowApolloService
   ) {
     const storedTheme = localStorage.getItem('theme');
     this.isDarkMode = storedTheme === 'dark';
@@ -42,6 +45,33 @@ export class MainLayout {
           console.log(this.avatarUrl)
         } else {
           this.avatarUrl = null;
+        }
+      })
+    );
+  }
+
+  ngOnInit(): void {
+    this.loadPendingWorkflowCount();
+    
+    // Auto-refresh pending workflow count every 30 seconds
+    setInterval(() => {
+      this.loadPendingWorkflowCount();
+    }, 30000);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
+  private loadPendingWorkflowCount(): void {
+    this.subscriptions.add(
+      this.workflowApolloService.getMyPendingWorkflows().subscribe({
+        next: (workflows) => {
+          this.pendingWorkflowCount = workflows.length;
+        },
+        error: (error) => {
+          console.error('Error loading pending workflows:', error);
+          this.pendingWorkflowCount = 0;
         }
       })
     );
@@ -71,5 +101,9 @@ export class MainLayout {
         this.router.navigate(['auth'])
       }
     })
+  }
+
+  refreshPendingWorkflowCount(): void {
+    this.loadPendingWorkflowCount();
   }
 }

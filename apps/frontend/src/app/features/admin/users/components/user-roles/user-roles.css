@@ -2,7 +2,7 @@
 .user-roles__backdrop {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -15,7 +15,7 @@
 .user-roles {
   background-color: var(--color-background-primary);
   padding: 2.5rem;
-  border-radius: 12px;
+  border-radius: 8px;
   box-shadow: var(--shadow-default);
   width: 100%;
   max-width: 800px;
@@ -65,7 +65,7 @@
   display: block;
   font-size: 0.95rem;
   font-weight: 500;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
   margin-bottom: 0.5rem;
 }
 
@@ -114,7 +114,7 @@
 }
 
 .roles-form__submit-button:hover {
-  opacity: 0.9;
+  background: color-mix(in srgb, var(--color-primary) 80%, black);
 }
 
 .roles-form__submit-button:active {
@@ -122,12 +122,12 @@
 }
 
 .roles-form__cancel-button {
-  background-color: #e0e0e0;
-  color: var(--color-text-secondary);
+  background-color: var(--color-text-secondary);
+  color: var(--color-text-on-primary);
 }
 
 .roles-form__cancel-button:hover {
-  opacity: 0.85;
+  background: color-mix(in srgb, var(--color-text-secondary) 80%, black);
 }
 
 /* ===== Responsive nhỏ gọn ===== */

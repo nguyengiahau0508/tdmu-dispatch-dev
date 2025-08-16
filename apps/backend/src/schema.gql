@@ -242,7 +242,7 @@ type WorkflowActionLog {
   step: WorkflowStep!
   actionType: ActionType!
   actionByUserId: Int!
-  actionByUser: User!
+  actionByUser: User
   actionAt: DateTime!
   note: String
   metadata: String
@@ -1112,6 +1112,41 @@ type RoleDto {
   label: String!
 }
 
+type WorkflowPermissionDto {
+  instanceId: Int!
+  stepId: Int!
+  actionType: String!
+  canPerform: Boolean!
+  reason: String
+}
+
+type WorkflowViewPermissionDto {
+  instanceId: Int!
+  canView: Boolean!
+  reason: String
+}
+
+type WorkflowCreatePermissionDto {
+  templateId: Int!
+  canCreate: Boolean!
+  reason: String
+}
+
+type AvailableActionsDto {
+  stepId: Int!
+  availableActions: [String!]!
+}
+
+type RoleLabelDto {
+  role: String!
+  label: String!
+}
+
+type ActionTypeLabelDto {
+  actionType: String!
+  label: String!
+}
+
 type Query {
   users: [User!]!
   user(id: Int!): User
@@ -1170,6 +1205,12 @@ type Query {
   """Lấy workflow instances đang chờ xử lý theo role"""
   pendingWorkflows: [WorkflowInstance!]!
 
+  """Lấy workflow instances mà user hiện tại có thể xử lý"""
+  myPendingWorkflows: [WorkflowInstance!]!
+
+  """Lấy danh sách actions có thể thực hiện cho workflow instance"""
+  availableActions(instanceId: Int!): [String!]!
+
   """Lấy lịch sử workflow instance"""
   workflowHistory(instanceId: Int!): WorkflowInstance!
 
@@ -1189,7 +1230,7 @@ type Query {
   workflowStepTypes: [StepTypeDto!]!
 
   """Lấy danh sách các vai trò có thể gán cho workflow step"""
-  workflowRoles: [RoleDto!]!
+  workflowRoles: [String!]!
 
   """Lấy tất cả workflow templates"""
   workflowTemplates: [WorkflowTemplate!]!
@@ -1202,6 +1243,47 @@ type Query {
 
   """Lấy danh sách workflow templates đang hoạt động"""
   activeWorkflowTemplates: [WorkflowTemplate!]!
+
+  """Lấy danh sách các loại hành động trong workflow"""
+  workflowActionTypes: [String!]!
+
+  """Kiểm tra user có thể thực hiện action trên workflow step không"""
+  checkWorkflowPermission(input: CheckWorkflowPermissionInput!): WorkflowPermissionDto!
+
+  """
+  Kiểm tra user có thể thực hiện action trên workflow step không (legacy)
+  """
+  canPerformWorkflowAction(instanceId: Int!, stepId: Int!, actionType: String!): Boolean!
+
+  """Kiểm tra user có thể xem workflow instance không"""
+  checkWorkflowViewPermission(input: CheckWorkflowViewPermissionInput!): WorkflowViewPermissionDto!
+
+  """Kiểm tra user có thể xem workflow instance không (legacy)"""
+  canViewWorkflow(instanceId: Int!): Boolean!
+
+  """Kiểm tra user có thể tạo workflow instance không"""
+  checkWorkflowCreatePermission(input: CheckWorkflowCreatePermissionInput!): WorkflowCreatePermissionDto!
+
+  """Kiểm tra user có thể tạo workflow instance không (legacy)"""
+  canCreateWorkflow(templateId: Int!): Boolean!
+
+  """Lấy danh sách actions có thể thực hiện cho step"""
+  getAvailableActionsForStep(stepId: Int!): AvailableActionsDto!
+
+  """Lấy danh sách actions có thể thực hiện cho step (legacy)"""
+  availableActionsForStep(stepId: Int!): [String!]!
+
+  """Lấy label cho role"""
+  getRoleLabel(role: String!): RoleLabelDto!
+
+  """Lấy label cho role (legacy)"""
+  roleLabel(role: String!): String!
+
+  """Lấy label cho action type"""
+  getActionTypeLabel(actionType: String!): ActionTypeLabelDto!
+
+  """Lấy label cho action type (legacy)"""
+  actionTypeLabel(actionType: String!): String!
   documents(input: GetDocumentsPaginatedInput!): GetDocumentsPaginatedResponse!
   document(id: Int!): GetDocumentResponse!
   documentCategories(input: GetDocumentCategoriesPaginatedInput!): GetDocumentCategoriesPaginatedResponse!
@@ -1329,6 +1411,20 @@ input GetWorkflowTemplatePaginatedInput {
 
   """Từ khóa tìm kiếm"""
   search: String
+}
+
+input CheckWorkflowPermissionInput {
+  instanceId: Int!
+  stepId: Int!
+  actionType: String!
+}
+
+input CheckWorkflowViewPermissionInput {
+  instanceId: Int!
+}
+
+input CheckWorkflowCreatePermissionInput {
+  templateId: Int!
 }
 
 input GetDocumentsPaginatedInput {

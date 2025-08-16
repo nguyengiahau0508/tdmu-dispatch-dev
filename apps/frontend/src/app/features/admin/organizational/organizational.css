@@ -2,26 +2,45 @@
   display: flex;
   background-color: var(--color-background-layout);
   overflow: hidden;
-  height: 100%;
+  height: 100vh;
 }
 
 /* ======= SIDEBAR ======= */
 .organizational__sidebar {
-  /* ← tăng chiều rộng để chứa được cả icon và text */
+  width: 280px;
   background-color: var(--color-background-primary);
   border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
-  padding: 16px 0;
   box-shadow: var(--shadow-default);
   height: 100vh;
+  flex-shrink: 0;
+}
+
+/* Sidebar header */
+.sidebar__header {
+  padding: 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sidebar__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.sidebar__subtitle {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
 }
 
 /* Danh sách menu */
 .sidebar__menu {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  padding: 16px 0;
   flex: 1;
 }
 
@@ -30,49 +49,111 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 16px;
+  padding: 12px 20px;
   cursor: pointer;
-  transition: background-color 0.2s;
-  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+  color: var(--color-text-secondary);
   font-size: 14px;
-  background-color: var(--color-background-secondary);
-  font-weight: 600;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+  margin: 0 8px;
+  border-radius: 6px;
 }
 
 .sidebar__menu-item:hover {
-  background-color: var(--color-primary);
-  color: var(--color-background-secondary);
+  background-color: color-mix(in srgb, var(--color-primary) 10%, var(--color-background-secondary));
+  color: var(--color-primary);
+  border-left-color: var(--color-primary);
+}
 
-  img {
-    filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
-  }
+.sidebar__menu-item:hover img {
+  filter: brightness(0) saturate(100%) invert(27%) sepia(87%) saturate(5091%) hue-rotate(202deg) brightness(94%) contrast(101%);
 }
 
 .sidebar__menu-item img {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
-  filter: brightness(0) saturate(100%) invert(27%) sepia(87%) saturate(5091%) hue-rotate(202deg) brightness(94%) contrast(101%);
+  filter: brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+  transition: filter 0.2s ease;
 }
 
 .sidebar__menu-item span {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: 500;
 }
 
 .sidebar__menu-item.active {
-  background-color: var(--color-primary);
-  color: white;
+  background-color: color-mix(in srgb, var(--color-primary) 15%, var(--color-background-secondary));
+  color: var(--color-primary);
+  border-left-color: var(--color-primary);
+  font-weight: 600;
 }
 
 .sidebar__menu-item.active img {
-  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+  filter: brightness(0) saturate(100%) invert(27%) sepia(87%) saturate(5091%) hue-rotate(202deg) brightness(94%) contrast(101%);
 }
 
+/* Main content area */
 .organizational__main {
   flex: 1;
   position: relative;
   background-color: var(--color-background-layout);
-  overflow: hidden;
+  overflow: auto;
+  padding: 20px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .organizational__sidebar {
+    width: 240px;
+  }
+  
+  .sidebar__menu-item {
+    padding: 10px 16px;
+    margin: 0 4px;
+  }
+  
+  .sidebar__menu-item span {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 640px) {
+  .organizational {
+    flex-direction: column;
+  }
+  
+  .organizational__sidebar {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+  
+  .sidebar__menu {
+    flex-direction: row;
+    padding: 12px 16px;
+    gap: 16px;
+    overflow-x: auto;
+  }
+  
+  .sidebar__menu-item {
+    flex-shrink: 0;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    margin: 0;
+    padding: 8px 12px;
+  }
+  
+  .sidebar__menu-item.active {
+    border-left-color: transparent;
+    border-bottom-color: var(--color-primary);
+  }
+  
+  .organizational__main {
+    padding: 16px;
+  }
 }

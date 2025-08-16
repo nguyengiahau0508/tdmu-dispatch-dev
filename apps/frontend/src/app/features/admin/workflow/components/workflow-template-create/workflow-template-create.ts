@@ -79,7 +79,7 @@ import { WorkflowTemplatesService } from '../../../../../core/modules/workflow/w
     }
 
     .modal-content {
-      background: white;
+      background: var(--color-background-primary);
       border-radius: 8px;
       width: 90%;
       max-width: 500px;
@@ -92,13 +92,14 @@ import { WorkflowTemplatesService } from '../../../../../core/modules/workflow/w
       justify-content: space-between;
       align-items: center;
       padding: 20px;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid var(--color-border);
     }
 
     .modal-header h2 {
       margin: 0;
       font-size: 18px;
       font-weight: 600;
+      color: var(--color-text-primary);
     }
 
     .close-btn {
@@ -106,7 +107,11 @@ import { WorkflowTemplatesService } from '../../../../../core/modules/workflow/w
       border: none;
       font-size: 24px;
       cursor: pointer;
-      color: #666;
+      color: var(--color-text-secondary);
+    }
+
+    .close-btn:hover {
+      color: var(--color-text-primary);
     }
 
     .modal-body {
@@ -121,16 +126,25 @@ import { WorkflowTemplatesService } from '../../../../../core/modules/workflow/w
       display: block;
       margin-bottom: 8px;
       font-weight: 500;
-      color: #333;
+      color: var(--color-text-primary);
     }
 
     .form-group input,
     .form-group textarea {
       width: 100%;
       padding: 10px;
-      border: 1px solid #ddd;
+      border: 1px solid var(--color-border);
       border-radius: 4px;
       font-size: 14px;
+      background-color: var(--color-background-secondary);
+      color: var(--color-text-primary);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
     }
 
     .form-group input.error {
@@ -148,6 +162,7 @@ import { WorkflowTemplatesService } from '../../../../../core/modules/workflow/w
       align-items: center;
       cursor: pointer;
       font-weight: normal;
+      color: var(--color-text-primary);
     }
 
     .checkbox-label input[type="checkbox"] {
@@ -171,18 +186,19 @@ import { WorkflowTemplatesService } from '../../../../../core/modules/workflow/w
     }
 
     .btn-primary {
-      background: #007bff;
-      color: white;
+      background: var(--color-primary);
+      color: var(--color-text-on-primary);
     }
 
     .btn-primary:disabled {
-      background: #ccc;
+      background: var(--color-background-disabled);
+      color: var(--color-text-secondary);
       cursor: not-allowed;
     }
 
     .btn-secondary {
-      background: #6c757d;
-      color: white;
+      background: var(--color-text-secondary);
+      color: var(--color-text-on-primary);
     }
   `]
 })

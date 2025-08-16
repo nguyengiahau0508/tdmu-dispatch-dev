@@ -1,13 +1,16 @@
 <div class="units">
   <div class="units__header">
     <div class="header__group">
+      <!-- <div class="header__title">
+        <h2>Quản lý đơn vị</h2>
+      </div> -->
       <div class="header__search">
         <input type="text" placeholder="Tìm đơn vị..." />
       </div>
       <div class="header__add">
-        <button (click)="toggleUnitCreate()">
-          <img src="/icons/add.svg" alt="Thêm" />
-          Thêm
+        <button class="btn btn-primary" (click)="toggleUnitCreate()">
+          <span class="btn-icon">+</span>
+          Thêm đơn vị
         </button>
       </div>
     </div>
@@ -29,6 +32,7 @@
              <th>Ngày thành lập</th>
              <th>Email</th>
              <th>Số điện thoại</th>
+             <th>Trạng thái</th>
              <th></th>
            </tr>
          </thead>
@@ -37,23 +41,32 @@
            @for (unit of units; track unit.id) {
            <tr class="unit-row">
              <td>{{ unit.id }}</td>
-             <td [title]="unit.unitName" class="unit-name-cell">
-               {{ unit.unitName }}
+             <td class="unit-name-cell">
+               <div class="unit-name">{{ unit.unitName }}</div>
+               <!-- <div class="unit-description">{{ unit.unitDescription || 'Không có mô tả' }}</div> -->
              </td>
              <td>{{ unit.unitType?.typeName || '-' }}</td>
              <td>{{ unit.parentUnit?.unitName || '-' }}</td>
              <td>{{ (unit.establishmentDate | date:'dd/MM/yyyy') || '-' }}</td>
              <td>{{ unit.email || '-' }}</td>
              <td>{{ unit.phone || '-' }}</td>
-
+             <td>
+               <span class="status-badge status-active">Hoạt động</span>
+             </td>
              <td class="row-actions">
                <div class="actions-menu">
                  <button class="menu-button" (click)="toggleMenu(unit.id)">⋮</button>
 
                  @if (selectedMenuId === unit.id) {
                  <div class="dropdown-menu" (mouseleave)="toggleMenu(unit.id)">
-                   <button (click)="onEditUnit(unit)">Sửa</button>
-                   <button (click)="onDeleteUnit(unit)">Xóa</button>
+                   <button class="menu-item" (click)="onEditUnit(unit)">
+                     <span class="btn-icon">✏️</span>
+                     Chỉnh sửa
+                   </button>
+                   <button class="menu-item" (click)="onDeleteUnit(unit)">
+                     <span class="btn-icon">🗑️</span>
+                     Xóa
+                   </button>
                  </div>
                  }
                </div>
@@ -63,7 +76,14 @@
          </tbody>
        </table>
     } @else {
-    <p>Chưa có dữ liệu đơn vị.</p>
+    <div class="empty-state">
+      <span class="empty-icon">🏛️</span>
+      <p>Chưa có dữ liệu đơn vị.</p>
+      <button class="btn btn-primary" (click)="toggleUnitCreate()">
+        <span class="btn-icon">+</span>
+        Thêm đơn vị đầu tiên
+      </button>
+    </div>
     }
   </div>
 </div>

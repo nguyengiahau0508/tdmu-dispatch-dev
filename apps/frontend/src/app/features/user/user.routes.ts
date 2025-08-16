@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { IncomingDocuments } from './incoming-documents/incoming-documents';
 import { OutgoingDocuments } from './outgoing-documents/outgoing-documents';
 import { AllDocuments } from './all-documents/all-documents';
-import { WorkflowInstances } from './workflow/workflow-instances';
+import { WORKFLOW_ROUTES } from './workflow/workflow.routes';
 
 export const USER_ROUTES: Routes = [
   {
@@ -21,13 +21,14 @@ export const USER_ROUTES: Routes = [
     title: 'Công văn đi'
   },
   {
-    path: 'workflow-instances',
-    component: WorkflowInstances,
+    path: 'workflow',
+    children: WORKFLOW_ROUTES,
     title: 'Quy trình xử lý'
   },
+
   {
     path: '',
-    redirectTo: 'all-documents',
+    redirectTo: 'workflow',
     pathMatch: 'full'
   }
 ];

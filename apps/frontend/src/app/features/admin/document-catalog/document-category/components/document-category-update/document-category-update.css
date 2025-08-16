@@ -1,72 +1,162 @@
+/* ===== Backdrop (Wrapper ngoài) ===== */
 .document-category-update__backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.2);
-  z-index: 1000;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+  box-sizing: border-box;
 }
+
+/* ===== Container chính ===== */
 .document-category-update {
-  background: #fff;
+  background-color: var(--color-background-primary);
+  padding: 2.5rem;
   border-radius: 8px;
-  padding: 32px 24px;
-  min-width: 350px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+  box-shadow: var(--shadow-default);
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.25s ease-in-out;
 }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===== Form ===== */
+.document-category-form {
+  display: flex;
+  flex-direction: column;
+}
+
 .document-category-form__title {
-  margin-bottom: 8px;
-  font-size: 20px;
+  font-size: 1.75rem;
   font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
 }
+
 .document-category-form__subtitle {
-  margin-bottom: 16px;
-  color: #888;
-  font-size: 14px;
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 1.5rem;
 }
+
+/* ===== Group Input ===== */
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 1.5rem;
 }
+
 .form-group__label {
   display: block;
-  margin-bottom: 4px;
-  font-weight: 600;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
 }
-.form-group__input, .form-group__textarea {
+
+.form-group__input,
+.form-group__textarea {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 15px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  box-sizing: border-box;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
+
+.form-group__input:focus,
+.form-group__textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
+.form-group__textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
 .form-error {
   color: #e74c3c;
   font-size: 13px;
   margin-top: 2px;
 }
+
+/* ===== Action Buttons ===== */
 .document-category-form__actions {
   display: flex;
-  gap: 12px;
   justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
-.document-category-form__submit-button {
-  background: var(--color-primary, #1976d2);
-  color: #fff;
-  border: none;
-  padding: 8px 18px;
-  border-radius: 4px;
-  font-weight: 600;
-  cursor: pointer;
-}
+
+.document-category-form__submit-button,
 .document-category-form__cancel-button {
-  background: #eee;
-  color: #333;
-  border: none;
-  padding: 8px 18px;
-  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
+  border: none;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+/* Nút "Cập nhật" */
+.document-category-form__submit-button {
+  background-color: var(--color-primary);
+  color: var(--color-text-on-primary);
+}
+
+.document-category-form__submit-button:hover {
+  background: color-mix(in srgb, var(--color-primary) 80%, black);
+}
+
+.document-category-form__submit-button:active {
+  transform: scale(0.98);
+}
+
+/* Nút "Hủy" */
+.document-category-form__cancel-button {
+  background-color: var(--color-text-secondary);
+  color: var(--color-text-on-primary);
+}
+
+.document-category-form__cancel-button:hover {
+  background: color-mix(in srgb, var(--color-text-secondary) 80%, black);
+}
+
+/* ===== Responsive nhỏ gọn ===== */
+@media (max-width: 480px) {
+  .document-category-update {
+    padding: 1.5rem;
+  }
+
+  .document-category-form__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .document-category-form__submit-button,
+  .document-category-form__cancel-button {
+    width: 100%;
+  }
 }

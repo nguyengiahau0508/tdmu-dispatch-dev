@@ -1,9 +1,8 @@
-/* ===== Backdrop (Warp ngoài) ===== */
-.unit-type-create__backdrop {
+/* ===== Backdrop (Wrapper ngoài) ===== */
+.unit-type-update__backdrop {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  /* lớp phủ mờ */
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -13,22 +12,19 @@
 }
 
 /* ===== Container chính ===== */
-.unit-type-create {
+.unit-type-update {
   background-color: var(--color-background-primary);
   padding: 2.5rem;
-  border-radius: 12px;
+  border-radius: 8px;
   box-shadow: var(--shadow-default);
   width: 100%;
-  max-width: 480px;
-  height: 600px; /* Chiều cao cố định */
+  max-width: 600px;
   max-height: 90vh;
-  min-height: 400px;
+  overflow-y: auto;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   animation: fadeIn 0.25s ease-in-out;
-  overflow-y: auto; /* Hiện thanh trượt dọc nếu vượt quá */
-  overflow-x: hidden;
 }
 
 @keyframes fadeIn {
@@ -36,7 +32,6 @@
     opacity: 0;
     transform: scale(0.98);
   }
-
   to {
     opacity: 1;
     transform: scale(1);
@@ -49,19 +44,17 @@
   flex-direction: column;
 }
 
-/* Tiêu đề */
 .unit-type-form__title {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--color-text-primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
-/* Mô tả phụ */
 .unit-type-form__subtitle {
   font-size: 1rem;
   color: var(--color-text-secondary);
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 /* ===== Group Input ===== */
@@ -73,7 +66,7 @@
   display: block;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
   margin-bottom: 0.5rem;
 }
 
@@ -121,14 +114,14 @@
   transition: background-color 0.3s, transform 0.1s;
 }
 
-/* Nút "Thêm" */
+/* Nút "Cập nhật" */
 .unit-type-form__submit-button {
   background-color: var(--color-primary);
   color: var(--color-text-on-primary);
 }
 
 .unit-type-form__submit-button:hover {
-  opacity: 0.9;
+  background: color-mix(in srgb, var(--color-primary) 80%, black);
 }
 
 .unit-type-form__submit-button:active {
@@ -137,17 +130,17 @@
 
 /* Nút "Hủy" */
 .unit-type-form__cancel-button {
-  background-color: #e0e0e0;
-  color: var(--color-text-secondary);
+  background-color: var(--color-text-secondary);
+  color: var(--color-text-on-primary);
 }
 
 .unit-type-form__cancel-button:hover {
-  opacity: 0.85;
+  background: color-mix(in srgb, var(--color-text-secondary) 80%, black);
 }
 
 /* ===== Responsive nhỏ gọn ===== */
 @media (max-width: 480px) {
-  .unit-type-create {
+  .unit-type-update {
     padding: 1.5rem;
   }
 

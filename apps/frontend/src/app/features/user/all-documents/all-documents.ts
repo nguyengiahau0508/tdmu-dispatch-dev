@@ -10,41 +10,43 @@ import { DocumentDetailComponent } from '../document-detail/document-detail.comp
   standalone: true,
   imports: [CommonModule, FormsModule, DocumentFormComponent, DocumentDetailComponent],
   template: `
-    <div class="all-documents-container">
-      <div class="header">
-        <h2>📋 Tất cả công văn</h2>
-        <div class="actions">
-          <button class="btn btn-primary" (click)="createDocument()">
-            <i class="icon">📄</i> Tạo công văn mới
-          </button>
+    <div class="documents">
+      <div class="documents__header">
+        <div class="header__group">
+          <!-- <div class="header__title">
+            <h2>Quản lý công văn</h2>
+          </div> -->
+          <div class="header__search">
+            <input 
+              type="text" 
+              [(ngModel)]="searchTerm" 
+              (input)="applyFilters()"
+              placeholder="Tìm kiếm công văn..."
+            />
+          </div>
+          <div class="header__add">
+            <button class="btn btn-primary" (click)="createDocument()">
+              <span class="btn-icon">+</span>
+              Tạo công văn mới
+            </button>
+          </div>
         </div>
-      </div>
-
-      <!-- Filters -->
-      <div class="filters">
-        <div class="search-box">
-          <input 
-            type="text" 
-            [(ngModel)]="searchTerm" 
-            (input)="applyFilters()"
-            placeholder="🔍 Tìm kiếm theo tiêu đề..."
-            class="form-control"
-          >
-        </div>
-        <div class="filter-options">
-          <select [(ngModel)]="selectedDocumentType" (change)="applyFilters()" class="form-control">
-            <option value="">Tất cả loại</option>
-            <option value="INCOMING">Công văn đến</option>
-            <option value="OUTGOING">Công văn đi</option>
-            <option value="INTERNAL">Nội bộ</option>
-          </select>
-          <select [(ngModel)]="selectedStatus" (change)="applyFilters()" class="form-control">
-            <option value="">Tất cả trạng thái</option>
-            <option value="draft">Nháp</option>
-            <option value="pending">Chờ xử lý</option>
-            <option value="approved">Đã duyệt</option>
-            <option value="rejected">Từ chối</option>
-          </select>
+        <div class="header__group header__group--block">
+          <div class="filter-options">
+            <select [(ngModel)]="selectedDocumentType" (change)="applyFilters()" class="filter-select">
+              <option value="">Tất cả loại</option>
+              <option value="INCOMING">Công văn đến</option>
+              <option value="OUTGOING">Công văn đi</option>
+              <option value="INTERNAL">Nội bộ</option>
+            </select>
+            <select [(ngModel)]="selectedStatus" (change)="applyFilters()" class="filter-select">
+              <option value="">Tất cả trạng thái</option>
+              <option value="draft">Nháp</option>
+              <option value="pending">Chờ xử lý</option>
+              <option value="approved">Đã duyệt</option>
+              <option value="rejected">Từ chối</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -54,80 +56,92 @@ import { DocumentDetailComponent } from '../document-detail/document-detail.comp
         <p>Đang tải danh sách công văn...</p>
       </div>
 
-      <!-- Debug Info -->
-      <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 4px;">
-        <p><strong>Debug Info:</strong></p>
-        <p>Loading: {{ isLoading }}</p>
-        <p>Documents length: {{ documents.length }}</p>
-        <p>Filtered documents length: {{ filteredDocuments.length }}</p>
-        <p>Search term: "{{ searchTerm }}"</p>
-        <p>Selected type: "{{ selectedDocumentType }}"</p>
-        <p>Selected status: "{{ selectedStatus }}"</p>
-      </div>
+      <div class="documents__main">
+        @if (!isLoading && filteredDocuments.length > 0) {
+        <table class="documents__table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tiêu đề</th>
+              <th>Loại</th>
+              <th>Nhóm</th>
+              <th>Trạng thái</th>
+              <th>Ngày tạo</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (document of filteredDocuments; track document.id) {
+            <tr class="document-row" (click)="viewDetail(document)">
+              <td>{{ document.id }}</td>
+              <td class="document-title-cell">
+                <div class="document-title">{{ document.title }}</div>
+                @if (document.content) {
+                <div class="document-preview">{{ document.content | slice:0:100 }}{{ document.content.length > 100 ? '...' : '' }}</div>
+                }
+              </td>
+              <td>
+                <span class="document-type-badge" [class]="'type-' + document.documentType.toLowerCase()">
+                  {{ getDocumentTypeLabel(document.documentType) }}
+                </span>
+              </td>
+              <td>
+                @if (document.documentCategory) {
+                {{ document.documentCategory.name }}
+                } @else {
+                <span class="text-muted">Chưa phân loại</span>
+                }
+              </td>
+              <td>
+                <span class="document-status" [class]="'status-' + (document.status || 'draft')">
+                  {{ getStatusLabel(document.status || 'draft') }}
+                </span>
+              </td>
+              <td>
+                {{ document.createdAt | date:'dd/MM/yyyy' }}
+              </td>
+              <td class="row-actions">
+                <div class="actions-menu">
+                  <button class="menu-button" (click)="toggleMenu(document.id)">⋮</button>
 
-      <!-- Documents List -->
-      <div *ngIf="!isLoading && filteredDocuments.length > 0" class="documents-list">
-        <div class="document-item" *ngFor="let document of filteredDocuments" (click)="viewDetail(document)">
-          <div class="document-header">
-            <h3 class="document-title">{{ document.title }}</h3>
-            <div class="document-type-badge" [class]="'type-' + document.documentType.toLowerCase()">
-              {{ getDocumentTypeLabel(document.documentType) }}
-            </div>
-          </div>
-          <div class="document-meta">
-            <span class="document-category" *ngIf="document.documentCategory">
-              📁 {{ document.documentCategory.name }}
-            </span>
-            <span class="document-status" [class]="'status-' + (document.status || 'draft')">
-              {{ getStatusLabel(document.status || 'draft') }}
-            </span>
-            <span class="document-date">
-              📅 {{ document.createdAt | date:'dd/MM/yyyy HH:mm' }}
-            </span>
-          </div>
-          <div class="document-content" *ngIf="document.content">
-            <p class="content-preview">{{ document.content | slice:0:150 }}{{ document.content.length > 150 ? '...' : '' }}</p>
-          </div>
-          <div class="document-actions">
-            <button class="btn btn-sm btn-outline-primary" (click)="editDocument($event, document)">
-              ✏️ Sửa
-            </button>
-            <button class="btn btn-sm btn-outline-danger" (click)="deleteDocument($event, document)">
-              🗑️ Xóa
-            </button>
-          </div>
+                  @if (selectedMenuId === document.id) {
+                  <div class="dropdown-menu" (mouseleave)="toggleMenu(document.id)">
+                    <button class="menu-item" (click)="viewDetail(document)">
+                      <span class="btn-icon">👁️</span>
+                      Xem chi tiết
+                    </button>
+                    <button class="menu-item" (click)="editDocument($event, document)">
+                      <span class="btn-icon">✏️</span>
+                      Chỉnh sửa
+                    </button>
+                    <button class="menu-item" (click)="deleteDocument($event, document)">
+                      <span class="btn-icon">🗑️</span>
+                      Xóa
+                    </button>
+                  </div>
+                  }
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+        } @else if (!isLoading && filteredDocuments.length === 0) {
+        <div class="empty-state">
+          <span class="empty-icon">📭</span>
+          <h3>Không có công văn nào</h3>
+          <p>Chưa có công văn nào được tạo hoặc không tìm thấy công văn phù hợp với bộ lọc.</p>
+          <button class="btn btn-primary" (click)="createDocument()">
+            <span class="btn-icon">+</span>
+            Tạo công văn đầu tiên
+          </button>
         </div>
-      </div>
-
-      <!-- Empty State -->
-      <div *ngIf="!isLoading && filteredDocuments.length === 0" class="empty-state">
-        <div class="empty-icon">📭</div>
-        <h3>Không có công văn nào</h3>
-        <p>Chưa có công văn nào được tạo hoặc không tìm thấy công văn phù hợp với bộ lọc.</p>
-        <button class="btn btn-primary" (click)="createDocument()">
-          📄 Tạo công văn đầu tiên
-        </button>
-      </div>
-
-      <!-- Pagination -->
-      <div *ngIf="!isLoading && totalPages > 1" class="pagination">
-        <button 
-          class="btn btn-outline-primary" 
-          [disabled]="currentPage === 1"
-          (click)="changePage(currentPage - 1)"
-        >
-          ← Trước
-        </button>
-        <span class="page-info">
-          Trang {{ currentPage }} / {{ totalPages }}
-        </span>
-        <button 
-          class="btn btn-outline-primary" 
-          [disabled]="currentPage === totalPages"
-          (click)="changePage(currentPage + 1)"
-        >
-          Sau →
-        </button>
+        } @else {
+        <div class="loading">
+          <div class="spinner">⏳</div>
+          <p>Đang tải danh sách công văn...</p>
+        </div>
+        }
       </div>
     </div>
 
@@ -166,62 +180,288 @@ import { DocumentDetailComponent } from '../document-detail/document-detail.comp
     </div>
   `,
   styles: [`
-    .all-documents-container {
+    .documents {
       padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
+      background: var(--color-background-layout);
+      min-height: 100vh;
     }
 
-    .header {
+    /* Header chứa tìm kiếm và thêm */
+    .documents__header {
+      background: var(--color-background-primary);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-default);
+    }
+
+    .header__group {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid #e0e0e0;
+      margin-bottom: 15px;
     }
 
-    .header h2 {
+    .header__group:last-child {
+      margin-bottom: 0;
+    }
+
+    .header__group--block {
+      display: block;
+    }
+
+    .header__title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header__title h2 {
       margin: 0;
-      color: #2c3e50;
-      font-size: 1.8rem;
+      color: var(--color-text-primary);
+      font-size: 1.5rem;
+      font-weight: 600;
     }
 
-    .actions .btn {
-      padding: 10px 20px;
+    /* Ô tìm kiếm */
+    .documents__header .header__search input {
+      padding: 10px 15px;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      width: 300px;
+      font-size: 14px;
+      background-color: var(--color-background-secondary);
+      color: var(--color-text-primary);
+    }
+
+    .documents__header .header__search input::placeholder {
+      color: var(--color-text-secondary);
       font-size: 14px;
     }
 
-    .filters {
+    /* Nút Thêm */
+    .documents__header .header__add button {
       display: flex;
-      gap: 15px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: var(--color-primary);
+      color: var(--color-text-on-primary);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background-color 0.2s;
     }
 
-    .search-box {
-      flex: 1;
-      min-width: 250px;
+    .documents__header .header__add button:hover {
+      background: color-mix(in srgb, var(--color-primary) 80%, black);
     }
 
+    /* Filter options */
     .filter-options {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       flex-wrap: wrap;
     }
 
-    .filter-options select {
+    .filter-select {
+      padding: 10px 15px;
+      font-size: 14px;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      background-color: var(--color-background-secondary);
+      color: var(--color-text-primary);
       min-width: 150px;
     }
 
+    .documents__main {
+      background: var(--color-background-primary);
+      border-radius: 8px;
+      box-shadow: var(--shadow-default);
+      overflow: hidden;
+    }
+
+    /* Table style */
+    .documents__table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .documents__table thead {
+      background: var(--color-background-secondary);
+    }
+
+    .documents__table th {
+      background: var(--color-background-secondary);
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      border-bottom: 2px solid var(--color-border);
+      font-size: 14px;
+    }
+
+    .documents__table td {
+      padding: 15px;
+      border-bottom: 1px solid var(--color-border);
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    .documents__table tr:hover {
+      background: color-mix(in srgb, var(--color-primary) 5%, var(--color-background-secondary));
+      cursor: pointer;
+    }
+
+    /* Document title cell */
+    .document-title-cell {
+      max-width: 300px;
+    }
+
+    .document-title {
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 4px;
+    }
+
+    .document-preview {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      line-height: 1.4;
+    }
+
+    /* Document type badges */
+    .document-type-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .type-incoming {
+      background: color-mix(in srgb, var(--color-primary) 15%, var(--color-background-secondary));
+      color: var(--color-primary);
+    }
+
+    .type-outgoing {
+      background: color-mix(in srgb, var(--color-accent) 15%, var(--color-background-secondary));
+      color: var(--color-accent);
+    }
+
+    .type-internal {
+      background: color-mix(in srgb, var(--color-primary) 10%, var(--color-background-secondary));
+      color: var(--color-primary);
+    }
+
+    /* Document status */
+    .document-status {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-draft {
+      background: var(--color-background-disabled);
+      color: var(--color-text-secondary);
+    }
+
+    .status-pending {
+      background: color-mix(in srgb, var(--color-accent) 15%, var(--color-background-secondary));
+      color: var(--color-accent);
+    }
+
+    .status-approved {
+      background: color-mix(in srgb, var(--color-primary) 15%, var(--color-background-secondary));
+      color: var(--color-primary);
+    }
+
+    .status-rejected {
+      background: color-mix(in srgb, #dc3545 15%, var(--color-background-secondary));
+      color: #dc3545;
+    }
+
+    /* Text muted */
+    .text-muted {
+      color: var(--color-text-secondary);
+      font-style: italic;
+    }
+
+    /* Cột hành động */
+    .row-actions {
+      position: relative;
+      text-align: right;
+      width: 100px;
+    }
+
+    /* Nút 3 chấm */
+    .menu-button {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 4px;
+      color: var(--color-text-secondary);
+      transition: background-color 0.2s;
+    }
+
+    .menu-button:hover {
+      background: var(--color-background-secondary);
+      color: var(--color-primary);
+    }
+
+    /* Dropdown menu */
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: var(--color-background-primary);
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      box-shadow: var(--shadow-default);
+      z-index: 1000;
+      min-width: 150px;
+      padding: 8px 0;
+    }
+
+    .dropdown-menu button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 15px;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--color-text-primary);
+      transition: background-color 0.2s;
+    }
+
+    .dropdown-menu button:hover {
+      background: var(--color-background-secondary);
+      color: var(--color-primary);
+    }
+
+    /* Loading */
     .loading {
       text-align: center;
-      padding: 40px;
+      padding: 60px 20px;
+      color: var(--color-text-secondary);
     }
 
     .spinner {
       font-size: 2rem;
       animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
     }
 
     @keyframes spin {
@@ -229,158 +469,85 @@ import { DocumentDetailComponent } from '../document-detail/document-detail.comp
       100% { transform: rotate(360deg); }
     }
 
-    .documents-list {
-      display: grid;
-      gap: 15px;
-    }
-
-    .document-item {
-      background: white;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 20px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .document-item:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-      border-color: #3498db;
-    }
-
-    .document-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 10px;
-    }
-
-    .document-title {
-      margin: 0;
-      font-size: 1.2rem;
-      color: #2c3e50;
-      flex: 1;
-      margin-right: 15px;
-    }
-
-    .document-type-badge {
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-
-    .type-incoming {
-      background: #e8f5e8;
-      color: #27ae60;
-    }
-
-    .type-outgoing {
-      background: #fff3cd;
-      color: #f39c12;
-    }
-
-    .type-internal {
-      background: #e3f2fd;
-      color: #2196f3;
-    }
-
-    .document-meta {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
-      font-size: 14px;
-      color: #666;
-    }
-
-    .document-category {
-      color: #3498db;
-      font-weight: 500;
-    }
-
-    .document-status {
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-size: 12px;
-      font-weight: bold;
-    }
-
-    .status-draft {
-      background: #f8f9fa;
-      color: #6c757d;
-    }
-
-    .status-pending {
-      background: #fff3cd;
-      color: #856404;
-    }
-
-    .status-approved {
-      background: #d4edda;
-      color: #155724;
-    }
-
-    .status-rejected {
-      background: #f8d7da;
-      color: #721c24;
-    }
-
-    .document-content {
-      margin-bottom: 15px;
-    }
-
-    .content-preview {
-      color: #666;
-      line-height: 1.5;
-      margin: 0;
-    }
-
-    .document-actions {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-    }
-
-    .btn-sm {
-      padding: 5px 10px;
-      font-size: 12px;
-    }
-
+    /* Empty state */
     .empty-state {
       text-align: center;
       padding: 60px 20px;
-      color: #666;
+      color: var(--color-text-secondary);
     }
 
     .empty-icon {
-      font-size: 4rem;
-      margin-bottom: 20px;
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
     }
 
     .empty-state h3 {
-      margin-bottom: 10px;
-      color: #2c3e50;
+      margin-bottom: 0.5rem;
+      color: var(--color-text-primary);
+      font-size: 1.25rem;
+      font-weight: 600;
     }
 
-    .pagination {
+    .empty-state p {
+      margin-bottom: 1.5rem;
+      color: var(--color-text-secondary);
+      font-size: 16px;
+    }
+
+    /* Button styles */
+    .btn {
       display: flex;
-      justify-content: center;
       align-items: center;
-      gap: 15px;
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid #e0e0e0;
-    }
-
-    .page-info {
+      gap: 8px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
       font-weight: 500;
-      color: #666;
+      transition: background-color 0.2s;
     }
 
+    .btn-primary {
+      background: var(--color-primary);
+      color: var(--color-text-on-primary);
+    }
+
+    .btn-primary:hover {
+      background: color-mix(in srgb, var(--color-primary) 80%, black);
+    }
+
+    .btn-icon {
+      font-size: 16px;
+    }
+
+    /* Menu item styles */
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 15px;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--color-text-primary);
+      transition: background-color 0.2s;
+    }
+
+    .menu-item:hover {
+      background: var(--color-background-secondary);
+      color: var(--color-primary);
+    }
+
+    .menu-item .btn-icon {
+      font-size: 14px;
+    }
+
+    /* Modal styles */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -395,12 +562,12 @@ import { DocumentDetailComponent } from '../document-detail/document-detail.comp
     }
 
     .modal-content {
-      background: white;
+      background: var(--color-background-primary);
       border-radius: 8px;
       max-width: 90%;
       max-height: 90%;
       overflow: auto;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      box-shadow: var(--shadow-default);
     }
 
     .modal-header {
@@ -408,12 +575,14 @@ import { DocumentDetailComponent } from '../document-detail/document-detail.comp
       justify-content: space-between;
       align-items: center;
       padding: 20px;
-      border-bottom: 1px solid #e0e0e0;
+      border-bottom: 1px solid var(--color-border);
     }
 
     .modal-header h3 {
       margin: 0;
-      color: #2c3e50;
+      color: var(--color-text-primary);
+      font-size: 1.25rem;
+      font-weight: 600;
     }
 
     .btn-close {
@@ -421,54 +590,77 @@ import { DocumentDetailComponent } from '../document-detail/document-detail.comp
       border: none;
       font-size: 24px;
       cursor: pointer;
-      color: #666;
+      color: var(--color-text-secondary);
       padding: 0;
       width: 30px;
       height: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
+      border-radius: 4px;
+      transition: background-color 0.2s;
     }
 
     .btn-close:hover {
-      color: #333;
+      background: var(--color-background-secondary);
+      color: var(--color-text-primary);
     }
 
     .modal-body {
       padding: 20px;
     }
 
+    /* Responsive design */
     @media (max-width: 768px) {
-      .header {
+      .documents {
+        padding: 10px;
+      }
+
+      .header__group {
         flex-direction: column;
         gap: 15px;
         align-items: stretch;
       }
 
-      .filters {
-        flex-direction: column;
+      .header__search input {
+        width: 100%;
       }
 
       .filter-options {
         flex-direction: column;
       }
 
-      .document-header {
-        flex-direction: column;
-        gap: 10px;
+      .filter-select {
+        width: 100%;
       }
 
-      .document-meta {
-        flex-direction: column;
-        gap: 5px;
+      .documents__table {
+        font-size: 12px;
       }
 
-      .document-actions {
-        justify-content: stretch;
+      .documents__table th,
+      .documents__table td {
+        padding: 10px 8px;
       }
 
-      .btn-sm {
-        flex: 1;
+      .document-title-cell {
+        max-width: 200px;
+      }
+
+      .dropdown-menu {
+        width: 150px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .documents__table {
+        display: block;
+        overflow-x: auto;
+      }
+
+      .documents__table th,
+      .documents__table td {
+        min-width: 100px;
       }
     }
   `]
@@ -489,6 +681,9 @@ export class AllDocuments implements OnInit {
   currentPage = 1;
   totalPages = 1;
   pageSize = 10;
+
+  // Menu state
+  selectedMenuId: number | null = null;
 
   constructor(private documentsService: DocumentsService) {
     // Initialize arrays to prevent undefined errors
@@ -642,5 +837,9 @@ export class AllDocuments implements OnInit {
       case 'rejected': return 'Từ chối';
       default: return status;
     }
+  }
+
+  toggleMenu(documentId: number): void {
+    this.selectedMenuId = this.selectedMenuId === documentId ? null : documentId;
   }
 }

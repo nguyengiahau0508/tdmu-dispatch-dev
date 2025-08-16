@@ -1,15 +1,15 @@
 .workflow {
   padding: 20px;
-  background: #f8f9fa;
+  background: var(--color-background-layout);
   min-height: 100vh;
 }
 
 .workflow__header {
-  background: white;
+  background: var(--color-background-primary);
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-default);
 }
 
 .header__group {
@@ -27,12 +27,27 @@
   display: block;
 }
 
+.header__title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header__title h2 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
 .header__search input {
   padding: 10px 15px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   width: 300px;
   font-size: 14px;
+  background-color: var(--color-background-secondary);
+  color: var(--color-text-primary);
 }
 
 .header__add button {
@@ -40,8 +55,8 @@
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background: #007bff;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -51,7 +66,7 @@
 }
 
 .header__add button:hover {
-  background: #0056b3;
+  background: color-mix(in srgb, var(--color-primary) 80%, black);
 }
 
 .header__add img {
@@ -60,9 +75,9 @@
 }
 
 .workflow__main {
-  background: white;
+  background: var(--color-background-primary);
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-default);
   overflow: hidden;
 }
 
@@ -72,24 +87,24 @@
 }
 
 .workflow__table th {
-  background: #f8f9fa;
+  background: var(--color-background-secondary);
   padding: 15px;
   text-align: left;
   font-weight: 600;
-  color: #495057;
-  border-bottom: 2px solid #dee2e6;
+  color: var(--color-text-primary);
+  border-bottom: 2px solid var(--color-border);
   font-size: 14px;
 }
 
 .workflow__table td {
   padding: 15px;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid var(--color-border);
   font-size: 14px;
   vertical-align: middle;
 }
 
 .workflow-row:hover {
-  background: #f8f9fa;
+  background: color-mix(in srgb, var(--color-primary) 5%, var(--color-background-secondary));
 }
 
 .workflow-name {
@@ -99,12 +114,12 @@
 
 .workflow-name .name {
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   margin-bottom: 4px;
 }
 
 .description {
-  color: #666;
+  color: var(--color-text-secondary);
   font-size: 13px;
   max-width: 200px;
   overflow: hidden;
@@ -122,22 +137,22 @@
 }
 
 .status-badge.status-active {
-  background: #d4edda;
-  color: #155724;
+  background: color-mix(in srgb, var(--color-primary) 15%, var(--color-background-secondary));
+  color: var(--color-primary);
 }
 
 .status-badge.status-inactive {
-  background: #f8d7da;
-  color: #721c24;
+  background: color-mix(in srgb, #dc3545 15%, var(--color-background-secondary));
+  color: #dc3545;
 }
 
 .steps-count {
-  color: #666;
+  color: var(--color-text-secondary);
   font-size: 13px;
 }
 
 .creator {
-  color: #333;
+  color: var(--color-text-primary);
   font-weight: 500;
 }
 
@@ -156,22 +171,23 @@
   cursor: pointer;
   padding: 5px;
   border-radius: 4px;
-  color: #666;
+  color: var(--color-text-secondary);
   transition: background-color 0.2s;
 }
 
 .menu-button:hover {
-  background: #f8f9fa;
+  background: var(--color-background-secondary);
+  color: var(--color-primary);
 }
 
 .dropdown-menu {
   position: absolute;
   top: 100%;
   right: 0;
-  background: white;
-  border: 1px solid #ddd;
+  background: var(--color-background-primary);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-default);
   z-index: 1000;
   min-width: 150px;
   padding: 8px 0;
@@ -188,12 +204,13 @@
   text-align: left;
   cursor: pointer;
   font-size: 14px;
-  color: #333;
+  color: var(--color-text-primary);
   transition: background-color 0.2s;
 }
 
 .menu-item:hover {
-  background: #f8f9fa;
+  background: var(--color-background-secondary);
+  color: var(--color-primary);
 }
 
 .menu-item--danger {
@@ -201,7 +218,7 @@
 }
 
 .menu-item--danger:hover {
-  background: #f8d7da;
+  background: color-mix(in srgb, #dc3545 10%, var(--color-background-secondary));
 }
 
 .menu-item img {
@@ -212,25 +229,25 @@
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #666;
+  color: var(--color-text-secondary);
 }
 
-.empty-state img {
-  width: 80px;
-  height: 80px;
-  margin-bottom: 20px;
+.empty-state .empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
   opacity: 0.5;
 }
 
 .empty-state p {
   font-size: 16px;
   margin-bottom: 20px;
+  color: var(--color-text-secondary);
 }
 
 .empty-state .btn {
   padding: 12px 24px;
-  background: #007bff;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -240,7 +257,7 @@
 }
 
 .empty-state .btn:hover {
-  background: #0056b3;
+  background: color-mix(in srgb, var(--color-primary) 80%, black);
 }
 
 /* Responsive */

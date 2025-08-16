@@ -2,6 +2,8 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, ILike } from 'typeorm';
@@ -15,6 +17,7 @@ import { WorkflowActionInput } from './dto/workflow-action/workflow-action.input
 import { WorkflowStepsService } from '../workflow-steps/workflow-steps.service';
 import { WorkflowActionLogsService } from '../workflow-action-logs/workflow-action-logs.service';
 import { WorkflowTemplatesService } from '../workflow-templates/workflow-templates.service';
+import { WorkflowPermissionsService } from '../workflow-permissions/workflow-permissions.service';
 import { User } from 'src/modules/users/entities/user.entity';
 import { ActionType } from '../workflow-action-logs/entities/workflow-action-log.entity';
 import { StepType } from '../workflow-steps/entities/workflow-step.entity';
@@ -27,6 +30,8 @@ export class WorkflowInstancesService {
     private readonly workflowStepsService: WorkflowStepsService,
     private readonly workflowActionLogsService: WorkflowActionLogsService,
     private readonly workflowTemplatesService: WorkflowTemplatesService,
+    @Inject(forwardRef(() => WorkflowPermissionsService))
+    private readonly workflowPermissionsService: WorkflowPermissionsService,
   ) {}
 
   async create(
@@ -39,6 +44,11 @@ export class WorkflowInstancesService {
     );
     if (!template.isActive) {
       throw new BadRequestException('Workflow template is not active');
+    }
+
+    // Kiểm tra quyền tạo workflow
+    if (!this.workflowPermissionsService.canCreateWorkflow(user, template.id)) {
+      throw new BadRequestException('User does not have permission to create this workflow');
     }
 
     // Get first step (START step)
@@ -91,7 +101,7 @@ export class WorkflowInstancesService {
 
   async findAll(): Promise<WorkflowInstance[]> {
     return this.repository.find({
-      relations: ['template', 'currentStep', 'createdByUser', 'logs'],
+      relations: ['template', 'currentStep', 'createdByUser', 'logs', 'logs.actionByUser'],
       order: { createdAt: 'DESC' },
     });
   }
@@ -119,7 +129,7 @@ export class WorkflowInstancesService {
   async findByUser(userId: number): Promise<WorkflowInstance[]> {
     return this.repository.find({
       where: { createdByUserId: userId },
-      relations: ['template', 'currentStep', 'createdByUser', 'logs'],
+      relations: ['template', 'currentStep', 'createdByUser', 'logs', 'logs.actionByUser'],
       order: { createdAt: 'DESC' },
     });
   }
@@ -133,6 +143,7 @@ export class WorkflowInstancesService {
       .leftJoinAndSelect('instance.currentStep', 'currentStep')
       .leftJoinAndSelect('instance.createdByUser', 'createdByUser')
       .leftJoinAndSelect('instance.logs', 'logs')
+      .leftJoinAndSelect('logs.actionByUser', 'actionByUser')
       .where('currentStep.assignedRole = :assignedRole', { assignedRole })
       .andWhere('instance.status = :status', {
         status: WorkflowStatus.IN_PROGRESS,
@@ -166,8 +177,8 @@ export class WorkflowInstancesService {
       actionInput.stepId,
     );
 
-    // Validate user can perform action on this step
-    if (!user.roles.includes(currentStep.assignedRole as any)) {
+    // Validate user can perform action on this step using permissions service
+    if (!this.workflowPermissionsService.canPerformAction(user, currentStep, actionInput.actionType)) {
       throw new BadRequestException(
         'User does not have permission to perform this action',
       );
@@ -264,5 +275,19 @@ export class WorkflowInstancesService {
 
   async getPendingWorkflows(assignedRole: string): Promise<WorkflowInstance[]> {
     return this.findByCurrentStepAssignee(assignedRole);
+  }
+
+  async getMyPendingWorkflows(user: User): Promise<WorkflowInstance[]> {
+    const allInstances = await this.findAll();
+    return this.workflowPermissionsService.getActionableWorkflows(user, allInstances);
+  }
+
+  async getAvailableActions(instanceId: number, user: User): Promise<ActionType[]> {
+    const instance = await this.findOne(instanceId);
+    if (!instance.currentStep) {
+      return [];
+    }
+    
+    return this.workflowPermissionsService.getAvailableActions(instance.currentStep);
   }
 }

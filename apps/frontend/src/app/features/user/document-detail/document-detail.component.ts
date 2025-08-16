@@ -94,7 +94,7 @@ import { FileService } from '../../../core/services/file.service';
     }
 
     .document-detail-modal {
-      background: white;
+      background: var(--color-background-primary);
       border-radius: 8px;
       width: 90%;
       max-width: 700px;
@@ -107,13 +107,14 @@ import { FileService } from '../../../core/services/file.service';
       justify-content: space-between;
       align-items: center;
       padding: 20px;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid var(--color-border);
     }
 
     .modal-header h3 {
       margin: 0;
       font-size: 1.25rem;
       font-weight: 600;
+      color: var(--color-text-primary);
     }
 
     .close-btn {
@@ -121,11 +122,11 @@ import { FileService } from '../../../core/services/file.service';
       border: none;
       font-size: 1.5rem;
       cursor: pointer;
-      color: #6b7280;
+      color: var(--color-text-secondary);
     }
 
     .close-btn:hover {
-      color: #374151;
+      color: var(--color-text-primary);
     }
 
     .document-content {
@@ -147,12 +148,12 @@ import { FileService } from '../../../core/services/file.service';
     .info-row label {
       min-width: 120px;
       font-weight: 600;
-      color: #374151;
+      color: var(--color-text-primary);
     }
 
     .info-row span {
       flex: 1;
-      color: #6b7280;
+      color: var(--color-text-secondary);
     }
 
     .content-row {
@@ -163,11 +164,11 @@ import { FileService } from '../../../core/services/file.service';
       flex: 1;
       white-space: pre-wrap;
       line-height: 1.6;
-      color: #374151;
-      background: #f9fafb;
+      color: var(--color-text-primary);
+      background: var(--color-background-secondary);
       padding: 12px;
       border-radius: 6px;
-      border: 1px solid #e5e7eb;
+      border: 1px solid var(--color-border);
     }
 
     .status-badge {
@@ -177,10 +178,22 @@ import { FileService } from '../../../core/services/file.service';
       font-weight: 500;
     }
 
-    .status-draft { background: #f3f4f6; color: #374151; }
-    .status-pending { background: #fef3c7; color: #92400e; }
-    .status-processing { background: #dbeafe; color: #1e40af; }
-    .status-completed { background: #d1fae5; color: #065f46; }
+    .status-draft { 
+      background: var(--color-background-disabled); 
+      color: var(--color-text-secondary); 
+    }
+    .status-pending { 
+      background: color-mix(in srgb, var(--color-accent) 15%, var(--color-background-secondary)); 
+      color: var(--color-accent); 
+    }
+    .status-processing { 
+      background: color-mix(in srgb, var(--color-primary) 15%, var(--color-background-secondary)); 
+      color: var(--color-primary); 
+    }
+    .status-completed { 
+      background: color-mix(in srgb, var(--color-primary) 15%, var(--color-background-secondary)); 
+      color: var(--color-primary); 
+    }
 
     .file-info {
       display: flex;
@@ -190,10 +203,11 @@ import { FileService } from '../../../core/services/file.service';
 
     .file-name {
       font-family: monospace;
-      background: #f3f4f6;
+      background: var(--color-background-secondary);
       padding: 4px 8px;
       border-radius: 4px;
       font-size: 12px;
+      color: var(--color-text-secondary);
     }
 
     .modal-footer {
@@ -201,7 +215,7 @@ import { FileService } from '../../../core/services/file.service';
       justify-content: flex-end;
       gap: 12px;
       padding: 20px;
-      border-top: 1px solid #e5e7eb;
+      border-top: 1px solid var(--color-border);
     }
 
     .btn {
@@ -214,13 +228,13 @@ import { FileService } from '../../../core/services/file.service';
     }
 
     .btn-primary {
-      background: #3b82f6;
-      color: white;
+      background: var(--color-primary);
+      color: var(--color-text-on-primary);
     }
 
     .btn-secondary {
-      background: #6b7280;
-      color: white;
+      background: var(--color-text-secondary);
+      color: var(--color-text-on-primary);
     }
 
     .btn-sm {
