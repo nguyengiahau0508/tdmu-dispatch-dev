@@ -7,6 +7,10 @@
 
     <!-- Menu chính -->
     <div class="sidebar__menu">
+      <div class="sidebar__menu-item" routerLink="/dashboard" routerLinkActive="active">
+        <img src="/icons/dashboard.svg" alt="" title="Bảng điều khiển">
+        <span class="sidebar__tooltip">Bảng điều khiển</span>
+      </div>
       <div class="sidebar__menu-item" routerLink="/workflow" routerLinkActive="active" (click)="refreshPendingWorkflowCount()">
         <img src="/icons/conversion_path.svg" alt="" title="Quy trình xử lý">
         <span class="sidebar__tooltip">Quy trình xử lý</span>
@@ -33,6 +37,13 @@
         <img src="/icons/outgoing.svg" alt="" title="Công văn đi">
         <span class="sidebar__tooltip">Công văn đi</span>
       </div>
+      <div class="sidebar__menu-item" routerLink="/task-management" routerLinkActive="active" (click)="refreshTaskCount()">
+        <img src="/icons/assignment.svg" alt="" title="Giao việc">
+        <span class="sidebar__tooltip">Giao việc</span>
+        @if (pendingTaskCount > 0) {
+          <span class="notification-badge">{{ pendingTaskCount }}</span>
+        }
+      </div>
     </div>
 
     <!-- Cài đặt -->
@@ -48,6 +59,12 @@
     <header class="header">
       <h1 class="header__title">Quản lí công văn</h1>
       <div class="header__tools">
+        <button class="tool-btn" (click)="navigateToTaskManagement()" title="Giao việc mới">
+          <img src="/icons/assignment.svg" alt="Giao việc">
+        </button>
+        <button class="tool-btn" (click)="navigateToDocumentForm()" title="Tạo văn bản mới">
+          <img src="/icons/document.svg" alt="Tạo văn bản">
+        </button>
 
         <button (click)="toggleTheme()" class="tool-btn" title="Chuyển chế độ sáng/tối">
           <img [src]="isDarkMode ? '/icons/sun.svg' : '/icons/moon.svg'" alt="Đổi giao diện">

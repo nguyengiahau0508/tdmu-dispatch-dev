@@ -3,13 +3,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DocumentsService, Document, CreateDocumentInput, UpdateDocumentInput } from '../../../core/services/dispatch/documents.service';
 import { DocumentCategoryService } from '../../../core/services/dispatch/document-category.service';
+import { WorkflowTemplatesService, WorkflowTemplate } from '../../../core/services/dispatch/workflow-templates.service';
 import { FileService } from '../../../core/services/file.service';
 import { IDocumentCategory } from '../../../core/interfaces/dispatch.interface';
+import { TaskAssignmentService } from '../../../core/services/dispatch/task-assignment.service';
+import { TaskAssignmentModalComponent } from '../task-assignment/task-assignment-modal.component';
 
 @Component({
   selector: 'app-document-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TaskAssignmentModalComponent],
   template: `
     <div class="document-form-overlay" (click)="close()">
       <div class="document-form-modal" (click)="$event.stopPropagation()">
@@ -95,11 +98,36 @@ import { IDocumentCategory } from '../../../core/interfaces/dispatch.interface';
               formControlName="status"
               class="form-control"
             >
-              <option value="draft">Bản nháp</option>
-              <option value="pending">Chờ xử lý</option>
-              <option value="processing">Đang xử lý</option>
-              <option value="completed">Đã hoàn thành</option>
+              <option value="DRAFT">Bản nháp</option>
+              <option value="PENDING">Chờ xử lý</option>
+              <option value="PROCESSING">Đang xử lý</option>
+              <option value="APPROVED">Đã phê duyệt</option>
+              <option value="REJECTED">Đã từ chối</option>
+              <option value="COMPLETED">Đã hoàn thành</option>
+              <option value="CANCELLED">Đã hủy</option>
             </select>
+          </div>
+
+          <div class="form-group">
+            <label for="workflowTemplateId">Quy trình xét duyệt</label>
+            @if (isLoadingTemplates) {
+              <div class="loading-templates">Đang tải quy trình...</div>
+            } @else {
+              <select 
+                id="workflowTemplateId"
+                formControlName="workflowTemplateId"
+                class="form-control"
+              >
+                <option value="">Chọn quy trình xét duyệt (tùy chọn)</option>
+                @for (template of workflowTemplates; track template.id) {
+                  <option [value]="template.id">{{ template.name }}</option>
+                }
+                @if (workflowTemplates.length === 0) {
+                  <option value="" disabled>Không có quy trình nào</option>
+                }
+              </select>
+            }
+            <small class="form-text">Nếu không chọn, hệ thống sẽ tự động chọn quy trình mặc định</small>
           </div>
 
           <div class="form-group">
@@ -120,6 +148,17 @@ import { IDocumentCategory } from '../../../core/interfaces/dispatch.interface';
           </div>
 
           <div class="form-actions">
+            @if (isEditMode && document) {
+              <button 
+                type="button" 
+                class="btn btn-info" 
+                (click)="showTaskAssignmentModal = true"
+                title="Giao việc cho nhân viên"
+              >
+                <img src="/icons/assignment.svg" alt="Giao việc" style="width: 16px; height: 16px; margin-right: 8px;">
+                Giao việc
+              </button>
+            }
             <button 
               type="button" 
               class="btn btn-secondary" 
@@ -141,6 +180,15 @@ import { IDocumentCategory } from '../../../core/interfaces/dispatch.interface';
         </form>
       </div>
     </div>
+
+    <!-- Task Assignment Modal -->
+    @if (showTaskAssignmentModal && document) {
+      <app-task-assignment-modal
+        [documentId]="document.id"
+        (taskAssigned)="onTaskAssigned($event)"
+        (cancelled)="showTaskAssignmentModal = false"
+      ></app-task-assignment-modal>
+    }
   `,
   styles: [`
     .document-form-overlay {
@@ -327,28 +375,35 @@ export class DocumentFormComponent implements OnInit {
 
   documentForm: FormGroup;
   documentCategories: IDocumentCategory[] = [];
+  workflowTemplates: WorkflowTemplate[] = [];
   selectedFile: File | null = null;
   isSubmitting = false;
+  showTaskAssignmentModal = false;
   isEditMode = false;
   isLoadingCategories = false;
+  isLoadingTemplates = false;
 
   constructor(
     private fb: FormBuilder,
     private documentsService: DocumentsService,
     private documentCategoryService: DocumentCategoryService,
-    private fileService: FileService
+    private workflowTemplatesService: WorkflowTemplatesService,
+    private fileService: FileService,
+    private taskAssignmentService: TaskAssignmentService
   ) {
     this.documentForm = this.fb.group({
       title: ['', Validators.required],
       documentType: ['', Validators.required],
       documentCategoryId: ['', Validators.required],
       content: [''],
-      status: ['draft']
+      status: ['DRAFT'],
+      workflowTemplateId: ['']
     });
   }
 
   ngOnInit(): void {
     this.loadDocumentCategories();
+    this.loadWorkflowTemplates();
     
     if (this.document) {
       this.isEditMode = true;
@@ -388,6 +443,23 @@ export class DocumentFormComponent implements OnInit {
     });
   }
 
+  loadWorkflowTemplates(): void {
+    this.isLoadingTemplates = true;
+    this.workflowTemplatesService.getActiveWorkflowTemplates().subscribe({
+      next: (templates) => {
+        this.workflowTemplates = templates || [];
+        console.log('Loaded workflow templates:', this.workflowTemplates);
+        this.isLoadingTemplates = false;
+      },
+      error: (error: any) => {
+        console.error('Error loading workflow templates:', error);
+        // Fallback to empty array
+        this.workflowTemplates = [];
+        this.isLoadingTemplates = false;
+      }
+    });
+  }
+
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
@@ -414,12 +486,20 @@ export class DocumentFormComponent implements OnInit {
     const formValues = this.documentForm.value;
     const processedValues = {
       ...formValues,
-      documentCategoryId: parseInt(formValues.documentCategoryId, 10)
+      documentCategoryId: parseInt(formValues.documentCategoryId, 10),
+      workflowTemplateId: formValues.workflowTemplateId ? parseInt(formValues.workflowTemplateId, 10) : undefined
     };
 
     // Validate that documentCategoryId is a valid number
     if (isNaN(processedValues.documentCategoryId)) {
       console.error('Invalid documentCategoryId:', formValues.documentCategoryId);
+      this.isSubmitting = false;
+      return;
+    }
+
+    // Validate workflowTemplateId if provided
+    if (processedValues.workflowTemplateId && isNaN(processedValues.workflowTemplateId)) {
+      console.error('Invalid workflowTemplateId:', formValues.workflowTemplateId);
       this.isSubmitting = false;
       return;
     }
@@ -473,5 +553,19 @@ export class DocumentFormComponent implements OnInit {
         console.error('Document categories error:', error);
       }
     });
+  }
+
+  openTaskAssignment(): void {
+    if (this.document) {
+      // Navigate to task management with document ID
+      window.open(`/task-management?documentId=${this.document.id}`, '_blank');
+    }
+  }
+
+  onTaskAssigned(result: any): void {
+    this.showTaskAssignmentModal = false;
+    // Show success message
+    alert('Giao việc thành công!');
+    console.log('Task assigned:', result);
   }
 }

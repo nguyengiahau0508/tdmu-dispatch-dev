@@ -8,7 +8,7 @@ import { UnitType } from '../../modules/organizational/unit-types/entities/unit-
 import { Unit } from '../../modules/organizational/units/entities/unit.entity';
 import { DocumentCategory } from '../../modules/dispatch/document-category/entities/document-category.entity';
 import { DocumentType } from '../../modules/dispatch/document-types/entities/document-type.entity';
-import { Document, DocumentTypeEnum } from '../../modules/dispatch/documents/entities/document.entity';
+import { Document, DocumentTypeEnum, DocumentStatus } from '../../modules/dispatch/documents/entities/document.entity';
 import { WorkflowTemplate } from '../../modules/workflow/workflow-templates/entities/workflow-template.entity';
 import { WorkflowStep, StepType } from '../../modules/workflow/workflow-steps/entities/workflow-step.entity';
 import { WorkflowInstance, WorkflowStatus } from '../../modules/workflow/workflow-instances/entities/workflow-instance.entity';
@@ -576,7 +576,8 @@ export class SeederSimpleService {
         documentType: DocumentTypeEnum.INTERNAL,
         documentCategoryId: categories[0].id,
         fileId: parseInt(files[0].id),
-        status: 'draft',
+        status: DocumentStatus.DRAFT,
+        createdByUserId: users[0].id,
       },
       {
         title: 'Công văn gửi Bộ Giáo dục và Đào tạo',
@@ -584,7 +585,8 @@ export class SeederSimpleService {
         documentType: DocumentTypeEnum.OUTGOING,
         documentCategoryId: categories[1].id,
         fileId: parseInt(files[1].id),
-        status: 'pending',
+        status: DocumentStatus.PENDING,
+        createdByUserId: users[1].id,
       },
       {
         title: 'Thông báo về lịch thi học kỳ',
@@ -592,7 +594,8 @@ export class SeederSimpleService {
         documentType: DocumentTypeEnum.INTERNAL,
         documentCategoryId: categories[2].id,
         fileId: parseInt(files[2].id),
-        status: 'approved',
+        status: DocumentStatus.APPROVED,
+        createdByUserId: users[2].id,
       },
       {
         title: 'Báo cáo tài chính quý 1',
@@ -600,7 +603,8 @@ export class SeederSimpleService {
         documentType: DocumentTypeEnum.INTERNAL,
         documentCategoryId: categories[2].id,
         fileId: parseInt(files[3].id),
-        status: 'draft',
+        status: DocumentStatus.DRAFT,
+        createdByUserId: users[3].id,
       },
       {
         title: 'Kế hoạch đào tạo năm học 2024-2025',
@@ -608,7 +612,8 @@ export class SeederSimpleService {
         documentType: DocumentTypeEnum.INTERNAL,
         documentCategoryId: categories[1].id,
         fileId: parseInt(files[4].id),
-        status: 'pending',
+        status: DocumentStatus.PENDING,
+        createdByUserId: users[4].id,
       },
       {
         title: 'Biên bản họp Hội đồng trường',
@@ -616,7 +621,8 @@ export class SeederSimpleService {
         documentType: DocumentTypeEnum.INTERNAL,
         documentCategoryId: categories[0].id,
         fileId: parseInt(files[5].id),
-        status: 'approved',
+        status: DocumentStatus.APPROVED,
+        createdByUserId: users[5].id,
       },
       {
         title: 'Hợp đồng hợp tác với doanh nghiệp',
@@ -624,7 +630,8 @@ export class SeederSimpleService {
         documentType: DocumentTypeEnum.OUTGOING,
         documentCategoryId: categories[3].id,
         fileId: parseInt(files[6].id),
-        status: 'draft',
+        status: DocumentStatus.DRAFT,
+        createdByUserId: users[6].id,
       },
       {
         title: 'Đơn đề nghị tăng lương',
@@ -632,7 +639,8 @@ export class SeederSimpleService {
         documentType: DocumentTypeEnum.INTERNAL,
         documentCategoryId: categories[4].id,
         fileId: parseInt(files[7].id),
-        status: 'pending',
+        status: DocumentStatus.PENDING,
+        createdByUserId: users[7].id,
       },
       {
         title: 'Nghị quyết về chính sách mới',
@@ -640,7 +648,8 @@ export class SeederSimpleService {
         documentType: DocumentTypeEnum.INTERNAL,
         documentCategoryId: categories[0].id,
         fileId: parseInt(files[8].id),
-        status: 'approved',
+        status: DocumentStatus.APPROVED,
+        createdByUserId: users[8].id,
       },
       {
         title: 'Chỉ thị về công tác an toàn',
@@ -648,7 +657,8 @@ export class SeederSimpleService {
         documentType: DocumentTypeEnum.INTERNAL,
         documentCategoryId: categories[0].id,
         fileId: parseInt(files[9].id),
-        status: 'draft',
+        status: DocumentStatus.DRAFT,
+        createdByUserId: users[9].id,
       },
     ];
 
@@ -819,11 +829,20 @@ export class SeederSimpleService {
     const stepsData = [
       {
         templateId: template.id,
-        name: 'Tạo văn bản',
-        description: 'Bước tạo văn bản ban đầu',
+        name: 'Giao việc',
+        description: 'Bước giao việc cho người thực hiện',
         type: StepType.START,
-        assignedRole: Role.BASIC_USER,
+        assignedRole: Role.DEPARTMENT_STAFF,
         orderNumber: 1,
+        isActive: true,
+      },
+      {
+        templateId: template.id,
+        name: 'Tạo văn bản',
+        description: 'Người được giao việc tạo văn bản',
+        type: StepType.TRANSFER,
+        assignedRole: Role.CLERK,
+        orderNumber: 2,
         isActive: true,
       },
       {
@@ -832,7 +851,7 @@ export class SeederSimpleService {
         description: 'Phê duyệt bởi trưởng phòng ban',
         type: StepType.APPROVAL,
         assignedRole: Role.DEPARTMENT_STAFF,
-        orderNumber: 2,
+        orderNumber: 3,
         isActive: true,
       },
       {
@@ -841,7 +860,7 @@ export class SeederSimpleService {
         description: 'Phê duyệt bởi phó hiệu trưởng',
         type: StepType.APPROVAL,
         assignedRole: Role.UNIVERSITY_LEADER,
-        orderNumber: 3,
+        orderNumber: 4,
         isActive: true,
       },
       {
@@ -850,7 +869,7 @@ export class SeederSimpleService {
         description: 'Phê duyệt cuối cùng bởi hiệu trưởng',
         type: StepType.END,
         assignedRole: Role.UNIVERSITY_LEADER,
-        orderNumber: 4,
+        orderNumber: 5,
         isActive: true,
       },
     ];
@@ -865,21 +884,21 @@ export class SeederSimpleService {
         templateId: templates[0].id,
         documentId: documents[0].id,
         status: WorkflowStatus.IN_PROGRESS,
-        currentStepId: 1,
+        currentStepId: 1, // Giao việc
         createdByUserId: users[0].id,
       },
       {
         templateId: templates[1].id,
         documentId: documents[1].id,
         status: WorkflowStatus.COMPLETED,
-        currentStepId: 4,
+        currentStepId: 5, // Phê duyệt hiệu trưởng (END)
         createdByUserId: users[1].id,
       },
       {
         templateId: templates[2].id,
         documentId: documents[2].id,
         status: WorkflowStatus.IN_PROGRESS,
-        currentStepId: 2,
+        currentStepId: 2, // Tạo văn bản
         createdByUserId: users[2].id,
       },
     ];
@@ -896,7 +915,7 @@ export class SeederSimpleService {
         actionType: ActionType.START,
         actionByUserId: users[0].id,
         actionAt: new Date(),
-        note: 'Đã tạo văn bản',
+        note: 'Đã giao việc',
       },
       {
         instanceId: instances[1].id,
@@ -904,11 +923,19 @@ export class SeederSimpleService {
         actionType: ActionType.START,
         actionByUserId: users[1].id,
         actionAt: new Date(),
-        note: 'Đã tạo văn bản',
+        note: 'Đã giao việc',
       },
       {
         instanceId: instances[1].id,
         stepId: 2,
+        actionType: ActionType.COMPLETE,
+        actionByUserId: users[2].id,
+        actionAt: new Date(),
+        note: 'Đã tạo văn bản',
+      },
+      {
+        instanceId: instances[1].id,
+        stepId: 3,
         actionType: ActionType.APPROVE,
         actionByUserId: users[3].id,
         actionAt: new Date(),

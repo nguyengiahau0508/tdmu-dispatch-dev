@@ -1,307 +1,560 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatIconModule } from '@angular/material/icon';
-import { MatChipsModule } from '@angular/material/chips';
+import { FormsModule } from '@angular/forms';
+import { DocumentProcessingInfo } from './services/document-processing-apollo.service';
 
-interface DocumentProcessingInfo {
+export interface DocumentActionData {
   documentId: number;
-  documentTitle: string;
-  documentType: string;
-  documentCategory: string;
-  status: string;
-  createdAt: Date;
-  workflowInstanceId?: number;
-  currentStepId?: number;
-  currentStepName?: string;
-  workflowStatus?: string;
-  requiresAction: boolean;
-  actionType?: string;
-  deadline?: Date;
-  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
-}
-
-interface DialogData {
-  document: DocumentProcessingInfo;
-  action: string;
+  actionType: string;
+  notes?: string;
+  transferToUserId?: number;
 }
 
 @Component({
   selector: 'app-document-action-dialog',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatIconModule,
-    MatChipsModule,
-  ],
+  imports: [CommonModule, FormsModule],
   template: `
-    <div class="dialog-container">
-      <h2 mat-dialog-title>
-        <mat-icon [class]="getActionIcon(data.action)">{{ getActionIcon(data.action) }}</mat-icon>
-        {{ getActionTitle(data.action) }}
-      </h2>
+    <div class="dialog-overlay" (click)="close()">
+      <div class="dialog-container" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h2 class="dialog-title">
+            <span class="action-icon">{{ getActionIcon(actionType) }}</span>
+            {{ getActionTitle(actionType) }}
+          </h2>
+          <button class="close-button" (click)="close()">
+            <span class="close-icon">✕</span>
+          </button>
+        </div>
 
-      <mat-dialog-content>
-        <div class="document-info">
-          <h3>{{ data.document.documentTitle }}</h3>
-          <div class="document-meta">
-            <span class="meta-item">
-              <mat-icon>description</mat-icon>
-              {{ data.document.documentType }}
-            </span>
-            <span class="meta-item">
-              <mat-icon>category</mat-icon>
-              {{ data.document.documentCategory }}
-            </span>
-            <span class="meta-item">
-              <mat-icon>schedule</mat-icon>
-              {{ data.document.createdAt | date:'dd/MM/yyyy' }}
-            </span>
+        <div class="dialog-content">
+          <!-- Document Info -->
+          <div class="document-info-section">
+            <h3 class="section-title">Thông tin văn bản</h3>
+            <div class="document-details">
+              <div class="detail-row">
+                <span class="label">Tiêu đề:</span>
+                <span class="value">{{ document?.documentTitle }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Loại văn bản:</span>
+                <span class="value">{{ document?.documentType }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Danh mục:</span>
+                <span class="value">{{ document?.documentCategory }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Trạng thái:</span>
+                <span class="value status-badge" [class]="'status-' + (document?.status || '').toLowerCase()">
+                  {{ document?.status }}
+                </span>
+              </div>
+                             <div class="detail-row" *ngIf="document && document.priority">
+                 <span class="label">Độ ưu tiên:</span>
+                 <span class="value priority-badge" [class]="'priority-' + document.priority.toLowerCase()">
+                   {{ getPriorityLabel(document.priority) }}
+                 </span>
+               </div>
+            </div>
           </div>
 
-          <div class="priority-info" *ngIf="data.document.priority">
-            <mat-chip [color]="getPriorityColor(data.document.priority)" selected>
-              {{ getPriorityLabel(data.document.priority) }}
-            </mat-chip>
-          </div>
+          <!-- Action Form -->
+          <div class="action-form-section">
+            <h3 class="section-title">Thông tin hành động</h3>
+            
+            <!-- Notes -->
+            <div class="form-group">
+              <label class="form-label" for="notes">
+                <span class="label-icon">📝</span>
+                Ghi chú (tùy chọn)
+              </label>
+              <textarea 
+                id="notes"
+                class="form-textarea" 
+                [(ngModel)]="notes"
+                placeholder="Nhập ghi chú cho hành động này..."
+                rows="3">
+              </textarea>
+            </div>
 
-          <div class="current-step" *ngIf="data.document.currentStepName">
-            <span class="label">Bước hiện tại:</span>
-            <span class="value">{{ data.document.currentStepName }}</span>
-          </div>
+            <!-- Transfer User (only for TRANSFER action) -->
+            <div class="form-group" *ngIf="actionType === 'TRANSFER'">
+              <label class="form-label" for="transferUser">
+                <span class="label-icon">👤</span>
+                Chuyển cho người dùng
+              </label>
+              <select 
+                id="transferUser"
+                class="form-select" 
+                [(ngModel)]="selectedTransferUserId">
+                <option value="">-- Chọn người dùng --</option>
+                <option *ngFor="let user of availableUsers" [value]="user.id">
+                  {{ user.name }} ({{ user.email }})
+                </option>
+              </select>
+            </div>
 
-          <div class="deadline-info" *ngIf="data.document.deadline">
-            <span class="label">Deadline:</span>
-            <span class="value" [class.overdue]="isOverdue(data.document.deadline)">
-              {{ data.document.deadline | date:'dd/MM/yyyy HH:mm' }}
-            </span>
+            <!-- Confirmation Message -->
+            <div class="confirmation-message" [class]="'confirmation-' + actionType.toLowerCase()">
+              <div class="confirmation-icon">{{ getConfirmationIcon(actionType) }}</div>
+              <div class="confirmation-text">
+                <strong>{{ getConfirmationTitle(actionType) }}</strong>
+                <p>{{ getConfirmationMessage(actionType) }}</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <form [formGroup]="actionForm" class="action-form">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Ghi chú</mat-label>
-            <textarea matInput formControlName="notes" 
-                      placeholder="Nhập ghi chú cho action này (tùy chọn)"
-                      rows="3"></textarea>
-            <mat-hint>Ghi chú sẽ được lưu trong lịch sử xử lý</mat-hint>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width" 
-                          *ngIf="data.action === 'TRANSFER'">
-            <mat-label>Chuyển tiếp cho</mat-label>
-            <mat-select formControlName="transferToUserId">
-              <mat-option value="">Chọn người nhận</mat-option>
-              <mat-option *ngFor="let user of availableUsers" [value]="user.id">
-                {{ user.name }} ({{ user.role }})
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="actionForm.get('transferToUserId')?.hasError('required')">
-              Vui lòng chọn người nhận
-            </mat-error>
-          </mat-form-field>
-
-          <div class="confirmation-message" *ngIf="data.action === 'REJECT'">
-            <mat-icon color="warn">warning</mat-icon>
-            <span>Bạn có chắc chắn muốn từ chối văn bản này?</span>
-          </div>
-
-          <div class="confirmation-message" *ngIf="data.action === 'APPROVE'">
-            <mat-icon color="primary">check_circle</mat-icon>
-            <span>Bạn sẽ phê duyệt văn bản này và chuyển sang bước tiếp theo</span>
-          </div>
-        </form>
-      </mat-dialog-content>
-
-      <mat-dialog-actions align="end">
-        <button mat-button (click)="onCancel()">
-          <mat-icon>close</mat-icon>
-          Hủy
-        </button>
-        <button mat-raised-button 
-                [color]="getActionButtonColor(data.action)"
-                [disabled]="actionForm.invalid || processing"
-                (click)="onConfirm()">
-          <mat-icon>{{ getActionIcon(data.action) }}</mat-icon>
-          <span *ngIf="!processing">{{ getActionButtonText(data.action) }}</span>
-          <span *ngIf="processing">Đang xử lý...</span>
-        </button>
-      </mat-dialog-actions>
+        <div class="dialog-actions">
+          <button class="action-btn secondary" (click)="close()">
+            <span class="action-icon">❌</span>
+            Hủy bỏ
+          </button>
+          <button 
+            class="action-btn primary" 
+            [class]="'action-btn-' + actionType.toLowerCase()"
+            (click)="confirmAction()"
+            [disabled]="isProcessing">
+            <span class="action-icon" *ngIf="!isProcessing">{{ getActionIcon(actionType) }}</span>
+            <span class="loading-spinner" *ngIf="isProcessing">⏳</span>
+            {{ isProcessing ? 'Đang xử lý...' : getActionButtonText(actionType) }}
+          </button>
+        </div>
+      </div>
     </div>
   `,
   styles: [`
+    .dialog-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
     .dialog-container {
-      min-width: 500px;
+      background: var(--color-background-primary);
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 90%;
       max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: slideIn 0.3s ease;
     }
 
-    mat-dialog-title {
+    @keyframes slideIn {
+      from { 
+        opacity: 0; 
+        transform: translateY(-20px) scale(0.95); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+      }
+    }
+
+    .dialog-header {
       display: flex;
       align-items: center;
-      gap: 10px;
-      color: #333;
+      justify-content: space-between;
+      padding: 24px 24px 0 24px;
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: 24px;
     }
 
-    .document-info {
-      margin-bottom: 20px;
-      padding: 15px;
-      background: #f8f9fa;
+    .dialog-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .action-icon {
+      font-size: 1.5rem;
+    }
+
+    .close-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 6px;
+      color: var(--color-text-secondary);
+      transition: all 0.2s ease;
+    }
+
+    .close-button:hover {
+      background: var(--color-background-secondary);
+      color: var(--color-text-primary);
+    }
+
+    .close-icon {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .dialog-content {
+      padding: 0 24px;
+    }
+
+    .section-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .document-info-section {
+      margin-bottom: 32px;
+    }
+
+    .document-details {
+      background: var(--color-background-secondary);
       border-radius: 8px;
-      border-left: 4px solid #007bff;
+      padding: 16px;
     }
 
-    .document-info h3 {
-      margin: 0 0 10px 0;
-      color: #333;
-      font-size: 1.1rem;
-    }
-
-    .document-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      margin-bottom: 10px;
-    }
-
-    .meta-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 0.9rem;
-      color: #666;
-    }
-
-    .meta-item mat-icon {
-      font-size: 1rem;
-      width: 1rem;
-      height: 1rem;
-    }
-
-    .priority-info {
-      margin-bottom: 10px;
-    }
-
-    .current-step, .deadline-info {
+    .detail-row {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 8px;
-      font-size: 0.9rem;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 0.875rem;
+    }
+
+    .detail-row:last-child {
+      margin-bottom: 0;
     }
 
     .label {
       font-weight: 500;
-      color: #666;
+      color: var(--color-text-secondary);
     }
 
     .value {
-      color: #333;
+      color: var(--color-text-primary);
+      font-weight: 500;
     }
 
-    .value.overdue {
-      color: #f44336;
-      font-weight: bold;
+    .status-badge, .priority-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
     }
 
-    .action-form {
-      margin-top: 20px;
+    .status-pending {
+      background: #fef3c7;
+      color: #d97706;
     }
 
-    .full-width {
+    .status-in_progress {
+      background: #dbeafe;
+      color: #2563eb;
+    }
+
+    .status-completed {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+
+    .priority-urgent {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .priority-high {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .priority-medium {
+      background: #dbeafe;
+      color: #2563eb;
+    }
+
+    .priority-low {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+
+    .action-form-section {
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      margin-bottom: 8px;
+      font-size: 0.875rem;
+    }
+
+    .label-icon {
+      font-size: 1rem;
+    }
+
+    .form-textarea, .form-select {
       width: 100%;
-      margin-bottom: 15px;
+      padding: 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      font-size: 0.875rem;
+      background: var(--color-background-primary);
+      color: var(--color-text-primary);
+      transition: border-color 0.2s ease;
+    }
+
+    .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
     }
 
     .confirmation-message {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 15px;
-      border-radius: 4px;
-      margin-bottom: 15px;
-      font-size: 0.9rem;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 16px;
     }
 
-    .confirmation-message mat-icon {
-      font-size: 1.2rem;
-      width: 1.2rem;
-      height: 1.2rem;
+    .confirmation-approve {
+      background: #dcfce7;
+      border: 1px solid #bbf7d0;
     }
 
-    mat-dialog-actions {
-      padding: 16px 0;
+    .confirmation-reject {
+      background: #fee2e2;
+      border: 1px solid #fecaca;
     }
 
-    mat-dialog-actions button {
+    .confirmation-transfer {
+      background: #dbeafe;
+      border: 1px solid #bfdbfe;
+    }
+
+    .confirmation-complete {
+      background: #fef3c7;
+      border: 1px solid #fed7aa;
+    }
+
+    .confirmation-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .confirmation-text {
+      flex: 1;
+    }
+
+    .confirmation-text strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--color-text-primary);
+    }
+
+    .confirmation-text p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+    }
+
+    .dialog-actions {
+      display: flex;
+      gap: 12px;
+      padding: 24px;
+      border-top: 1px solid var(--color-border);
+      justify-content: flex-end;
+    }
+
+    .action-btn {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 8px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
     }
 
-    .approve-icon { color: #4caf50; }
-    .reject-icon { color: #f44336; }
-    .transfer-icon { color: #ff9800; }
-    .complete-icon { color: #2196f3; }
+    .action-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .action-btn.secondary {
+      background: var(--color-background-secondary);
+      color: var(--color-text-primary);
+      border: 1px solid var(--color-border);
+    }
+
+    .action-btn.secondary:hover:not(:disabled) {
+      background: var(--color-border);
+    }
+
+    .action-btn.primary {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .action-btn.primary:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--color-primary) 80%, black);
+    }
+
+    .action-btn-approve {
+      background: #10b981;
+      color: white;
+    }
+
+    .action-btn-approve:hover:not(:disabled) {
+      background: #059669;
+    }
+
+    .action-btn-reject {
+      background: #ef4444;
+      color: white;
+    }
+
+    .action-btn-reject:hover:not(:disabled) {
+      background: #dc2626;
+    }
+
+    .action-btn-transfer {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .action-btn-transfer:hover:not(:disabled) {
+      background: #2563eb;
+    }
+
+    .action-btn-complete {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .action-btn-complete:hover:not(:disabled) {
+      background: #d97706;
+    }
+
+    .loading-spinner {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .dialog-container {
+        width: 95%;
+        margin: 20px;
+      }
+
+      .dialog-header {
+        padding: 20px 20px 0 20px;
+      }
+
+      .dialog-content {
+        padding: 0 20px;
+      }
+
+      .dialog-actions {
+        padding: 20px;
+        flex-direction: column;
+      }
+
+      .action-btn {
+        justify-content: center;
+      }
+
+      .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+    }
   `]
 })
 export class DocumentActionDialogComponent {
-  actionForm: FormGroup;
-  processing = false;
+  @Input() document: DocumentProcessingInfo | null = null;
+  @Input() actionType: string = '';
+  @Output() actionConfirmed = new EventEmitter<DocumentActionData>();
+  @Output() dialogClosed = new EventEmitter<void>();
+
+  notes: string = '';
+  selectedTransferUserId: number | null = null;
+  isProcessing = false;
+
+  // Mock data for available users (in real app, this would come from a service)
   availableUsers = [
-    { id: 1, name: 'Nguyễn Văn A', role: 'Trưởng phòng' },
-    { id: 2, name: 'Trần Thị B', role: 'Phó phòng' },
-    { id: 3, name: 'Lê Văn C', role: 'Chuyên viên' },
+    { id: 1, name: 'Nguyễn Văn A', email: 'nguyenvana@tdmu.edu.vn' },
+    { id: 2, name: 'Trần Thị B', email: 'tranthib@tdmu.edu.vn' },
+    { id: 3, name: 'Lê Văn C', email: 'levanc@tdmu.edu.vn' },
+    { id: 4, name: 'Phạm Thị D', email: 'phamthid@tdmu.edu.vn' },
   ];
 
-  constructor(
-    private dialogRef: MatDialogRef<DocumentActionDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-    private fb: FormBuilder
-  ) {
-    this.actionForm = this.fb.group({
-      notes: [''],
-      transferToUserId: [''],
-    });
-
-    // Add validation for TRANSFER action
-    if (data.action === 'TRANSFER') {
-      this.actionForm.get('transferToUserId')?.setValidators([Validators.required]);
+  getActionIcon(actionType: string): string {
+    switch (actionType) {
+      case 'APPROVE': return '✅';
+      case 'REJECT': return '❌';
+      case 'TRANSFER': return '🔄';
+      case 'COMPLETE': return '🏁';
+      default: return '📋';
     }
   }
 
-  getActionIcon(action: string): string {
-    switch (action) {
-      case 'APPROVE': return 'check';
-      case 'REJECT': return 'close';
-      case 'TRANSFER': return 'forward';
-      case 'COMPLETE': return 'done_all';
-      default: return 'help';
+  getActionTitle(actionType: string): string {
+    switch (actionType) {
+      case 'APPROVE': return 'Phê duyệt văn bản';
+      case 'REJECT': return 'Từ chối văn bản';
+      case 'TRANSFER': return 'Chuyển tiếp văn bản';
+      case 'COMPLETE': return 'Hoàn thành văn bản';
+      default: return 'Xử lý văn bản';
     }
   }
 
-  getActionTitle(action: string): string {
-    switch (action) {
-      case 'APPROVE': return 'Phê duyệt Văn bản';
-      case 'REJECT': return 'Từ chối Văn bản';
-      case 'TRANSFER': return 'Chuyển tiếp Văn bản';
-      case 'COMPLETE': return 'Hoàn thành Văn bản';
-      default: return 'Xử lý Văn bản';
-    }
-  }
-
-  getActionButtonText(action: string): string {
-    switch (action) {
+  getActionButtonText(actionType: string): string {
+    switch (actionType) {
       case 'APPROVE': return 'Phê duyệt';
       case 'REJECT': return 'Từ chối';
       case 'TRANSFER': return 'Chuyển tiếp';
@@ -310,23 +563,33 @@ export class DocumentActionDialogComponent {
     }
   }
 
-  getActionButtonColor(action: string): string {
-    switch (action) {
-      case 'APPROVE': return 'primary';
-      case 'REJECT': return 'warn';
-      case 'TRANSFER': return 'accent';
-      case 'COMPLETE': return 'primary';
-      default: return 'primary';
+  getConfirmationIcon(actionType: string): string {
+    switch (actionType) {
+      case 'APPROVE': return '✅';
+      case 'REJECT': return '❌';
+      case 'TRANSFER': return '🔄';
+      case 'COMPLETE': return '🏁';
+      default: return '📋';
     }
   }
 
-  getPriorityColor(priority: string): string {
-    switch (priority) {
-      case 'URGENT': return 'warn';
-      case 'HIGH': return 'accent';
-      case 'MEDIUM': return 'primary';
-      case 'LOW': return '';
-      default: return '';
+  getConfirmationTitle(actionType: string): string {
+    switch (actionType) {
+      case 'APPROVE': return 'Xác nhận phê duyệt';
+      case 'REJECT': return 'Xác nhận từ chối';
+      case 'TRANSFER': return 'Xác nhận chuyển tiếp';
+      case 'COMPLETE': return 'Xác nhận hoàn thành';
+      default: return 'Xác nhận hành động';
+    }
+  }
+
+  getConfirmationMessage(actionType: string): string {
+    switch (actionType) {
+      case 'APPROVE': return 'Văn bản sẽ được phê duyệt và chuyển sang bước tiếp theo trong quy trình.';
+      case 'REJECT': return 'Văn bản sẽ bị từ chối và quy trình sẽ dừng lại.';
+      case 'TRANSFER': return 'Văn bản sẽ được chuyển cho người dùng khác để xử lý.';
+      case 'COMPLETE': return 'Văn bản sẽ được đánh dấu là hoàn thành và kết thúc quy trình.';
+      default: return 'Hành động này sẽ được thực hiện trên văn bản.';
     }
   }
 
@@ -340,36 +603,26 @@ export class DocumentActionDialogComponent {
     }
   }
 
-  isOverdue(deadline: Date | undefined): boolean {
-    if (!deadline) return false;
-    return new Date() > deadline;
-  }
+  confirmAction(): void {
+    if (!this.document) return;
 
-  onCancel(): void {
-    this.dialogRef.close();
-  }
+    this.isProcessing = true;
 
-  async onConfirm(): Promise<void> {
-    if (this.actionForm.invalid) return;
-
-    this.processing = true;
-    try {
-      const formValue = this.actionForm.value;
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const result = {
-        documentId: this.data.document.documentId,
-        actionType: this.data.action,
-        notes: formValue.notes,
-        transferToUserId: formValue.transferToUserId,
+    // Simulate API call delay
+    setTimeout(() => {
+      const actionData: DocumentActionData = {
+        documentId: this.document!.documentId,
+        actionType: this.actionType,
+        notes: this.notes || undefined,
+        transferToUserId: this.selectedTransferUserId || undefined
       };
-      
-      this.dialogRef.close(result);
-    } catch (error) {
-      console.error('Error processing action:', error);
-      this.processing = false;
-    }
+
+      this.actionConfirmed.emit(actionData);
+      this.isProcessing = false;
+    }, 1000);
+  }
+
+  close(): void {
+    this.dialogClosed.emit();
   }
 }

@@ -35,8 +35,8 @@ import { FileService } from '../../../core/services/file.service';
               
               <div class="info-row">
                 <label>Trạng thái:</label>
-                <span class="status-badge" [class]="getStatusClass(document.status || 'draft')">
-                  {{ getStatusLabel(document.status || 'draft') }}
+                                  <span class="status-badge" [class]="getStatusClass(document.status || 'DRAFT')">
+                  {{ getStatusLabel(document.status || 'DRAFT') }}
                 </span>
               </div>
               
@@ -261,20 +261,26 @@ export class DocumentDetailComponent {
 
   getStatusLabel(status: string): string {
     const statusLabels: Record<string, string> = {
-      'draft': 'Bản nháp',
-      'pending': 'Chờ xử lý',
-      'processing': 'Đang xử lý',
-      'completed': 'Đã hoàn thành'
+      'DRAFT': 'Bản nháp',
+      'PENDING': 'Chờ xử lý',
+      'PROCESSING': 'Đang xử lý',
+      'APPROVED': 'Đã phê duyệt',
+      'REJECTED': 'Đã từ chối',
+      'COMPLETED': 'Đã hoàn thành',
+      'CANCELLED': 'Đã hủy'
     };
     return statusLabels[status] || status;
   }
 
   getStatusClass(status: string): string {
     const statusClasses: Record<string, string> = {
-      'draft': 'status-draft',
-      'pending': 'status-pending',
-      'processing': 'status-processing',
-      'completed': 'status-completed'
+      'DRAFT': 'status-draft',
+      'PENDING': 'status-pending',
+      'PROCESSING': 'status-processing',
+      'APPROVED': 'status-approved',
+      'REJECTED': 'status-rejected',
+      'COMPLETED': 'status-completed',
+      'CANCELLED': 'status-cancelled'
     };
     return statusClasses[status] || 'status-default';
   }

@@ -51,6 +51,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     const currentUser = await this.userService.findOneById(payload.sub);
+    console.log('🔍 Debug JWT Strategy:');
+    console.log('  - User ID:', currentUser?.id);
+    console.log('  - User email:', currentUser?.email);
+    console.log('  - User roles:', currentUser?.roles);
+    console.log('  - User roles type:', typeof currentUser?.roles);
+    console.log('  - User isActive:', currentUser?.isActive);
     return currentUser;
   }
 }

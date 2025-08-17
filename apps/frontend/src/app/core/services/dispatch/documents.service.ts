@@ -30,6 +30,7 @@ export interface CreateDocumentInput {
   documentCategoryId: number;
   fileId?: number;
   status?: string;
+  workflowTemplateId?: number;
 }
 
 export interface UpdateDocumentInput {
@@ -105,26 +106,24 @@ const GET_DOCUMENT = gql`
         message
       }
       data {
-        document {
+        id
+        title
+        content
+        documentType
+        documentCategoryId
+        documentCategory {
           id
-          title
-          content
-          documentType
-          documentCategoryId
-          documentCategory {
-            id
-            name
-          }
-          fileId
-          file {
-            id
-            driveFileId
-            isPublic
-          }
-          status
-          createdAt
-          updatedAt
+          name
         }
+        fileId
+        file {
+          id
+          driveFileId
+          isPublic
+        }
+        status
+        createdAt
+        updatedAt
       }
     }
   }
@@ -138,26 +137,24 @@ const CREATE_DOCUMENT = gql`
         message
       }
       data {
-        document {
+        id
+        title
+        content
+        documentType
+        documentCategoryId
+        documentCategory {
           id
-          title
-          content
-          documentType
-          documentCategoryId
-          documentCategory {
-            id
-            name
-          }
-          fileId
-          file {
-            id
-            driveFileId
-            isPublic
-          }
-          status
-          createdAt
-          updatedAt
+          name
         }
+        fileId
+        file {
+          id
+          driveFileId
+          isPublic
+        }
+        status
+        createdAt
+        updatedAt
       }
     }
   }
@@ -171,26 +168,24 @@ const UPDATE_DOCUMENT = gql`
         message
       }
       data {
-        document {
+        id
+        title
+        content
+        documentType
+        documentCategoryId
+        documentCategory {
           id
-          title
-          content
-          documentType
-          documentCategoryId
-          documentCategory {
-            id
-            name
-          }
-          fileId
-          file {
-            id
-            driveFileId
-            isPublic
-          }
-          status
-          createdAt
-          updatedAt
+          name
         }
+        fileId
+        file {
+          id
+          driveFileId
+          isPublic
+        }
+        status
+        createdAt
+        updatedAt
       }
     }
   }
@@ -242,18 +237,18 @@ export class DocumentsService {
 
   getDocument(id: number): Observable<Document> {
     return this.apollo.watchQuery<{
-      document: ApiResponse<{ document: Document }>
+      document: ApiResponse<Document>
     }>({
       query: GET_DOCUMENT,
       variables: { id }
     }).valueChanges.pipe(
-      map(result => result.data.document.data.document)
+      map(result => result.data.document.data)
     );
   }
 
   createDocument(input: CreateDocumentInput, file?: File): Observable<Document> {
     return this.apollo.mutate<{
-      createDocument: ApiResponse<{ document: Document }>
+      createDocument: ApiResponse<Document>
     }>({
       mutation: CREATE_DOCUMENT,
       variables: { 
@@ -267,13 +262,13 @@ export class DocumentsService {
         }
       ]
     }).pipe(
-      map(result => result.data!.createDocument.data.document)
+      map(result => result.data!.createDocument.data)
     );
   }
 
   updateDocument(input: UpdateDocumentInput): Observable<Document> {
     return this.apollo.mutate<{
-      updateDocument: ApiResponse<{ document: Document }>
+      updateDocument: ApiResponse<Document>
     }>({
       mutation: UPDATE_DOCUMENT,
       variables: { updateDocumentInput: input },
@@ -284,7 +279,7 @@ export class DocumentsService {
         }
       ]
     }).pipe(
-      map(result => result.data!.updateDocument.data.document)
+      map(result => result.data!.updateDocument.data)
     );
   }
 

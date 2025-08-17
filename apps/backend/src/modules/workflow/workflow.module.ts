@@ -13,5 +13,12 @@ import { Module } from '@nestjs/common';
     WorkflowTemplatesModule,
     WorkflowPermissionsModule,
   ],
+  exports: [
+    WorkflowInstancesModule,
+    WorkflowActionLogsModule,
+    WorkflowStepsModule,
+    WorkflowTemplatesModule,
+    WorkflowPermissionsModule,
+  ],
 })
 export class WorkflowModule {}

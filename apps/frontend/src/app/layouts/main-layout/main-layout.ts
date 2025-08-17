@@ -8,6 +8,8 @@ import { AuthService } from '../../core/services/auth.service';
 import { FileService } from '../../core/services/file.service';
 import { WorkflowApolloService } from '../../features/user/workflow/services/workflow-apollo.service';
 import { DocumentProcessingApolloService } from '../../features/user/document-processing/services/document-processing-apollo.service';
+import { TaskAssignmentService } from '../../core/services/dispatch/task-assignment.service';
+import { TaskRequestService } from '../../core/services/dispatch/task-request.service';
 
 @Component({
   selector: 'app-main-layout',
@@ -25,6 +27,7 @@ export class MainLayout implements OnInit, OnDestroy {
   avatarUrl: string | null = null
   pendingWorkflowCount = 0;
   pendingDocumentCount = 0;
+  pendingTaskCount = 0;
   private subscriptions = new Subscription();
   constructor(
     private renderer: Renderer2,
@@ -33,7 +36,9 @@ export class MainLayout implements OnInit, OnDestroy {
     private router: Router,
     private fileService: FileService,
     private workflowApolloService: WorkflowApolloService,
-    private documentProcessingApolloService: DocumentProcessingApolloService
+    private documentProcessingApolloService: DocumentProcessingApolloService,
+    private taskAssignmentService: TaskAssignmentService,
+    private taskRequestService: TaskRequestService
   ) {
     const storedTheme = localStorage.getItem('theme');
     this.isDarkMode = storedTheme === 'dark';
@@ -56,11 +61,13 @@ export class MainLayout implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadPendingWorkflowCount();
     this.loadPendingDocumentCount();
+    this.loadPendingTaskCount();
     
     // Auto-refresh pending counts every 30 seconds
     setInterval(() => {
       this.loadPendingWorkflowCount();
       this.loadPendingDocumentCount();
+      this.loadPendingTaskCount();
     }, 30000);
   }
 
@@ -128,5 +135,36 @@ export class MainLayout implements OnInit, OnDestroy {
 
   refreshPendingDocumentCount(): void {
     this.loadPendingDocumentCount();
+  }
+
+  refreshTaskCount(): void {
+    this.loadPendingTaskCount();
+  }
+
+  navigateToTaskManagement(): void {
+    this.router.navigate(['/task-management']);
+  }
+
+  navigateToDocumentForm(): void {
+    // TODO: Navigate to document form or create modal
+    console.log('Navigate to document form');
+    alert('Tính năng tạo văn bản sẽ được triển khai sau.');
+  }
+
+  private loadPendingTaskCount(): void {
+    this.subscriptions.add(
+      this.taskRequestService.getMyTaskRequests().subscribe({
+        next: (tasks) => {
+          // Count only pending task requests
+          this.pendingTaskCount = tasks.filter(task => 
+            task.status === 'PENDING'
+          ).length;
+        },
+        error: (error) => {
+          console.error('Error loading pending task count:', error);
+          this.pendingTaskCount = 0;
+        }
+      })
+    );
   }
 }

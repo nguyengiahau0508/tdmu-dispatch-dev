@@ -360,15 +360,18 @@ export class AssignWorkflowModalComponent implements OnInit {
 
   getStatusLabel(status?: string): string {
     const labels: Record<string, string> = {
-      'draft': 'Bản nháp',
-      'pending': 'Chờ xử lý',
-      'processing': 'Đang xử lý',
-      'completed': 'Đã hoàn thành'
+      'DRAFT': 'Bản nháp',
+      'PENDING': 'Chờ xử lý',
+      'PROCESSING': 'Đang xử lý',
+      'APPROVED': 'Đã phê duyệt',
+      'REJECTED': 'Đã từ chối',
+      'COMPLETED': 'Đã hoàn thành',
+      'CANCELLED': 'Đã hủy'
     };
     return labels[status || ''] || status || '';
   }
 
   getStatusClass(status?: string): string {
-    return `status-${status || 'draft'}`;
+    return `status-${status || 'DRAFT'}`;
   }
 }

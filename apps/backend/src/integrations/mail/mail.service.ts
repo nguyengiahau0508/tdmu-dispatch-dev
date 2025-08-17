@@ -16,4 +16,25 @@ export class MailService {
       },
     });
   }
+
+  async sendTaskAssignmentNotification(
+    to: string,
+    recipientName: string,
+    taskTitle: string,
+    assignedBy: string,
+    deadline?: Date,
+  ) {
+    await this.mailerService.sendMail({
+      to,
+      subject: `Bạn có công việc mới: ${taskTitle}`,
+      template: 'task-assignment-notification',
+      context: {
+        recipientName,
+        taskTitle,
+        assignedBy,
+        deadline: deadline ? deadline.toLocaleDateString('vi-VN') : 'Không có hạn',
+        currentDate: new Date().toLocaleDateString('vi-VN'),
+      },
+    });
+  }
 }

@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Document, DocumentTypeEnum } from './entities/document.entity';
+import { Document, DocumentTypeEnum, DocumentStatus } from './entities/document.entity';
 import { WorkflowInstancesService } from 'src/modules/workflow/workflow-instances/workflow-instances.service';
 import { WorkflowTemplatesService } from 'src/modules/workflow/workflow-templates/workflow-templates.service';
 import { User } from 'src/modules/users/entities/user.entity';
@@ -97,7 +97,7 @@ export class DocumentWorkflowService {
 
     // Update document status to 'processing'
     await this.documentRepository.update(document.id, {
-      status: 'processing',
+      status: DocumentStatus.PROCESSING,
     });
 
     console.log('Workflow assigned successfully:', {
@@ -151,8 +151,8 @@ export class DocumentWorkflowService {
   async getDocumentsNeedingWorkflow(): Promise<Document[]> {
     return this.documentRepository.find({
       where: [
-        { status: 'draft', documentType: DocumentTypeEnum.OUTGOING },
-        { status: 'pending', documentType: DocumentTypeEnum.OUTGOING },
+        { status: DocumentStatus.DRAFT, documentType: DocumentTypeEnum.OUTGOING },
+        { status: DocumentStatus.PENDING, documentType: DocumentTypeEnum.OUTGOING },
       ],
       relations: ['documentCategory'],
       order: { createdAt: 'DESC' },
@@ -223,7 +223,7 @@ export class DocumentWorkflowService {
 
     // Update document status back to draft
     await this.documentRepository.update(documentId, {
-      status: 'draft',
+      status: DocumentStatus.DRAFT,
     });
 
     return {

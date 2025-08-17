@@ -929,16 +929,122 @@ type DocumentCategory {
   description: String
 }
 
+type DocumentComment {
+  id: Int!
+  content: String!
+  documentId: Int!
+  document: Document!
+  createdByUserId: Int!
+  createdByUser: User!
+  parentCommentId: Int
+  parentComment: DocumentComment
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type DocumentVersion {
+  id: Int!
+  documentId: Int!
+  document: Document!
+  title: String!
+  content: String
+  documentNumber: String
+  fileId: Int
+  file: File
+  versionNumber: Float!
+  changeDescription: String!
+  createdByUserId: Int!
+  createdByUser: User!
+  createdAt: DateTime!
+}
+
+type DocumentApprovalHistory {
+  id: Int!
+  documentId: Int!
+  document: Document!
+  action: ApprovalAction!
+  level: ApprovalLevel!
+  comment: String
+  approvedByUserId: Int!
+  approvedByUser: User!
+  createdAt: DateTime!
+}
+
+"""Type of approval action"""
+enum ApprovalAction {
+  APPROVE
+  REJECT
+  RETURN
+  FORWARD
+}
+
+"""Level of approval"""
+enum ApprovalLevel {
+  DRAFT
+  DEPARTMENT_HEAD
+  UNIVERSITY_LEADER
+  FINAL
+}
+
+type TaskRequest {
+  id: Int!
+  requestedByUserId: Int!
+  requestedByUser: User!
+  assignedToUserId: Int!
+  assignedToUser: User!
+  title: String!
+  description: String
+  priority: TaskPriority!
+  deadline: DateTime
+  instructions: String
+  notes: String
+  status: TaskRequestStatus!
+  rejectionReason: String
+  approvedAt: DateTime
+  rejectedAt: DateTime
+  cancelledAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Priority level of task"""
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+"""Status of task request"""
+enum TaskRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
 type Document {
   id: Int!
   title: String!
   content: String
+  documentNumber: String
   documentType: DocumentTypeEnum!
   documentCategoryId: Int!
   documentCategory: DocumentCategory
   file: File
   fileId: Int
-  status: String
+  status: DocumentStatus!
+  priority: DocumentPriority!
+  deadline: DateTime
+  assignedToUserId: Int
+  assignedToUser: User
+  createdByUserId: Int!
+  createdByUser: User!
+  comments: [DocumentComment!]
+  versions: [DocumentVersion!]
+  approvalHistory: [DocumentApprovalHistory!]
+  taskRequestId: Int
+  taskRequest: TaskRequest
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -952,152 +1058,23 @@ enum DocumentTypeEnum {
   INTERNAL
 }
 
-type GetDocumentsPaginatedResponse {
-  """Dữ liệu trả về (danh sách)"""
-  data: [Document!]
-
-  """Thông tin metadata của response"""
-  metadata: Metadata!
-
-  """Tổng số mục (cho phân trang)"""
-  totalCount: Int
-
-  """Còn trang tiếp theo không (cho phân trang)"""
-  hasNextPage: Boolean
+"""Status of document"""
+enum DocumentStatus {
+  DRAFT
+  PENDING
+  PROCESSING
+  APPROVED
+  REJECTED
+  COMPLETED
+  CANCELLED
 }
 
-type GetDocumentOutput {
-  """Thông tin văn bản"""
-  document: Document!
-}
-
-type GetDocumentResponse {
-  """Dữ liệu trả về"""
-  data: GetDocumentOutput
-
-  """Thông tin metadata của response"""
-  metadata: Metadata!
-}
-
-type RemoveDocumentData {
-  """Kết quả xóa"""
-  success: Boolean!
-}
-
-type RemoveDocumentOutput {
-  """Thông tin metadata của response"""
-  metadata: Metadata!
-
-  """Dữ liệu trả về"""
-  data: RemoveDocumentData!
-}
-
-type AssignWorkflowData {
-  """ID của document"""
-  documentId: Int!
-
-  """ID của workflow instance"""
-  workflowInstanceId: Int!
-
-  """Trạng thái workflow"""
-  workflowStatus: String!
-
-  """Bước hiện tại"""
-  currentStep: String
-
-  """Thông báo"""
-  message: String!
-}
-
-type AssignWorkflowOutput {
-  """Thông tin metadata của response"""
-  metadata: Metadata!
-
-  """Dữ liệu trả về"""
-  data: AssignWorkflowData!
-}
-
-type RemoveWorkflowData {
-  """ID của document"""
-  documentId: Int!
-
-  """Thông báo"""
-  message: String!
-}
-
-type RemoveWorkflowOutput {
-  """Thông tin metadata của response"""
-  metadata: Metadata!
-
-  """Dữ liệu trả về"""
-  data: RemoveWorkflowData!
-}
-
-type DocumentNeedingWorkflow {
-  """ID của document"""
-  id: Int!
-
-  """Tiêu đề document"""
-  title: String!
-
-  """Loại document"""
-  documentType: DocumentTypeEnum!
-
-  """Trạng thái document"""
-  status: String
-
-  """Tên category"""
-  documentCategory: String
-
-  """Thời gian tạo"""
-  createdAt: DateTime!
-}
-
-type DocumentsNeedingWorkflowResponse {
-  """Danh sách documents"""
-  documents: [DocumentNeedingWorkflow!]!
-}
-
-type DocumentWorkflowInfo {
-  """ID của document"""
-  documentId: Int!
-
-  """Tiêu đề document"""
-  documentTitle: String!
-
-  """Loại document"""
-  documentType: String!
-
-  """ID của workflow instance"""
-  workflowInstanceId: Int
-
-  """Trạng thái workflow"""
-  workflowStatus: String
-
-  """Bước hiện tại"""
-  currentStep: String
-
-  """Có workflow đang hoạt động không"""
-  hasActiveWorkflow: Boolean!
-}
-
-type SuitableWorkflowTemplate {
-  """ID của template"""
-  id: Int!
-
-  """Tên template"""
-  name: String!
-
-  """Mô tả template"""
-  description: String
-
-  """Template có đang hoạt động không"""
-  isActive: Boolean!
-}
-
-type SuitableWorkflowTemplatesResponse {
-  """Danh sách templates"""
-  templates: [SuitableWorkflowTemplate!]!
+"""Priority level of document"""
+enum DocumentPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
 }
 
 type DocumentProcessingInfo {
@@ -1187,34 +1164,9 @@ type ProcessingStatisticsResponse {
   data: ProcessingStatistics!
 }
 
-type ProcessDocumentData {
-  """ID của document"""
-  documentId: Int!
-
-  """ID của workflow instance"""
-  workflowInstanceId: Int!
-
-  """Loại action đã thực hiện"""
-  actionType: String!
-
-  """Thông báo kết quả"""
-  message: String!
-
-  """Trạng thái workflow sau khi xử lý"""
-  workflowStatus: String!
-}
-
-type ProcessDocumentOutput {
-  """Thông tin metadata của response"""
-  metadata: Metadata!
-
-  """Dữ liệu kết quả xử lý"""
-  data: ProcessDocumentData!
-}
-
-type GetDocumentCategoriesPaginatedResponse {
+type GetDocumentsPaginatedResponse {
   """Dữ liệu trả về (danh sách)"""
-  data: [DocumentCategory!]
+  data: [Document!]
 
   """Thông tin metadata của response"""
   metadata: Metadata!
@@ -1226,30 +1178,130 @@ type GetDocumentCategoriesPaginatedResponse {
   hasNextPage: Boolean
 }
 
-type GetDocumentCategoryOutput {
-  """Thông tin nhóm văn bản"""
-  documentCategory: DocumentCategory!
-}
-
-type GetDocumentCategoryResponse {
+type DocumentResponse {
   """Dữ liệu trả về"""
-  data: GetDocumentCategoryOutput
+  data: Document
 
   """Thông tin metadata của response"""
   metadata: Metadata!
 }
 
-type RemoveDocumentCategoryOutput {
-  """Kết quả xóa"""
+type DocumentsResponse {
+  metadata: Metadata!
+  data: [Document!]!
+}
+
+type DocumentStatistics {
+  pending: Int!
+  processing: Int!
+  completed: Int!
+  rejected: Int!
+  total: Int!
+}
+
+type DocumentStatisticsResponse {
+  metadata: Metadata!
+  data: DocumentStatistics!
+}
+
+type DocumentHistoryItem {
+  id: Int!
+  actionType: String!
+  actionByUser: User
+  actionAt: DateTime!
+  note: String
+  stepName: String!
+  stepType: String!
+}
+
+type DocumentHistoryResponse {
+  metadata: Metadata!
+  data: [DocumentHistoryItem!]!
+}
+
+type TaskAssignment {
+  id: Int!
+  documentId: Int!
+  document: Document!
+  assignedToUserId: Int!
+  assignedToUser: User!
+  assignedByUserId: Int!
+  assignedByUser: User!
+  taskDescription: String
+  deadline: DateTime
+  instructions: String
+  notes: String
+  status: TaskStatus!
+  assignedAt: DateTime!
+  completedAt: DateTime
+  updatedAt: DateTime!
+}
+
+"""Status of task assignment"""
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+type TaskAssignmentResponse {
+  """Dữ liệu trả về"""
+  data: TaskAssignment
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type TaskStatistics {
+  total: Int!
+  pending: Int!
+  inProgress: Int!
+  completed: Int!
+  cancelled: Int!
+}
+
+type TaskStatisticsResponse {
+  metadata: Metadata!
+  data: TaskStatistics!
+}
+
+type TasksResponse {
+  metadata: Metadata!
+  data: [TaskAssignment!]!
+}
+
+"""Thống kê task request"""
+type TaskRequestStatistics {
+  """Tổng số task request"""
+  total: Int!
+
+  """Số task request đang chờ xử lý"""
+  pending: Int!
+
+  """Số task request đã được phê duyệt"""
+  approved: Int!
+
+  """Số task request đã bị từ chối"""
+  rejected: Int!
+
+  """Số task request đã bị hủy"""
+  cancelled: Int!
+}
+
+"""Kết quả tạo document từ task request"""
+type CreateDocumentFromTaskOutput {
+  """ID của document được tạo"""
+  documentId: Int!
+
+  """ID của workflow instance được tạo"""
+  workflowInstanceId: Int!
+
+  """Trạng thái thành công"""
   success: Boolean!
-}
 
-type RemoveDocumentCategoryResponse {
-  """Dữ liệu trả về"""
-  data: RemoveDocumentCategoryOutput
-
-  """Thông tin metadata của response"""
-  metadata: Metadata!
+  """Thông báo kết quả"""
+  message: String!
 }
 
 type StepTypeDto {
@@ -1295,6 +1347,46 @@ type RoleLabelDto {
 type ActionTypeLabelDto {
   actionType: String!
   label: String!
+}
+
+type GetDocumentCategoriesPaginatedResponse {
+  """Dữ liệu trả về (danh sách)"""
+  data: [DocumentCategory!]
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+
+  """Tổng số mục (cho phân trang)"""
+  totalCount: Int
+
+  """Còn trang tiếp theo không (cho phân trang)"""
+  hasNextPage: Boolean
+}
+
+type GetDocumentCategoryOutput {
+  """Thông tin nhóm văn bản"""
+  documentCategory: DocumentCategory!
+}
+
+type GetDocumentCategoryResponse {
+  """Dữ liệu trả về"""
+  data: GetDocumentCategoryOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
+}
+
+type RemoveDocumentCategoryOutput {
+  """Kết quả xóa"""
+  success: Boolean!
+}
+
+type RemoveDocumentCategoryResponse {
+  """Dữ liệu trả về"""
+  data: RemoveDocumentCategoryOutput
+
+  """Thông tin metadata của response"""
+  metadata: Metadata!
 }
 
 type DocumentType {
@@ -1505,34 +1597,27 @@ type Query {
   """Lấy label cho action type (legacy)"""
   actionTypeLabel(actionType: String!): String!
   documents(input: GetDocumentsPaginatedInput!): GetDocumentsPaginatedResponse!
-  document(id: Int!): GetDocumentResponse!
-
-  """Lấy danh sách documents cần gán workflow"""
-  documentsNeedingWorkflow: DocumentsNeedingWorkflowResponse!
-
-  """Lấy thông tin workflow của document"""
-  documentWorkflowInfo(documentId: Int!): DocumentWorkflowInfo!
-
-  """Lấy danh sách workflow templates phù hợp"""
-  suitableWorkflowTemplates(documentType: String!): SuitableWorkflowTemplatesResponse!
-
-  """Lấy danh sách documents với workflow status"""
-  documentsWithWorkflowStatus: [DocumentWorkflowInfo!]!
-
-  """Lấy danh sách documents cần xử lý"""
+  document(id: Int!): DocumentResponse!
+  myDocumentsForProcessing: DocumentsForProcessingResponse!
   documentsForProcessing: DocumentsForProcessingResponse!
-
-  """Lấy danh sách documents đã xử lý"""
-  processedDocuments: ProcessedDocumentsResponse!
-
-  """Lấy thống kê xử lý document"""
+  myDocumentsByStatus(status: String!): DocumentsResponse!
+  myDocumentStatistics: DocumentStatisticsResponse!
   processingStatistics: ProcessingStatisticsResponse!
-
-  """Lấy documents theo priority"""
-  documentsByPriority(priority: String!): DocumentsForProcessingResponse!
-
-  """Lấy documents sắp hết hạn"""
+  documentProcessingHistory(documentId: Int!): DocumentHistoryResponse!
+  searchDocuments(searchTerm: String, status: String, documentType: String, priority: String): DocumentsResponse!
+  processedDocuments: ProcessedDocumentsResponse!
   urgentDocuments: DocumentsForProcessingResponse!
+  myAssignedTasks: TasksResponse!
+  tasksAssignedByMe: TasksResponse!
+  taskAssignment(id: Int!): TaskAssignmentResponse!
+  tasksByStatus(status: String!): TasksResponse!
+  taskStatistics: TaskStatisticsResponse!
+  searchTasks(searchTerm: String, status: String, assignedByUserId: Int): TasksResponse!
+  taskRequest(id: Int!): TaskRequest!
+  myTaskRequests: [TaskRequest!]!
+  myCreatedTaskRequests: [TaskRequest!]!
+  taskRequestsByStatus(status: TaskRequestStatus!): [TaskRequest!]!
+  taskRequestStatistics: TaskRequestStatistics!
   documentCategories(input: GetDocumentCategoriesPaginatedInput!): GetDocumentCategoriesPaginatedResponse!
   documentCategory(id: Int!): GetDocumentCategoryResponse!
   allDocumentCategories: [DocumentCategory!]!
@@ -1683,12 +1768,20 @@ input GetDocumentsPaginatedInput {
 
   """Số lượng item trên mỗi trang"""
   take: Int = 10
-
-  """Từ khóa tìm kiếm"""
   search: String
-
-  """Loại văn bản"""
   documentType: DocumentTypeEnum
+  status: DocumentStatus
+  priority: DocumentPriority
+  documentCategoryId: Int
+  assignedToUserId: Int
+  createdByUserId: Int
+  deadlineFrom: String
+  deadlineTo: String
+  createdAtFrom: String
+  createdAtTo: String
+  documentNumber: String
+  hasDeadline: Boolean
+  isOverdue: Boolean
 }
 
 input GetDocumentCategoriesPaginatedInput {
@@ -1808,18 +1901,20 @@ type Mutation {
 
   """Xóa workflow template"""
   removeWorkflowTemplate(id: Int!): Boolean!
-  createDocument(createDocumentInput: CreateDocumentInput!, file: Upload): GetDocumentResponse!
-  updateDocument(updateDocumentInput: UpdateDocumentInput!): GetDocumentResponse!
-  removeDocument(id: Int!): RemoveDocumentOutput!
-
-  """Gán workflow cho document"""
-  assignWorkflowToDocument(documentId: Int!, templateId: Int!, notes: String): AssignWorkflowOutput!
-
-  """Xóa workflow khỏi document"""
-  removeWorkflowFromDocument(documentId: Int!): RemoveWorkflowOutput!
-
-  """Xử lý document action"""
-  processDocumentAction(input: DocumentActionInput!): ProcessDocumentOutput!
+  createDocument(createDocumentInput: CreateDocumentInput!, file: Upload): DocumentResponse!
+  updateDocument(updateDocumentInput: UpdateDocumentInput!): DocumentResponse!
+  removeDocument(id: Int!): DocumentResponse!
+  assignDocumentToUser(documentId: Int!, assignedToUserId: Int!): DocumentResponse!
+  updateDocumentStatusFromWorkflow(documentId: Int!, workflowStatus: String!): DocumentResponse!
+  processDocumentAction(input: DocumentActionInput!): DocumentResponse!
+  assignTask(assignTaskInput: AssignTaskInput!): TaskAssignmentResponse!
+  updateTaskStatus(taskId: Int!, status: String!): TaskAssignmentResponse!
+  cancelTask(taskId: Int!): TaskAssignmentResponse!
+  createTaskRequest(createTaskRequestInput: CreateTaskRequestInput!): TaskRequest!
+  approveTaskRequest(approveTaskRequestInput: ApproveTaskRequestInput!): TaskRequest!
+  rejectTaskRequest(rejectTaskRequestInput: RejectTaskRequestInput!): TaskRequest!
+  cancelTaskRequest(taskRequestId: Int!): TaskRequest!
+  createDocumentFromTask(input: CreateDocumentFromTaskInput!): CreateDocumentFromTaskOutput!
   createDocumentCategory(createDocumentCategoryInput: CreateDocumentCategoryInput!): GetDocumentCategoryResponse!
   updateDocumentCategory(updateDocumentCategoryInput: UpdateDocumentCategoryInput!): GetDocumentCategoryResponse!
   removeDocumentCategory(id: Int!): RemoveDocumentCategoryResponse!
@@ -2206,44 +2301,31 @@ input UpdateWorkflowTemplateInput {
 }
 
 input CreateDocumentInput {
-  """Tiêu đề văn bản"""
   title: String!
-
-  """Nội dung"""
   content: String
-
-  """Loại văn bản"""
+  documentNumber: String
   documentType: DocumentTypeEnum!
-
-  """ID nhóm văn bản"""
   documentCategoryId: Int!
-
-  """ID file đính kèm"""
+  status: DocumentStatus
+  priority: DocumentPriority
+  deadline: String
+  assignedToUserId: Int
+  workflowTemplateId: Int
   fileId: Int
-
-  """Trạng thái"""
-  status: String
 }
 
 input UpdateDocumentInput {
-  """Tiêu đề văn bản"""
-  title: String
-
-  """Nội dung"""
-  content: String
-
-  """Loại văn bản"""
-  documentType: DocumentTypeEnum
-
-  """ID nhóm văn bản"""
-  documentCategoryId: Int
-
-  """ID file đính kèm"""
-  fileId: Int
-
-  """Trạng thái"""
-  status: String
   id: Int!
+  title: String
+  content: String
+  documentNumber: String
+  documentType: DocumentTypeEnum
+  documentCategoryId: Int
+  status: DocumentStatus
+  priority: DocumentPriority
+  deadline: String
+  assignedToUserId: Int
+  fileId: Int
 }
 
 input DocumentActionInput {
@@ -2258,6 +2340,79 @@ input DocumentActionInput {
 
   """ID user chuyển tiếp (cho TRANSFER action)"""
   transferToUserId: Int
+}
+
+input AssignTaskInput {
+  documentId: Int!
+  assignedToUserId: Int!
+  taskDescription: String
+  deadline: String
+  priority: DocumentPriority
+  instructions: String
+  notes: String
+}
+
+"""Dữ liệu đầu vào để tạo task request mới"""
+input CreateTaskRequestInput {
+  """ID của người được giao việc"""
+  assignedToUserId: Int!
+
+  """Tiêu đề công việc"""
+  title: String!
+
+  """Mô tả chi tiết công việc"""
+  description: String
+
+  """Mức độ ưu tiên"""
+  priority: TaskPriority
+
+  """Deadline (ISO string)"""
+  deadline: String
+
+  """Hướng dẫn thực hiện"""
+  instructions: String
+
+  """Ghi chú bổ sung"""
+  notes: String
+}
+
+"""Dữ liệu đầu vào để phê duyệt task request"""
+input ApproveTaskRequestInput {
+  """ID của task request"""
+  taskRequestId: Int!
+
+  """Ghi chú khi phê duyệt"""
+  notes: String
+}
+
+"""Dữ liệu đầu vào để từ chối task request"""
+input RejectTaskRequestInput {
+  """ID của task request"""
+  taskRequestId: Int!
+
+  """Lý do từ chối"""
+  rejectionReason: String!
+}
+
+"""Dữ liệu đầu vào để tạo document từ task request"""
+input CreateDocumentFromTaskInput {
+  """ID của task request"""
+  taskRequestId: Int!
+
+  """Tiêu đề văn bản"""
+  title: String!
+
+  """Nội dung văn bản"""
+  content: String!
+
+  """Danh mục văn bản"""
+  category: String
+
+  """Độ ưu tiên"""
+  priority: TaskPriority!
+
+  """Ghi chú"""
+  notes: String
 }
 
 input CreateDocumentCategoryInput {

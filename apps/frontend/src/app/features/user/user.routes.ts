@@ -4,6 +4,10 @@ import { OutgoingDocuments } from './outgoing-documents/outgoing-documents';
 import { AllDocuments } from './all-documents/all-documents';
 import { WORKFLOW_ROUTES } from './workflow/workflow.routes';
 import { DocumentProcessingComponent } from './document-processing/document-processing.component';
+import { TaskManagementComponent } from './task-assignment/task-management.component';
+import { TaskRequestListComponent } from './task-request/task-request-list.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { DocumentCreationComponent } from './document-creation/document-creation.component';
 
 export const USER_ROUTES: Routes = [
   {
@@ -32,8 +36,23 @@ export const USER_ROUTES: Routes = [
     title: 'Xử lý văn bản'
   },
   {
+    path: 'task-management',
+    component: TaskRequestListComponent,
+    title: 'Quản lý công việc'
+  },
+  {
+    path: 'document-creation/:taskId',
+    component: DocumentCreationComponent,
+    title: 'Tạo văn bản từ công việc'
+  },
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
+    title: 'Bảng điều khiển'
+  },
+  {
     path: '',
-    redirectTo: 'workflow',
+    redirectTo: 'dashboard',
     pathMatch: 'full'
   }
 ];

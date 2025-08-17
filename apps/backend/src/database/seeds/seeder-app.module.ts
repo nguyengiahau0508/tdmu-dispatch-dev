@@ -10,6 +10,9 @@ import { Unit } from '../../modules/organizational/units/entities/unit.entity';
 import { DocumentCategory } from '../../modules/dispatch/document-category/entities/document-category.entity';
 import { DocumentType } from '../../modules/dispatch/document-types/entities/document-type.entity';
 import { Document } from '../../modules/dispatch/documents/entities/document.entity';
+import { DocumentComment } from '../../modules/dispatch/documents/entities/document-comment.entity';
+import { DocumentVersion } from '../../modules/dispatch/documents/entities/document-version.entity';
+import { DocumentApprovalHistory } from '../../modules/dispatch/documents/entities/document-approval-history.entity';
 import { WorkflowTemplate } from '../../modules/workflow/workflow-templates/entities/workflow-template.entity';
 import { WorkflowStep } from '../../modules/workflow/workflow-steps/entities/workflow-step.entity';
 import { WorkflowInstance } from '../../modules/workflow/workflow-instances/entities/workflow-instance.entity';
@@ -40,6 +43,9 @@ import { File } from '../../modules/files/entities/file.entity';
         DocumentCategory,
         DocumentType,
         Document,
+        DocumentComment,
+        DocumentVersion,
+        DocumentApprovalHistory,
         WorkflowTemplate,
         WorkflowStep,
         WorkflowInstance,

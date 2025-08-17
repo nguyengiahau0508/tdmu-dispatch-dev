@@ -93,8 +93,8 @@ import { DocumentDetailComponent } from '../document-detail/document-detail.comp
                 }
               </td>
               <td>
-                <span class="document-status" [class]="'status-' + (document.status || 'draft')">
-                  {{ getStatusLabel(document.status || 'draft') }}
+                                  <span class="document-status" [class]="'status-' + (document.status || 'DRAFT')">
+                  {{ getStatusLabel(document.status || 'DRAFT') }}
                 </span>
               </td>
               <td>
@@ -751,7 +751,7 @@ export class AllDocuments implements OnInit {
 
       // Status filter
       const matchesStatus = !this.selectedStatus || 
-        (document.status || 'draft') === this.selectedStatus;
+        (document.status || 'DRAFT') === this.selectedStatus;
 
       const matches = matchesSearch && matchesType && matchesStatus;
       // console.log(`Document ${document.id} matches:`, matches, 'search:', matchesSearch, 'type:', matchesType, 'status:', matchesStatus);
@@ -831,10 +831,13 @@ export class AllDocuments implements OnInit {
 
   getStatusLabel(status: string): string {
     switch (status) {
-      case 'draft': return 'Nháp';
-      case 'pending': return 'Chờ xử lý';
-      case 'approved': return 'Đã duyệt';
-      case 'rejected': return 'Từ chối';
+      case 'DRAFT': return 'Nháp';
+      case 'PENDING': return 'Chờ xử lý';
+      case 'PROCESSING': return 'Đang xử lý';
+      case 'APPROVED': return 'Đã duyệt';
+      case 'REJECTED': return 'Từ chối';
+      case 'COMPLETED': return 'Đã hoàn thành';
+      case 'CANCELLED': return 'Đã hủy';
       default: return status;
     }
   }

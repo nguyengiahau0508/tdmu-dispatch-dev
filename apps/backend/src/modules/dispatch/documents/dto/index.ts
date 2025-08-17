@@ -1,6 +1,6 @@
 // Create Document DTOs
-export * from './create-document.input';
-export * from './update-document.input';
+export * from './create-document/create-document.input';
+export * from './update-document/update-document.input';
 
 // Remove Document DTOs
 export * from './remove-document/remove-document.output';

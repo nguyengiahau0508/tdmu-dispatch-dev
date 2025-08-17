@@ -32,18 +32,26 @@ export class RolesGuard implements CanActivate {
     }
 
     // Lấy thông tin người dùng từ request
-    // Giả sử entity User của bạn có thuộc tính `role` là một giá trị đơn lẻ từ enum UserRole
-    const user = request.user as { role: Role; [key: string]: any }; // Type assertion để TypeScript biết user có thuộc tính 'role'
-    // Kiểm tra xem user có thuộc tính 'role' không
-    if (user && typeof user.role !== 'undefined') {
+    const user = request.user as { roles: Role[]; [key: string]: any }; // Type assertion để TypeScript biết user có thuộc tính 'roles'
+    
+    console.log('🔍 Debug RolesGuard:');
+    console.log('  - User ID:', user?.id);
+    console.log('  - User email:', user?.email);
+    console.log('  - User roles:', user?.roles);
+    console.log('  - Required roles:', requiredRoles);
+    
+    // Kiểm tra xem user có thuộc tính 'roles' không
+    if (user && user.roles && Array.isArray(user.roles)) {
       // So sánh vai trò của người dùng với các vai trò được yêu cầu
-      return requiredRoles.some((role) => user.role === role);
+      const hasRole = user.roles.some((role) => requiredRoles.includes(role));
+      console.log('  - Has required role:', hasRole);
+      return hasRole;
     } else {
       console.error(
-        'RolesGuard: Thuộc tính "role" không tồn tại hoặc không hợp lệ trên user object.',
+        'RolesGuard: Thuộc tính "roles" không tồn tại hoặc không hợp lệ trên user object.',
         user, // Log ra user object để debug
       );
-      return false; // Nếu không có thuộc tính 'role', không cho phép
+      return false; // Nếu không có thuộc tính 'roles', không cho phép
     }
   }
 }

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Thông báo công việc mới</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 0 0 8px 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .task-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #2563eb;
+        }
+        .task-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+        .task-detail {
+            margin: 8px 0;
+        }
+        .label {
+            font-weight: bold;
+            color: #64748b;
+        }
+        .value {
+            color: #334155;
+        }
+        .cta-button {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📋 Công việc mới</h1>
+        <p>Bạn có một công việc mới được giao</p>
+    </div>
+    
+    <div class="content">
+        <p>Xin chào <strong>{{recipientName}}</strong>,</p>
+        
+        <p>Bạn vừa được giao một công việc mới trong hệ thống quản lý công văn.</p>
+        
+        <div class="task-info">
+            <div class="task-title">{{taskTitle}}</div>
+            <div class="task-detail">
+                <span class="label">Người giao việc:</span>
+                <span class="value">{{assignedBy}}</span>
+            </div>
+            <div class="task-detail">
+                <span class="label">Ngày giao:</span>
+                <span class="value">{{currentDate}}</span>
+            </div>
+            <div class="task-detail">
+                <span class="label">Hạn hoàn thành:</span>
+                <span class="value">{{deadline}}</span>
+            </div>
+        </div>
+        
+        <p>Vui lòng đăng nhập vào hệ thống để xem chi tiết và thực hiện công việc này.</p>
+        
+        <a href="http://localhost:4200/task-management" class="cta-button">
+            Xem chi tiết công việc
+        </a>
+        
+        <div class="footer">
+            <p>Email này được gửi tự động từ hệ thống quản lý công văn TDMU.</p>
+            <p>Nếu bạn có thắc mắc, vui lòng liên hệ với người quản trị hệ thống.</p>
+        </div>
+    </div>
+</body>
+</html>

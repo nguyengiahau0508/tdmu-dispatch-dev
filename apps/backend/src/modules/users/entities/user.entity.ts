@@ -70,6 +70,18 @@ export class User {
     type: 'set',
     enum: Role,
     default: [Role.BASIC_USER],
+    transformer: {
+      to: (value: Role[]) => value,
+      from: (value: string | string[]) => {
+        if (Array.isArray(value)) {
+          return value;
+        }
+        if (typeof value === 'string') {
+          return [value];
+        }
+        return [Role.BASIC_USER];
+      }
+    }
   })
   @Field(() => [Role], { description: 'Danh sách vai trò của người dùng' })
   roles: Role[];

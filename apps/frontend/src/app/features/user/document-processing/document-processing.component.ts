@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DocumentActionDialogComponent } from './document-action-dialog.component';
+import { DocumentActionDialogComponent, DocumentActionData } from './document-action-dialog.component';
+import { DocumentDetailsComponent } from './document-details.component';
+import { ToastNotificationService } from './toast-notification.service';
 import { DocumentProcessingApolloService, DocumentProcessingInfo, ProcessingStatistics, DocumentActionInput } from './services/document-processing-apollo.service';
 
 @Component({
@@ -10,6 +12,8 @@ import { DocumentProcessingApolloService, DocumentProcessingInfo, ProcessingStat
   imports: [
     CommonModule,
     FormsModule,
+    DocumentActionDialogComponent,
+    DocumentDetailsComponent,
   ],
   template: `
     <div class="document-processing-container">
@@ -68,6 +72,12 @@ import { DocumentProcessingApolloService, DocumentProcessingInfo, ProcessingStat
               [class.active]="activeTab === 'pending'"
               (click)="setActiveTab('pending')">
               Cần xử lý ({{ pendingDocuments.length }})
+            </button>
+            <button 
+              class="tab-button" 
+              [class.active]="activeTab === 'in-progress'"
+              (click)="setActiveTab('in-progress')">
+              Đang xử lý ({{ inProgressDocuments.length }})
             </button>
             <button 
               class="tab-button" 
@@ -167,6 +177,93 @@ import { DocumentProcessingApolloService, DocumentProcessingInfo, ProcessingStat
                   <div class="empty-icon">📋</div>
                   <h3>Không có văn bản nào cần xử lý</h3>
                   <p>Tất cả văn bản đã được xử lý hoặc chưa được phân công.</p>
+                </div>
+              </ng-template>
+            </div>
+
+            <!-- Tab: Documents đang xử lý -->
+            <div class="tab-panel" *ngIf="activeTab === 'in-progress'">
+              <div class="tab-header">
+                <h3>Văn bản đang xử lý ({{ inProgressDocuments.length }})</h3>
+                <div class="tab-actions">
+                  <button class="action-button" (click)="refreshInProgressDocuments()">
+                    <span class="action-icon">🔄</span>
+                    Làm mới
+                  </button>
+                </div>
+              </div>
+
+              <div class="documents-grid" *ngIf="inProgressDocuments.length > 0; else noInProgressDocuments">
+                <div class="document-card in-progress" 
+                     *ngFor="let doc of inProgressDocuments" 
+                     [class.urgent]="doc.priority === 'URGENT'"
+                     [class.high]="doc.priority === 'HIGH'">
+                  <div class="document-header">
+                    <div class="document-title">{{ doc.documentTitle }}</div>
+                    <div class="document-subtitle">
+                      {{ doc.documentType }} • {{ doc.documentCategory }}
+                    </div>
+                    <div class="priority-badge" [class]="'priority-' + doc.priority.toLowerCase()">
+                      {{ getPriorityLabel(doc.priority) }}
+                    </div>
+                  </div>
+
+                  <div class="document-content">
+                    <div class="document-info">
+                      <div class="info-row">
+                        <span class="label">Trạng thái:</span>
+                        <span class="value in-progress-status">{{ doc.status }}</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="label">Bước hiện tại:</span>
+                        <span class="value">{{ doc.currentStepName || 'N/A' }}</span>
+                      </div>
+                      <div class="info-row">
+                        <span class="label">Ngày tạo:</span>
+                        <span class="value">{{ doc.createdAt | date:'dd/MM/yyyy' }}</span>
+                      </div>
+                      <div class="info-row" *ngIf="doc.deadline">
+                        <span class="label">Deadline:</span>
+                        <span class="value" [class.overdue]="isOverdue(doc.deadline)">
+                          {{ doc.deadline | date:'dd/MM/yyyy' }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="available-actions" *ngIf="doc.actionType">
+                      <span class="label">Actions có sẵn:</span>
+                      <div class="action-buttons">
+                        <button class="action-btn primary" 
+                                *ngFor="let action of getAvailableActions(doc.actionType)"
+                                (click)="processDocument(doc, action)">
+                          {{ getActionLabel(action) }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="document-actions">
+                    <button class="action-btn secondary" (click)="viewDocumentDetails(doc)">
+                      <span class="action-icon">👁️</span>
+                      Xem chi tiết
+                    </button>
+                    <button class="action-btn success" (click)="processDocument(doc, 'APPROVE')">
+                      <span class="action-icon">✅</span>
+                      Phê duyệt
+                    </button>
+                    <button class="action-btn danger" (click)="processDocument(doc, 'REJECT')">
+                      <span class="action-icon">❌</span>
+                      Từ chối
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <ng-template #noInProgressDocuments>
+                <div class="empty-state">
+                  <div class="empty-icon">🔄</div>
+                  <h3>Không có văn bản nào đang xử lý</h3>
+                  <p>Tất cả văn bản đã hoàn thành hoặc chưa được bắt đầu xử lý.</p>
                 </div>
               </ng-template>
             </div>
@@ -297,11 +394,28 @@ import { DocumentProcessingApolloService, DocumentProcessingInfo, ProcessingStat
         </div>
       </div>
     </div>
+
+    <!-- Document Action Dialog -->
+    <app-document-action-dialog
+      *ngIf="showActionDialog && selectedDocument"
+      [document]="selectedDocument"
+      [actionType]="selectedAction"
+      (actionConfirmed)="onActionConfirmed($event)"
+      (dialogClosed)="closeActionDialog()">
+    </app-document-action-dialog>
+
+    <!-- Document Details Dialog -->
+    <app-document-details
+      *ngIf="showDetailsDialog && selectedDocument"
+      [document]="selectedDocument"
+      (actionRequested)="onDetailsActionRequested($event)"
+      (dialogClosed)="closeDetailsDialog()">
+    </app-document-details>
   `,
   styles: [`
     .document-processing-container {
       padding: 20px;
-      // max-width: 1200px;
+      /* max-width: 1200px; */
       margin: 0 auto;
       background-color: var(--color-background-layout);
       min-height: 100vh;
@@ -551,6 +665,10 @@ import { DocumentProcessingApolloService, DocumentProcessingInfo, ProcessingStat
       border-left: 4px solid #10b981;
     }
 
+    .document-card.in-progress {
+      border-left: 4px solid #3b82f6;
+    }
+
     .document-header {
       padding: 20px 20px 0 20px;
       position: relative;
@@ -655,6 +773,11 @@ import { DocumentProcessingApolloService, DocumentProcessingInfo, ProcessingStat
 
     .value.overdue {
       color: #ef4444;
+      font-weight: 600;
+    }
+
+    .value.in-progress-status {
+      color: #3b82f6;
       font-weight: 600;
     }
 
@@ -840,14 +963,22 @@ import { DocumentProcessingApolloService, DocumentProcessingInfo, ProcessingStat
 })
 export class DocumentProcessingComponent implements OnInit {
   pendingDocuments: DocumentProcessingInfo[] = [];
+  inProgressDocuments: DocumentProcessingInfo[] = [];
   processedDocuments: DocumentProcessingInfo[] = [];
   urgentDocuments: DocumentProcessingInfo[] = [];
   statistics: ProcessingStatistics | null = null;
   loading = false;
   activeTab = 'pending';
+  
+  // Dialog states
+  showActionDialog = false;
+  showDetailsDialog = false;
+  selectedDocument: DocumentProcessingInfo | null = null;
+  selectedAction = '';
 
   constructor(
-    private documentProcessingService: DocumentProcessingApolloService
+    private documentProcessingService: DocumentProcessingApolloService,
+    private toastService: ToastNotificationService
   ) {}
 
   ngOnInit(): void {
@@ -862,6 +993,7 @@ export class DocumentProcessingComponent implements OnInit {
       
       // Load documents
       await this.loadPendingDocuments();
+      await this.loadInProgressDocuments();
       await this.loadProcessedDocuments();
       await this.loadUrgentDocuments();
     } catch (error) {
@@ -887,13 +1019,20 @@ export class DocumentProcessingComponent implements OnInit {
   async loadPendingDocuments(): Promise<void> {
     this.documentProcessingService.getDocumentsForProcessing().subscribe({
       next: (documents) => {
-        this.pendingDocuments = documents;
+        // Phân loại documents: pending vs in-progress
+        this.pendingDocuments = documents.filter(doc => doc.requiresAction);
+        this.inProgressDocuments = documents.filter(doc => !doc.requiresAction && doc.workflowStatus === 'IN_PROGRESS');
       },
       error: (error) => {
         console.error('Error loading pending documents:', error);
         this.showError('Lỗi khi tải văn bản cần xử lý');
       }
     });
+  }
+
+  async loadInProgressDocuments(): Promise<void> {
+    // Documents đang xử lý đã được load trong loadPendingDocuments
+    // Method này chỉ để refresh
   }
 
   async loadProcessedDocuments(): Promise<void> {
@@ -930,6 +1069,10 @@ export class DocumentProcessingComponent implements OnInit {
 
   refreshProcessedDocuments(): void {
     this.loadProcessedDocuments();
+  }
+
+  refreshInProgressDocuments(): void {
+    this.loadInProgressDocuments();
   }
 
   refreshUrgentDocuments(): void {
@@ -996,34 +1139,70 @@ export class DocumentProcessingComponent implements OnInit {
 
   async processDocument(document: DocumentProcessingInfo, action: string): Promise<void> {
     try {
-      console.log('Processing document:', document.documentId, 'with action:', action);
-      
-      // TODO: Implement document action dialog
-      this.showInfo(`Chức năng ${this.getActionLabel(action).toLowerCase()} đang được phát triển`);
-      
+      this.selectedDocument = document;
+      this.selectedAction = action;
+      this.showActionDialog = true;
     } catch (error) {
-      console.error('Error processing document:', error);
-      this.showError('Lỗi khi xử lý văn bản');
+      console.error('Error opening action dialog:', error);
+      this.showError('Lỗi khi mở dialog xử lý văn bản');
     }
   }
 
   viewDocumentDetails(document: DocumentProcessingInfo): void {
-    console.log('View document details:', document);
-    this.showInfo('Chức năng xem chi tiết đang được phát triển');
+    this.selectedDocument = document;
+    this.showDetailsDialog = true;
+  }
+
+  onActionConfirmed(actionData: DocumentActionData): void {
+    console.log('Action confirmed:', actionData);
+    
+    // Call the actual API
+    const input: DocumentActionInput = {
+      documentId: actionData.documentId,
+      actionType: actionData.actionType as any,
+      notes: actionData.notes,
+      transferToUserId: actionData.transferToUserId
+    };
+
+    this.documentProcessingService.processDocumentAction(input).subscribe({
+      next: (response) => {
+        this.showSuccess(`Đã ${this.getActionLabel(actionData.actionType).toLowerCase()} văn bản thành công`);
+        this.closeActionDialog();
+        // Refresh data
+        this.loadData();
+      },
+      error: (error) => {
+        console.error('Error processing document action:', error);
+        this.showError('Lỗi khi xử lý văn bản');
+      }
+    });
+  }
+
+  onDetailsActionRequested(event: {document: DocumentProcessingInfo, action: string}): void {
+    this.closeDetailsDialog();
+    this.processDocument(event.document, event.action);
+  }
+
+  closeActionDialog(): void {
+    this.showActionDialog = false;
+    this.selectedDocument = null;
+    this.selectedAction = '';
+  }
+
+  closeDetailsDialog(): void {
+    this.showDetailsDialog = false;
+    this.selectedDocument = null;
   }
 
   showSuccess(message: string): void {
-    // TODO: Implement toast notification
-    console.log('Success:', message);
+    this.toastService.success(message);
   }
 
   showError(message: string): void {
-    // TODO: Implement toast notification
-    console.error('Error:', message);
+    this.toastService.error(message);
   }
 
   showInfo(message: string): void {
-    // TODO: Implement toast notification
-    console.log('Info:', message);
+    this.toastService.info(message);
   }
 }

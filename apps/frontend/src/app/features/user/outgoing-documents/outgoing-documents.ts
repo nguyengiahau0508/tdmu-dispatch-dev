@@ -52,8 +52,8 @@ import { DocumentDetailComponent } from '../document-detail/document-detail.comp
               <div class="document-card">
                 <div class="document-header">
                   <span class="document-id">#{{ document.id }}</span>
-                  <span class="status-badge" [class]="getStatusClass(document.status || 'draft')">
-                    {{ getStatusLabel(document.status || 'draft') }}
+                  <span class="status-badge" [class]="getStatusClass(document.status || 'DRAFT')">
+                    {{ getStatusLabel(document.status || 'DRAFT') }}
                   </span>
                 </div>
                 
@@ -62,7 +62,7 @@ import { DocumentDetailComponent } from '../document-detail/document-detail.comp
                   <div class="document-info">
                     <p><strong>Loại:</strong> {{ document.documentCategory?.name || 'Chưa phân loại' }}</p>
                     <p><strong>Ngày tạo:</strong> {{ document.createdAt | date:'dd/MM/yyyy' }}</p>
-                    <p><strong>Trạng thái:</strong> {{ getStatusLabel(document.status || 'draft') }}</p>
+                    <p><strong>Trạng thái:</strong> {{ getStatusLabel(document.status || 'DRAFT') }}</p>
                   </div>
                   
                   @if (document.content) {
@@ -510,7 +510,7 @@ export class OutgoingDocuments implements OnInit {
     this.filteredDocuments = this.documents.filter(doc => {
       const matchesSearch = !this.searchTerm || 
         doc.title.toLowerCase().includes(this.searchTerm.toLowerCase());
-      const matchesStatus = !this.statusFilter || (doc.status || 'draft') === this.statusFilter;
+      const matchesStatus = !this.statusFilter || (doc.status || 'DRAFT') === this.statusFilter;
       return matchesSearch && matchesStatus;
     });
   }
@@ -562,20 +562,26 @@ export class OutgoingDocuments implements OnInit {
 
   getStatusLabel(status: string): string {
     const statusLabels: Record<string, string> = {
-      'draft': 'Bản nháp',
-      'pending': 'Chờ phê duyệt',
-      'approved': 'Đã phê duyệt',
-      'sent': 'Đã gửi'
+      'DRAFT': 'Bản nháp',
+      'PENDING': 'Chờ phê duyệt',
+      'PROCESSING': 'Đang xử lý',
+      'APPROVED': 'Đã phê duyệt',
+      'REJECTED': 'Đã từ chối',
+      'COMPLETED': 'Đã hoàn thành',
+      'CANCELLED': 'Đã hủy'
     };
     return statusLabels[status] || status;
   }
 
   getStatusClass(status: string): string {
     const statusClasses: Record<string, string> = {
-      'draft': 'status-draft',
-      'pending': 'status-pending',
-      'approved': 'status-approved',
-      'sent': 'status-sent'
+      'DRAFT': 'status-draft',
+      'PENDING': 'status-pending',
+      'PROCESSING': 'status-processing',
+      'APPROVED': 'status-approved',
+      'REJECTED': 'status-rejected',
+      'COMPLETED': 'status-completed',
+      'CANCELLED': 'status-cancelled'
     };
     return statusClasses[status] || 'status-default';
   }

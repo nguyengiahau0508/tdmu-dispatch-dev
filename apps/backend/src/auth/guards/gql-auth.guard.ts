@@ -39,7 +39,32 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
 
     // ✅ 5. Kiểm tra mảng roles
     const userRoles = user?.roles || [];
-    const hasRole = userRoles.some((role) => requiredRoles.includes(role));
+    console.log('🔍 Debug GqlAuthGuard:');
+    console.log('  - User ID:', user?.id);
+    console.log('  - User email:', user?.email);
+    console.log('  - User roles:', userRoles);
+    console.log('  - User roles type:', typeof userRoles);
+    console.log('  - Required roles:', requiredRoles);
+    
+    // Xử lý trường hợp roles có thể là string hoặc array
+    let normalizedUserRoles: Role[] = [];
+    if (Array.isArray(userRoles)) {
+      normalizedUserRoles = userRoles;
+    } else if (typeof userRoles === 'string') {
+      // Nếu roles là string, chuyển thành array
+      normalizedUserRoles = [userRoles as Role];
+    }
+    
+    console.log('  - Normalized user roles:', normalizedUserRoles);
+    console.log('  - Required roles type:', typeof requiredRoles);
+    console.log('  - Required roles array:', requiredRoles);
+    
+    const hasRole = normalizedUserRoles.some((role) => {
+      const includes = requiredRoles.includes(role);
+      console.log(`    - Checking role "${role}" against required roles: ${includes}`);
+      return includes;
+    });
+    console.log('  - Has required role:', hasRole);
 
     return hasRole;
   }

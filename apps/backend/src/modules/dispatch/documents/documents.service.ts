@@ -1,10 +1,10 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { FilesService } from 'src/modules/files/files.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, ILike, Repository } from 'typeorm';
-import { Document, DocumentTypeEnum } from './entities/document.entity';
-import { CreateDocumentInput } from './dto/create-document.input';
-import { UpdateDocumentInput } from './dto/update-document.input';
+import { FindOptionsWhere, ILike, Repository, DataSource } from 'typeorm';
+import { Document, DocumentTypeEnum, DocumentStatus, DocumentPriority } from './entities/document.entity';
+import { CreateDocumentInput } from './dto/create-document/create-document.input';
+import { UpdateDocumentInput } from './dto/update-document/update-document.input';
 import { GetDocumentsPaginatedInput } from './dto/get-documents-paginated/get-documents-paginated.input';
 import { PageDto } from 'src/common/shared/pagination/page.dto';
 import { PageMetaDto } from 'src/common/shared/pagination/page-meta.dto';
@@ -14,12 +14,16 @@ import { FileUpload } from 'graphql-upload-ts';
 import { DocumentCategoryService } from '../document-category/document-category.service';
 import { WorkflowInstancesService } from 'src/modules/workflow/workflow-instances/workflow-instances.service';
 import { User } from 'src/modules/users/entities/user.entity';
+import { File } from 'src/modules/files/entities/file.entity';
 
 @Injectable()
 export class DocumentsService {
   constructor(
     @InjectRepository(Document)
     private readonly documentRepository: Repository<Document>,
+    @InjectRepository(File)
+    private readonly fileRepository: Repository<File>,
+    private readonly dataSource: DataSource,
     private readonly googleDriveService: GoogleDriveService,
     private readonly documentCategoryService: DocumentCategoryService,
     private readonly workflowInstancesService: WorkflowInstancesService,
@@ -71,14 +75,31 @@ export class DocumentsService {
         // Get file info from Google Drive
         const fileInfo = await this.googleDriveService.getFileInfo(uploadedId);
         
-        fileEntity = {
+        // Create and save file entity to database
+        const fileEntityData = {
           driveFileId: uploadedId,
           originalName: file.filename || fileInfo.name || 'unknown',
           mimeType: file.mimetype || fileInfo.mimeType || 'application/octet-stream',
           isPublic: false,
         };
         
-        console.log('File entity created:', fileEntity);
+        try {
+          const fileEntityToSave = this.fileRepository.create(fileEntityData);
+          const savedFileEntity = await this.fileRepository.save(fileEntityToSave);
+          console.log('File entity saved to database:', savedFileEntity);
+          
+          fileEntity = savedFileEntity;
+        } catch (fileSaveError) {
+          console.error('Error saving file entity to database:', fileSaveError);
+          // Try to delete the uploaded file from Google Drive if database save fails
+          try {
+            await this.googleDriveService.deleteFile(uploadedId);
+            console.log('Deleted file from Google Drive due to database save failure');
+          } catch (deleteError) {
+            console.error('Failed to delete file from Google Drive:', deleteError);
+          }
+          throw new BadRequestException('Failed to save file information to database');
+        }
       } catch (error) {
         console.error('Error uploading file to Google Drive:', error);
         throw new BadRequestException('Failed to upload file to Google Drive');
@@ -104,17 +125,36 @@ export class DocumentsService {
     }
     
     // Create document entity
-    const entity = this.documentRepository.create({
-      ...createDocumentInput,
-      file: fileEntity,
-      status: createDocumentInput.status || 'draft',
-    });
+    const entityData: Partial<Document> = {
+      title: createDocumentInput.title,
+      content: createDocumentInput.content,
+      documentNumber: createDocumentInput.documentNumber,
+      documentType: createDocumentInput.documentType,
+      documentCategoryId: createDocumentInput.documentCategoryId,
+      status: createDocumentInput.status || DocumentStatus.DRAFT,
+      priority: createDocumentInput.priority,
+      deadline: createDocumentInput.deadline ? new Date(createDocumentInput.deadline) : undefined,
+      assignedToUserId: createDocumentInput.assignedToUserId,
+      createdByUserId: user?.id,
+    };
+    
+    // Set fileId if we have a file entity or if fileId is provided in input
+    if (fileEntity) {
+      entityData.fileId = fileEntity.id;
+      console.log('File ID set for document:', fileEntity.id);
+    } else if (createDocumentInput.fileId) {
+      entityData.fileId = createDocumentInput.fileId;
+      console.log('Using existing file ID:', createDocumentInput.fileId);
+    }
+    
+    const entity = this.documentRepository.create(entityData);
     
     console.log('Document entity created:', {
       id: entity.id,
       title: entity.title,
       documentType: entity.documentType,
       documentCategoryId: entity.documentCategoryId,
+      fileId: entity.fileId,
       status: entity.status
     });
     
@@ -136,14 +176,16 @@ export class DocumentsService {
         id: documentWithRelations.id,
         title: documentWithRelations.title,
         category: documentWithRelations.documentCategory?.name,
-        hasFile: !!documentWithRelations.file
+        fileId: documentWithRelations.fileId,
+        hasFile: !!documentWithRelations.file,
+        fileDriveId: documentWithRelations.file?.driveFileId
       });
       
       // Auto-create workflow if document type requires it
-      if (this.shouldCreateWorkflow(documentWithRelations)) {
+      if (this.shouldCreateWorkflow(documentWithRelations, createDocumentInput.workflowTemplateId)) {
         console.log('Auto-creating workflow for document...');
         try {
-          await this.createWorkflowForDocument(documentWithRelations, user);
+          await this.createWorkflowForDocument(documentWithRelations, user, createDocumentInput.workflowTemplateId);
           console.log('Workflow created successfully');
         } catch (workflowError) {
           console.error('Error creating workflow:', workflowError);
@@ -162,7 +204,7 @@ export class DocumentsService {
   async findPaginated(
     input: GetDocumentsPaginatedInput,
   ): Promise<PageDto<Document>> {
-    const { search, documentType, page, take, order, skip } = input;
+    const { search, documentType } = input;
 
     // Xây dựng điều kiện WHERE
     const where: FindOptionsWhere<Document>[] = [];
@@ -179,9 +221,9 @@ export class DocumentsService {
     const [data, itemCount] = await this.documentRepository.findAndCount({
       where: where.length > 0 ? where : undefined,
       relations: ['documentCategory', 'file'],
-      order: { id: order },
-      skip: skip,
-      take: take,
+      order: { id: input.order },
+      skip: input.skip,
+      take: input.take,
     });
 
     const meta = new PageMetaDto({ pageOptionsDto: input, itemCount });
@@ -232,7 +274,7 @@ export class DocumentsService {
       entity.fileId = updateDocumentInput.fileId;
     }
     if (updateDocumentInput.status !== undefined) {
-      entity.status = updateDocumentInput.status;
+      entity.status = updateDocumentInput.status as DocumentStatus;
     }
     
     const savedDocument = await this.documentRepository.save(entity);
@@ -267,43 +309,169 @@ export class DocumentsService {
     }
   }
 
-  private shouldCreateWorkflow(document: Document): boolean {
-    // Auto-create workflow for OUTGOING documents
-    return document.documentType === DocumentTypeEnum.OUTGOING && document.status === 'pending';
+  private shouldCreateWorkflow(document: Document, workflowTemplateId?: number): boolean {
+    // Logic mới: Tạo workflow cho tất cả văn bản cần xử lý
+    // 1. User chỉ định template cụ thể
+    if (workflowTemplateId) {
+      return true;
+    }
+    
+    // 2. Văn bản đi (OUTGOING) - luôn cần workflow phê duyệt
+    if (document.documentType === DocumentTypeEnum.OUTGOING) {
+      return true;
+    }
+    
+    // 3. Văn bản đến (INCOMING) - cần workflow xử lý
+    if (document.documentType === DocumentTypeEnum.INCOMING) {
+      return true;
+    }
+    
+    // 4. Văn bản nội bộ (INTERNAL) - chỉ cần workflow nếu có yêu cầu đặc biệt
+    if (document.documentType === DocumentTypeEnum.INTERNAL && document.priority === DocumentPriority.HIGH) {
+      return true;
+    }
+    
+    return false;
   }
 
-  private async createWorkflowForDocument(document: Document, user?: User): Promise<void> {
+  private async createWorkflowForDocument(document: Document, user?: User, workflowTemplateId?: number): Promise<void> {
     if (!user) {
       console.log('No user provided, skipping workflow creation');
       return;
     }
 
-    // Get default workflow template for document type
-    const defaultTemplateId = await this.getDefaultWorkflowTemplate(document.documentType);
-    
-    if (!defaultTemplateId) {
-      console.log('No default workflow template found for document type:', document.documentType);
-      return;
+    let templateId: number;
+
+    if (workflowTemplateId) {
+      // Use user-specified template
+      templateId = workflowTemplateId;
+      console.log('Using user-specified workflow template:', templateId);
+    } else {
+      // Get default workflow template for document type
+      const defaultTemplateId = await this.getDefaultWorkflowTemplate(document.documentType, document.priority);
+      
+      if (!defaultTemplateId) {
+        console.log('No default workflow template found for document type:', document.documentType);
+        return;
+      }
+      templateId = defaultTemplateId;
+      console.log('Using default workflow template:', templateId);
     }
 
     const workflowInput = {
-      templateId: defaultTemplateId,
+      templateId: templateId,
       documentId: document.id,
-      notes: `Auto-created workflow for document: ${document.title}`,
+      notes: `Auto-created workflow for ${document.documentType} document: ${document.title}`,
     };
 
-    await this.workflowInstancesService.create(workflowInput, user);
+    try {
+      await this.workflowInstancesService.create(workflowInput, user);
+      console.log('Workflow created successfully for document:', document.id);
+    } catch (error) {
+      console.error('Failed to create workflow for document:', document.id, error);
+      // Don't fail document creation if workflow creation fails
+    }
   }
 
-  private async getDefaultWorkflowTemplate(documentType: DocumentTypeEnum): Promise<number | null> {
-    // This should be implemented based on your business logic
-    // For now, return a default template ID
+  private async getDefaultWorkflowTemplate(documentType: DocumentTypeEnum, priority?: DocumentPriority): Promise<number | null> {
+    // Logic mới: Template dựa trên loại văn bản và độ ưu tiên
     const templateMap = {
-      [DocumentTypeEnum.OUTGOING]: 1, // Default template for outgoing documents
-      [DocumentTypeEnum.INCOMING]: 2, // Default template for incoming documents
-      [DocumentTypeEnum.INTERNAL]: 3, // Default template for internal documents
+      [DocumentTypeEnum.OUTGOING]: {
+        [DocumentPriority.LOW]: 1,      // Quy trình phê duyệt văn bản thông thường
+        [DocumentPriority.MEDIUM]: 1,   // Quy trình phê duyệt văn bản thông thường
+        [DocumentPriority.HIGH]: 2,     // Quy trình phê duyệt văn bản tài chính (nhanh hơn)
+        [DocumentPriority.URGENT]: 2,   // Quy trình phê duyệt văn bản tài chính (nhanh hơn)
+      },
+      [DocumentTypeEnum.INCOMING]: {
+        [DocumentPriority.LOW]: 3,      // Quy trình xử lý văn bản đến
+        [DocumentPriority.MEDIUM]: 3,   // Quy trình xử lý văn bản đến
+        [DocumentPriority.HIGH]: 4,     // Quy trình xử lý văn bản đến khẩn cấp
+        [DocumentPriority.URGENT]: 4,   // Quy trình xử lý văn bản đến khẩn cấp
+      },
+      [DocumentTypeEnum.INTERNAL]: {
+        [DocumentPriority.LOW]: 5,      // Quy trình nội bộ đơn giản
+        [DocumentPriority.MEDIUM]: 5,   // Quy trình nội bộ đơn giản
+        [DocumentPriority.HIGH]: 6,     // Quy trình nội bộ phức tạp
+        [DocumentPriority.URGENT]: 6,   // Quy trình nội bộ phức tạp
+      },
     };
     
-    return templateMap[documentType] || null;
+    const priorityKey = priority || DocumentPriority.MEDIUM;
+    return templateMap[documentType]?.[priorityKey] || null;
+  }
+
+  /**
+   * Cập nhật trạng thái văn bản dựa trên trạng thái workflow
+   */
+  async updateDocumentStatusFromWorkflow(documentId: number, workflowStatus: string): Promise<void> {
+    const document = await this.findOne(documentId);
+    if (!document) {
+      throw new BadRequestException(`Document with ID ${documentId} not found`);
+    }
+
+    let newStatus: DocumentStatus;
+    
+    switch (workflowStatus) {
+      case 'IN_PROGRESS':
+        newStatus = DocumentStatus.PROCESSING;
+        break;
+      case 'COMPLETED':
+        newStatus = DocumentStatus.APPROVED;
+        break;
+      case 'REJECTED':
+        newStatus = DocumentStatus.REJECTED;
+        break;
+      case 'CANCELLED':
+        newStatus = DocumentStatus.CANCELLED;
+        break;
+      default:
+        newStatus = DocumentStatus.PROCESSING;
+    }
+
+    if (document.status !== newStatus) {
+      document.status = newStatus;
+      await this.documentRepository.save(document);
+      console.log(`Document ${documentId} status updated from ${document.status} to ${newStatus}`);
+    }
+  }
+
+  /**
+   * Lấy danh sách văn bản theo trạng thái xử lý
+   */
+  async getDocumentsByProcessingStatus(userId: number, status: 'pending' | 'processing' | 'completed' | 'rejected'): Promise<Document[]> {
+    const query = this.documentRepository.createQueryBuilder('document')
+      .leftJoinAndSelect('document.documentCategory', 'category')
+      .leftJoinAndSelect('document.file', 'file')
+      .leftJoinAndSelect('document.createdByUser', 'creator');
+
+    switch (status) {
+      case 'pending':
+        // Văn bản chờ xử lý: DRAFT hoặc PENDING
+        query.where('document.status IN (:...statuses)', { 
+          statuses: [DocumentStatus.DRAFT, DocumentStatus.PENDING] 
+        });
+        break;
+      case 'processing':
+        // Văn bản đang xử lý: PROCESSING
+        query.where('document.status = :status', { status: DocumentStatus.PROCESSING });
+        break;
+      case 'completed':
+        // Văn bản hoàn thành: APPROVED hoặc COMPLETED
+        query.where('document.status IN (:...statuses)', { 
+          statuses: [DocumentStatus.APPROVED, DocumentStatus.COMPLETED] 
+        });
+        break;
+      case 'rejected':
+        // Văn bản bị từ chối: REJECTED hoặc CANCELLED
+        query.where('document.status IN (:...statuses)', { 
+          statuses: [DocumentStatus.REJECTED, DocumentStatus.CANCELLED] 
+        });
+        break;
+    }
+
+    // Chỉ lấy văn bản của user hoặc văn bản được giao cho user
+    query.andWhere('(document.createdByUserId = :userId OR document.assignedToUserId = :userId)', { userId });
+
+    return query.orderBy('document.createdAt', 'DESC').getMany();
   }
 }

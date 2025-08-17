@@ -430,11 +430,20 @@ export class SeederService {
     const stepsData = [
       {
         templateId: template.id,
-        name: 'Tạo văn bản',
-        description: 'Bước tạo văn bản ban đầu',
+        name: 'Giao việc',
+        description: 'Bước giao việc cho người thực hiện',
         type: StepType.START,
-        assignedRole: Role.BASIC_USER,
+        assignedRole: Role.DEPARTMENT_STAFF,
         orderNumber: 1,
+        isActive: true,
+      },
+      {
+        templateId: template.id,
+        name: 'Tạo văn bản',
+        description: 'Người được giao việc tạo văn bản',
+        type: StepType.TRANSFER,
+        assignedRole: Role.CLERK,
+        orderNumber: 2,
         isActive: true,
       },
       {
@@ -443,7 +452,7 @@ export class SeederService {
         description: 'Phê duyệt bởi trưởng phòng ban',
         type: StepType.APPROVAL,
         assignedRole: Role.DEPARTMENT_STAFF,
-        orderNumber: 2,
+        orderNumber: 3,
         isActive: true,
       },
       {
@@ -452,7 +461,7 @@ export class SeederService {
         description: 'Phê duyệt bởi phó hiệu trưởng',
         type: StepType.APPROVAL,
         assignedRole: Role.UNIVERSITY_LEADER,
-        orderNumber: 3,
+        orderNumber: 4,
         isActive: true,
       },
       {
@@ -461,7 +470,7 @@ export class SeederService {
         description: 'Phê duyệt cuối cùng bởi hiệu trưởng',
         type: StepType.END,
         assignedRole: Role.UNIVERSITY_LEADER,
-        orderNumber: 4,
+        orderNumber: 5,
         isActive: true,
       },
     ];

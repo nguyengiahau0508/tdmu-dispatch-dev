@@ -7,6 +7,7 @@ import { WorkflowStepsModule } from '../workflow-steps/workflow-steps.module';
 import { WorkflowActionLogsModule } from '../workflow-action-logs/workflow-action-logs.module';
 import { WorkflowTemplatesModule } from '../workflow-templates/workflow-templates.module';
 import { WorkflowPermissionsModule } from '../workflow-permissions/workflow-permissions.module';
+import { DocumentsModule } from 'src/modules/dispatch/documents/documents.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { WorkflowPermissionsModule } from '../workflow-permissions/workflow-perm
     WorkflowActionLogsModule,
     WorkflowTemplatesModule,
     forwardRef(() => WorkflowPermissionsModule),
+    forwardRef(() => DocumentsModule),
   ],
   providers: [WorkflowInstancesResolver, WorkflowInstancesService],
   exports: [WorkflowInstancesService],

@@ -21,6 +21,7 @@ import { WorkflowPermissionsService } from '../workflow-permissions/workflow-per
 import { User } from 'src/modules/users/entities/user.entity';
 import { ActionType } from '../workflow-action-logs/entities/workflow-action-log.entity';
 import { StepType } from '../workflow-steps/entities/workflow-step.entity';
+import { DocumentsService } from 'src/modules/dispatch/documents/documents.service';
 
 @Injectable()
 export class WorkflowInstancesService {
@@ -32,6 +33,8 @@ export class WorkflowInstancesService {
     private readonly workflowTemplatesService: WorkflowTemplatesService,
     @Inject(forwardRef(() => WorkflowPermissionsService))
     private readonly workflowPermissionsService: WorkflowPermissionsService,
+    @Inject(forwardRef(() => DocumentsService))
+    private readonly documentsService: DocumentsService,
   ) {}
 
   async create(
@@ -198,6 +201,14 @@ export class WorkflowInstancesService {
       .getMany();
   }
 
+  async findByDocumentId(documentId: number): Promise<WorkflowInstance[]> {
+    return this.repository.find({
+      where: { documentId },
+      relations: ['template', 'currentStep', 'createdByUser', 'logs', 'logs.actionByUser'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
   async update(
     id: number,
     updateWorkflowInstanceInput: UpdateWorkflowInstanceInput,
@@ -320,6 +331,9 @@ export class WorkflowInstancesService {
         // Use update instead of save to avoid relation loading issues
         await this.repository.update(instance.id, updateData);
         console.log('Instance updated with new step successfully');
+        
+        // Cập nhật trạng thái văn bản thành PROCESSING
+        await this.documentsService.updateDocumentStatusFromWorkflow(instance.documentId, 'IN_PROGRESS');
       } catch (error) {
         console.error('Error updating instance:', error);
         throw error;
@@ -345,6 +359,9 @@ export class WorkflowInstancesService {
         // Use update instead of save to avoid relation loading issues
         await this.repository.update(instance.id, updateData);
         console.log('Instance updated as completed successfully');
+        
+        // Cập nhật trạng thái văn bản thành APPROVED
+        await this.documentsService.updateDocumentStatusFromWorkflow(instance.documentId, 'COMPLETED');
       } catch (error) {
         console.error('Error updating instance as completed:', error);
         throw error;
@@ -376,6 +393,10 @@ export class WorkflowInstancesService {
     try {
       await this.repository.update(instance.id, updateData);
       console.log('Instance rejected successfully');
+      
+      // Cập nhật trạng thái văn bản thành REJECTED
+      await this.documentsService.updateDocumentStatusFromWorkflow(instance.documentId, 'REJECTED');
+      
       return this.findOne(instance.id);
     } catch (error) {
       console.error('Error rejecting instance:', error);
@@ -406,6 +427,10 @@ export class WorkflowInstancesService {
     try {
       await this.repository.update(instance.id, updateData);
       console.log('Instance cancelled successfully');
+      
+      // Cập nhật trạng thái văn bản thành CANCELLED
+      await this.documentsService.updateDocumentStatusFromWorkflow(instance.documentId, 'CANCELLED');
+      
       return this.findOne(instance.id);
     } catch (error) {
       console.error('Error cancelling instance:', error);

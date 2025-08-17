@@ -1,37 +1,11 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common'; 
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
-import { Document, DocumentTypeEnum } from './entities/document.entity';
+import { Repository, FindOptionsWhere, ILike, In } from 'typeorm';
+import { Document, DocumentTypeEnum, DocumentStatus, DocumentPriority } from './entities/document.entity';
 import { User } from 'src/modules/users/entities/user.entity';
-import { Role } from 'src/common/enums/role.enums';
 import { WorkflowInstancesService } from 'src/modules/workflow/workflow-instances/workflow-instances.service';
 import { WorkflowActionLogsService } from 'src/modules/workflow/workflow-action-logs/workflow-action-logs.service';
-import { ActionType } from 'src/modules/workflow/workflow-action-logs/entities/workflow-action-log.entity';
-import { PriorityEnum } from './dto/document-processing/document-processing-info.output';
-
-export interface DocumentProcessingInfo {
-  documentId: number;
-  documentTitle: string;
-  documentType: string;
-  documentCategory: string;
-  status: string;
-  createdAt: Date;
-  workflowInstanceId?: number;
-  currentStepId?: number;
-  currentStepName?: string;
-  workflowStatus?: string;
-  requiresAction: boolean;
-  actionType?: string;
-  deadline?: Date;
-  priority: PriorityEnum;
-}
-
-export interface DocumentActionInput {
-  documentId: number;
-  actionType: ActionType;
-  notes?: string;
-  transferToUserId?: number;
-}
+import { DocumentActionInput } from './dto/document-processing/document-action.input';
 
 @Injectable()
 export class DocumentProcessingService {
@@ -43,323 +17,414 @@ export class DocumentProcessingService {
   ) {}
 
   /**
-   * Lấy danh sách documents cần xử lý của user
+   * Lấy danh sách văn bản cần xử lý theo vai trò của user
    */
-  async getDocumentsForProcessing(user: User): Promise<DocumentProcessingInfo[]> {
-    console.log('=== GET DOCUMENTS FOR PROCESSING ===');
-    console.log('User:', user.id, user.email, user.roles);
-
-    // Lấy tất cả workflow instances đang hoạt động
-    const activeWorkflows = await this.workflowInstancesService.findAll();
+  async getDocumentsForProcessing(user: User): Promise<Document[]> {
+    const userRoles = user.roles;
     
-    // Lọc workflows mà user có quyền xử lý
-    const userWorkflows = activeWorkflows.filter(workflow => {
-      // Kiểm tra xem user có phải là người được assign cho step hiện tại không
-      if (!workflow.currentStep) return false;
-      
-      // Kiểm tra permissions dựa trên role
-      return this.canUserProcessStep(user, workflow.currentStep);
-    });
-
-    // Lấy thông tin documents tương ứng
-    const documentIds = userWorkflows.map(w => w.documentId).filter(id => id);
+    // Lấy workflow instances mà user có thể xử lý
+    const pendingWorkflows = await this.workflowInstancesService.findByCurrentStepAssignee(userRoles[0]); // Sử dụng role đầu tiên
     
-    // Kiểm tra nếu không có document nào
+    // Lấy document IDs từ workflow instances
+    const documentIds = pendingWorkflows.map(workflow => workflow.documentId);
+    
     if (documentIds.length === 0) {
-      console.log('No documents found for processing');
       return [];
     }
 
-    const documents = await this.documentRepository.find({
+    // Lấy documents với relations
+    return this.documentRepository.find({
       where: { id: In(documentIds) },
-      relations: ['documentCategory'],
+      relations: ['documentCategory', 'file', 'createdByUser', 'assignedToUser'],
+      order: { 
+        priority: 'DESC', // Ưu tiên cao trước
+        createdAt: 'ASC'  // Cũ trước
+      }
     });
-
-    // Map thành DocumentProcessingInfo
-    const processingInfo: DocumentProcessingInfo[] = userWorkflows.map(workflow => {
-      const document = documents.find(d => d.id === workflow.documentId);
-      if (!document) return null;
-
-      return {
-        documentId: document.id,
-        documentTitle: document.title,
-        documentType: document.documentType,
-        documentCategory: document.documentCategory?.name || 'N/A',
-        status: document.status || '',
-        createdAt: document.createdAt,
-        workflowInstanceId: workflow.id,
-        currentStepId: workflow.currentStepId,
-        currentStepName: workflow.currentStep?.name,
-        workflowStatus: workflow.status,
-        requiresAction: true,
-        actionType: this.getAvailableActions(user, workflow.currentStep),
-        deadline: this.calculateDeadline(workflow.createdAt),
-        priority: this.calculatePriority(document, workflow),
-      };
-    }).filter(Boolean) as DocumentProcessingInfo[];
-
-    console.log(`Found ${processingInfo.length} documents for processing`);
-    return processingInfo;
   }
 
   /**
-   * Lấy danh sách documents đã xử lý của user
+   * Lấy danh sách văn bản theo trạng thái xử lý
    */
-  async getProcessedDocuments(user: User): Promise<DocumentProcessingInfo[]> {
-    console.log('=== GET PROCESSED DOCUMENTS ===');
-    console.log('User:', user.id, user.email);
+  async getDocumentsByStatus(user: User, status: 'pending' | 'processing' | 'completed' | 'rejected'): Promise<Document[]> {
+    const query = this.documentRepository.createQueryBuilder('document')
+      .leftJoinAndSelect('document.documentCategory', 'category')
+      .leftJoinAndSelect('document.file', 'file')
+      .leftJoinAndSelect('document.createdByUser', 'creator')
+      .leftJoinAndSelect('document.assignedToUser', 'assignee');
 
-    // Lấy action logs của user
-    const userActionLogs = await this.workflowActionLogsService.findByUser(user.id);
+    // Lọc theo trạng thái
+    switch (status) {
+      case 'pending':
+        query.where('document.status IN (:...statuses)', { 
+          statuses: [DocumentStatus.DRAFT, DocumentStatus.PENDING] 
+        });
+        break;
+      case 'processing':
+        query.where('document.status = :status', { status: DocumentStatus.PROCESSING });
+        break;
+      case 'completed':
+        query.where('document.status IN (:...statuses)', { 
+          statuses: [DocumentStatus.APPROVED, DocumentStatus.COMPLETED] 
+        });
+        break;
+      case 'rejected':
+        query.where('document.status IN (:...statuses)', { 
+          statuses: [DocumentStatus.REJECTED, DocumentStatus.CANCELLED] 
+        });
+        break;
+    }
+
+    // Lọc theo quyền của user
+    if (user.roles.includes('SYSTEM_ADMIN' as any)) {
+      // Admin có thể xem tất cả
+    } else if (user.roles.includes('UNIVERSITY_LEADER' as any)) {
+      // Lãnh đạo có thể xem văn bản cấp trường
+      query.andWhere('document.documentType IN (:...types)', { 
+        types: [DocumentTypeEnum.OUTGOING, DocumentTypeEnum.INTERNAL] 
+      });
+    } else if (user.roles.includes('DEPARTMENT_STAFF' as any)) {
+      // Nhân viên phòng ban chỉ xem văn bản của mình hoặc được giao
+      query.andWhere('(document.createdByUserId = :userId OR document.assignedToUserId = :userId)', { 
+        userId: user.id 
+      });
+    } else {
+      // BASIC_USER chỉ xem văn bản của mình
+      query.andWhere('document.createdByUserId = :userId', { userId: user.id });
+    }
+
+    return query
+      .orderBy('document.priority', 'DESC')
+      .addOrderBy('document.createdAt', 'ASC')
+      .getMany();
+  }
+
+  /**
+   * Lấy thống kê văn bản theo trạng thái
+   */
+  async getDocumentStatistics(user: User): Promise<{
+    pending: number;
+    processing: number;
+    completed: number;
+    rejected: number;
+    total: number;
+  }> {
+    // Lấy documents có thể xử lý (theo workflow)
+    const actionableDocuments = await this.getDocumentsForProcessing(user);
     
-    // Lấy unique document IDs từ action logs
-    const documentIds = [...new Set(userActionLogs.map(log => log.instance?.documentId).filter(Boolean))];
+    // Lấy documents theo trạng thái (cho thống kê tổng quan)
+    const [allPending, processing, completed, rejected] = await Promise.all([
+      this.getDocumentsByStatus(user, 'pending'),
+      this.getDocumentsByStatus(user, 'processing'),
+      this.getDocumentsByStatus(user, 'completed'),
+      this.getDocumentsByStatus(user, 'rejected'),
+    ]);
+
+    return {
+      pending: actionableDocuments.length, // Chỉ đếm documents có thể xử lý
+      processing: processing.length,
+      completed: completed.length,
+      rejected: rejected.length,
+      total: allPending.length + processing.length + completed.length + rejected.length,
+    };
+  }
+
+  /**
+   * Lấy lịch sử xử lý văn bản
+   */
+  async getDocumentProcessingHistory(documentId: number): Promise<any[]> {
+    // Lấy workflow instance của document
+    const workflows = await this.workflowInstancesService.findByDocumentId(documentId);
     
-    if (documentIds.length === 0) {
-      console.log('No processed documents found');
+    if (workflows.length === 0) {
       return [];
     }
 
-    // Lấy documents
-    const documents = await this.documentRepository.find({
-      where: { id: In(documentIds) },
-      relations: ['documentCategory'],
-    });
-
-    // Lấy workflow instances
-    const workflowInstances = await this.workflowInstancesService.findAll();
-    const documentWorkflows = workflowInstances.filter(w => documentIds.includes(w.documentId));
-
-    // Map thành DocumentProcessingInfo
-    const processedInfo: DocumentProcessingInfo[] = documentWorkflows.map(workflow => {
-      const document = documents.find(d => d.id === workflow.documentId);
-      if (!document) return null;
-
-      const userActions = userActionLogs.filter(log => log.instanceId === workflow.id);
-      const lastAction = userActions[userActions.length - 1];
-
-      return {
-        documentId: document.id,
-        documentTitle: document.title,
-        documentType: document.documentType,
-        documentCategory: document.documentCategory?.name || 'N/A',
-        status: document.status || '',
-        createdAt: document.createdAt,
-        workflowInstanceId: workflow.id,
-        currentStepId: workflow.currentStepId,
-        currentStepName: workflow.currentStep?.name,
-        workflowStatus: workflow.status,
-        requiresAction: false,
-        actionType: lastAction?.actionType,
-        deadline: this.calculateDeadline(workflow.createdAt),
-        priority: this.calculatePriority(document, workflow),
-      };
-    }).filter(Boolean) as DocumentProcessingInfo[];
-
-    console.log(`Found ${processedInfo.length} processed documents`);
-    return processedInfo;
-  }
-
-  /**
-   * Lấy danh sách documents khẩn cấp
-   */
-  async getUrgentDocuments(user: User): Promise<DocumentProcessingInfo[]> {
-    console.log('=== GET URGENT DOCUMENTS ===');
-    console.log('User:', user.id, user.email);
-
-    const allDocuments = await this.getDocumentsForProcessing(user);
+    const workflow = workflows[0];
     
-    // Lọc documents khẩn cấp (priority URGENT hoặc overdue)
-    const urgentDocuments = allDocuments.filter(doc => {
-      return doc.priority === PriorityEnum.URGENT || 
-             (doc.deadline && new Date() > doc.deadline);
-    });
-
-    console.log(`Found ${urgentDocuments.length} urgent documents`);
-    return urgentDocuments;
-  }
-
-  /**
-   * Lấy documents theo priority
-   */
-  async getDocumentsByPriority(user: User, priority: string): Promise<DocumentProcessingInfo[]> {
-    console.log('=== GET DOCUMENTS BY PRIORITY ===');
-    console.log('User:', user.id, user.email, 'Priority:', priority);
-
-    const allDocuments = await this.getDocumentsForProcessing(user);
+    // Lấy action logs của workflow
+    const actionLogs = await this.workflowActionLogsService.findByInstanceId(workflow.id);
     
-    const priorityDocuments = allDocuments.filter(doc => {
-      return doc.priority === priority;
-    });
-
-    console.log(`Found ${priorityDocuments.length} documents with priority ${priority}`);
-    return priorityDocuments;
+    // Format logs thành lịch sử xử lý
+    return actionLogs.map(log => ({
+      id: log.id,
+      actionType: log.actionType,
+      actionByUser: log.actionByUser,
+      actionAt: log.actionAt,
+      note: log.note,
+      stepName: log.step?.name || 'Unknown Step',
+      stepType: log.step?.type || 'Unknown',
+    }));
   }
 
   /**
-   * Xử lý document action
+   * Gán văn bản cho user khác xử lý
    */
-  async processDocumentAction(
-    input: DocumentActionInput,
-    user: User,
-  ): Promise<any> {
-    console.log('=== PROCESS DOCUMENT ACTION ===');
-    console.log('Input:', input);
-    console.log('User:', user.id, user.email);
-
-    // Validate document exists
+  async assignDocumentToUser(documentId: number, assignedToUserId: number, assignedByUser: User): Promise<Document> {
     const document = await this.documentRepository.findOne({
-      where: { id: input.documentId },
-      relations: ['documentCategory'],
+      where: { id: documentId },
+      relations: ['createdByUser', 'assignedToUser']
     });
 
     if (!document) {
-      throw new NotFoundException(`Document with ID ${input.documentId} not found`);
+      throw new NotFoundException(`Document with ID ${documentId} not found`);
     }
 
-    // Find workflow instance
-    const workflows = await this.workflowInstancesService.findAll();
-    const workflow = workflows.find(w => w.documentId === input.documentId && w.status === 'IN_PROGRESS');
-
-    if (!workflow) {
-      throw new BadRequestException('No active workflow found for this document');
+    // Kiểm tra quyền gán văn bản
+    if (!this.canAssignDocument(assignedByUser, document)) {
+      throw new BadRequestException('User does not have permission to assign this document');
     }
 
-    // Check if user can process current step
-    if (!this.canUserProcessStep(user, workflow.currentStep)) {
-      throw new BadRequestException('User does not have permission to process this step');
-    }
+    // Cập nhật người được giao
+    document.assignedToUserId = assignedToUserId;
+    await this.documentRepository.save(document);
 
-    // Execute workflow action
-    const actionInput = {
-      instanceId: workflow.id,
-      stepId: workflow.currentStepId,
-      actionType: input.actionType,
-      note: input.notes,
-      metadata: input.transferToUserId ? JSON.stringify({ transferToUserId: input.transferToUserId }) : undefined,
-    };
+    // Log việc gán văn bản
+    await this.logDocumentAction(documentId, 'ASSIGN', assignedByUser, `Document assigned to user ${assignedToUserId}`);
 
-    const result = await this.workflowInstancesService.executeAction(actionInput, user);
-
-    // Update document status if workflow is completed
-    if (result.status === 'COMPLETED') {
-      await this.documentRepository.update(document.id, {
-        status: 'completed',
-      });
-    }
-
-    return {
-      documentId: document.id,
-      workflowInstanceId: workflow.id,
-      actionType: input.actionType,
-      result: result,
-      message: `Document action ${input.actionType} executed successfully`,
-    };
+    return document;
   }
 
   /**
-   * Lấy thống kê xử lý document của user
+   * Kiểm tra quyền gán văn bản
    */
-  async getProcessingStatistics(user: User): Promise<any> {
-    const pendingDocuments = await this.getDocumentsForProcessing(user);
-    const processedDocuments = await this.getProcessedDocuments(user);
-
-    const totalDocuments = pendingDocuments.length + processedDocuments.length;
-    const completedDocuments = processedDocuments.filter(d => d.workflowStatus === 'COMPLETED').length;
-    const pendingCount = pendingDocuments.length;
-
-    return {
-      totalDocuments,
-      pendingCount,
-      completedCount: completedDocuments,
-      inProgressCount: processedDocuments.length - completedDocuments,
-      completionRate: totalDocuments > 0 ? (completedDocuments / totalDocuments) * 100 : 0,
-    };
-  }
-
-  /**
-   * Kiểm tra user có thể xử lý step không
-   */
-  private canUserProcessStep(user: User, step: any): boolean {
-    if (!step) return false;
-
-    // Kiểm tra role-based permissions
-    const userRoles = user.roles;
-    
-    // SYSTEM_ADMIN có thể xử lý tất cả
-    if (userRoles.includes(Role.SYSTEM_ADMIN)) return true;
-
-    // DEPARTMENT_HEAD có thể xử lý steps trong department của họ
-    if (userRoles.includes(Role.DEPARTMENT_HEAD)) {
-      // Logic kiểm tra department
+  private canAssignDocument(user: User, document: Document): boolean {
+    // SYSTEM_ADMIN có thể gán tất cả văn bản
+    if (user.roles.includes('SYSTEM_ADMIN' as any)) {
       return true;
     }
 
-    // CLERK có thể xử lý các steps liên quan đến văn thư
-    if (userRoles.includes(Role.CLERK)) {
-      return step.name?.toLowerCase().includes('văn thư') || 
-             step.name?.toLowerCase().includes('clerical') ||
-             step.name?.toLowerCase().includes('document');
+    // UNIVERSITY_LEADER có thể gán văn bản cấp trường
+    if (user.roles.includes('UNIVERSITY_LEADER' as any) && 
+        document.documentType === DocumentTypeEnum.OUTGOING) {
+      return true;
     }
 
-    // DEPARTMENT_STAFF có thể xử lý steps cơ bản
-    if (userRoles.includes(Role.DEPARTMENT_STAFF)) {
-      return step.name?.toLowerCase().includes('approve') ||
-             step.name?.toLowerCase().includes('review') ||
-             step.name?.toLowerCase().includes('phê duyệt');
+    // DEPARTMENT_STAFF có thể gán văn bản trong phòng ban
+    if (user.roles.includes('DEPARTMENT_STAFF' as any) && 
+        document.createdByUserId === user.id) {
+      return true;
     }
 
     return false;
   }
 
   /**
-   * Lấy các actions có sẵn cho user
+   * Log hành động xử lý văn bản
    */
-  private getAvailableActions(user: User, step: any): string {
-    if (!step) return '';
-
-    const userRoles = user.roles;
+  private async logDocumentAction(
+    documentId: number, 
+    actionType: string, 
+    user: User, 
+    note?: string
+  ): Promise<void> {
+    // Tìm workflow instance của document
+    const workflows = await this.workflowInstancesService.findByDocumentId(documentId);
     
-    if (userRoles.includes(Role.SYSTEM_ADMIN)) {
-      return 'APPROVE,REJECT,TRANSFER,COMPLETE';
+    if (workflows.length > 0) {
+      const workflow = workflows[0];
+      
+      // Log vào workflow action log
+      await this.workflowActionLogsService.logAction(
+        workflow.id,
+        workflow.currentStepId || 0,
+        actionType as any,
+        user,
+        note
+      );
     }
-
-    if (userRoles.includes(Role.DEPARTMENT_HEAD)) {
-      return 'APPROVE,REJECT,TRANSFER';
-    }
-
-    if (userRoles.includes(Role.CLERK)) {
-      return 'APPROVE,REJECT,TRANSFER';
-    }
-
-    if (userRoles.includes(Role.DEPARTMENT_STAFF)) {
-      return 'APPROVE,REJECT';
-    }
-
-    return '';
   }
 
   /**
-   * Tính toán deadline
+   * Tìm văn bản theo từ khóa và trạng thái
    */
-  private calculateDeadline(createdAt: Date): Date {
-    // Mặc định deadline là 7 ngày sau khi tạo
-    const deadline = new Date(createdAt);
-    deadline.setDate(deadline.getDate() + 7);
-    return deadline;
+  async searchDocuments(
+    user: User,
+    searchTerm?: string,
+    status?: DocumentStatus,
+    documentType?: DocumentTypeEnum,
+    priority?: DocumentPriority
+  ): Promise<Document[]> {
+    const query = this.documentRepository.createQueryBuilder('document')
+      .leftJoinAndSelect('document.documentCategory', 'category')
+      .leftJoinAndSelect('document.file', 'file')
+      .leftJoinAndSelect('document.createdByUser', 'creator')
+      .leftJoinAndSelect('document.assignedToUser', 'assignee');
+
+    // Tìm kiếm theo từ khóa
+    if (searchTerm) {
+      query.andWhere('(document.title LIKE :searchTerm OR document.content LIKE :searchTerm)', {
+        searchTerm: `%${searchTerm}%`
+      });
+    }
+
+    // Lọc theo trạng thái
+    if (status) {
+      query.andWhere('document.status = :status', { status });
+    }
+
+    // Lọc theo loại văn bản
+    if (documentType) {
+      query.andWhere('document.documentType = :documentType', { documentType });
+    }
+
+    // Lọc theo độ ưu tiên
+    if (priority) {
+      query.andWhere('document.priority = :priority', { priority });
+    }
+
+    // Lọc theo quyền của user
+    if (!user.roles.includes('SYSTEM_ADMIN' as any)) {
+      if (user.roles.includes('UNIVERSITY_LEADER' as any)) {
+        query.andWhere('document.documentType IN (:...types)', { 
+          types: [DocumentTypeEnum.OUTGOING, DocumentTypeEnum.INTERNAL] 
+        });
+      } else if (user.roles.includes('DEPARTMENT_STAFF' as any)) {
+        query.andWhere('(document.createdByUserId = :userId OR document.assignedToUserId = :userId)', { 
+          userId: user.id 
+        });
+      } else {
+        query.andWhere('document.createdByUserId = :userId', { userId: user.id });
+      }
+    }
+
+    return query
+      .orderBy('document.priority', 'DESC')
+      .addOrderBy('document.createdAt', 'DESC')
+      .getMany();
   }
 
   /**
-   * Tính toán priority
+   * Lấy danh sách văn bản đã xử lý
    */
-  private calculatePriority(document: Document, workflow: any): PriorityEnum {
-    const now = new Date();
-    const deadline = this.calculateDeadline(workflow.createdAt);
-    const daysUntilDeadline = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  async getProcessedDocuments(user: User): Promise<Document[]> {
+    return this.getDocumentsByStatus(user, 'completed');
+  }
 
-    if (daysUntilDeadline < 0) return PriorityEnum.URGENT;
-    if (daysUntilDeadline <= 1) return PriorityEnum.HIGH;
-    if (daysUntilDeadline <= 3) return PriorityEnum.MEDIUM;
-    return PriorityEnum.LOW;
+  /**
+   * Lấy danh sách văn bản khẩn cấp (có độ ưu tiên cao)
+   */
+  async getUrgentDocuments(user: User): Promise<Document[]> {
+    const query = this.documentRepository.createQueryBuilder('document')
+      .leftJoinAndSelect('document.documentCategory', 'category')
+      .leftJoinAndSelect('document.file', 'file')
+      .leftJoinAndSelect('document.createdByUser', 'creator')
+      .leftJoinAndSelect('document.assignedToUser', 'assignee')
+      .where('document.priority IN (:...priorities)', { 
+        priorities: [DocumentPriority.HIGH, DocumentPriority.URGENT] 
+      });
+
+    // Lọc theo quyền của user
+    if (!user.roles.includes('SYSTEM_ADMIN' as any)) {
+      if (user.roles.includes('UNIVERSITY_LEADER' as any)) {
+        query.andWhere('document.documentType IN (:...types)', { 
+          types: [DocumentTypeEnum.OUTGOING, DocumentTypeEnum.INTERNAL] 
+        });
+      } else if (user.roles.includes('DEPARTMENT_STAFF' as any)) {
+        query.andWhere('(document.createdByUserId = :userId OR document.assignedToUserId = :userId)', { 
+          userId: user.id 
+        });
+      } else {
+        query.andWhere('document.createdByUserId = :userId', { userId: user.id });
+      }
+    }
+
+    return query
+      .orderBy('document.priority', 'DESC')
+      .addOrderBy('document.createdAt', 'ASC')
+      .getMany();
+  }
+
+  /**
+   * Xử lý action trên document
+   */
+  async processDocumentAction(input: DocumentActionInput, user: User): Promise<Document> {
+    const { documentId, actionType, notes, transferToUserId } = input;
+
+    // Tìm document
+    const document = await this.documentRepository.findOne({
+      where: { id: documentId },
+      relations: ['documentCategory', 'file', 'createdByUser', 'assignedToUser']
+    });
+
+    if (!document) {
+      throw new NotFoundException(`Document with ID ${documentId} not found`);
+    }
+
+    // Kiểm tra quyền xử lý
+    const canProcess = this.canUserProcessDocument(user, document);
+    if (!canProcess) {
+      throw new BadRequestException('User does not have permission to process this document');
+    }
+
+    // Xử lý theo loại action
+    switch (actionType) {
+      case 'APPROVE':
+        document.status = DocumentStatus.APPROVED;
+        break;
+      case 'REJECT':
+        document.status = DocumentStatus.REJECTED;
+        break;
+      case 'TRANSFER':
+        if (!transferToUserId) {
+          throw new BadRequestException('Transfer user ID is required for TRANSFER action');
+        }
+        document.assignedToUserId = transferToUserId;
+        document.status = DocumentStatus.PROCESSING;
+        break;
+      case 'CANCEL':
+        document.status = DocumentStatus.CANCELLED;
+        break;
+      case 'COMPLETE':
+        document.status = DocumentStatus.COMPLETED;
+        break;
+      default:
+        throw new BadRequestException(`Unknown action type: ${actionType}`);
+    }
+
+    // Lưu document
+    const updatedDocument = await this.documentRepository.save(document);
+
+    // Tạo workflow action log
+    await this.workflowActionLogsService.create({
+      instanceId: 1, // TODO: Get from workflow service
+      stepId: 1, // TODO: Get from workflow service
+      actionType,
+      note: notes,
+      metadata: JSON.stringify({ documentId }),
+    }, user);
+
+    return updatedDocument;
+  }
+
+  /**
+   * Kiểm tra xem user có quyền xử lý document không
+   */
+  private canUserProcessDocument(user: User, document: Document): boolean {
+    const userRoles = user.roles;
+
+    // SYSTEM_ADMIN có thể xử lý tất cả
+    if (userRoles.includes('SYSTEM_ADMIN' as any)) {
+      return true;
+    }
+
+    // UNIVERSITY_LEADER có thể xử lý văn bản cấp trường
+    if (userRoles.includes('UNIVERSITY_LEADER' as any)) {
+      return document.documentType === DocumentTypeEnum.OUTGOING || 
+             document.documentType === DocumentTypeEnum.INTERNAL;
+    }
+
+    // DEPARTMENT_HEAD có thể xử lý văn bản trong phạm vi đơn vị
+    if (userRoles.includes('DEPARTMENT_HEAD' as any)) {
+      return document.documentType === DocumentTypeEnum.INTERNAL;
+    }
+
+    // DEPARTMENT_STAFF chỉ có thể xử lý văn bản được giao
+    if (userRoles.includes('DEPARTMENT_STAFF' as any)) {
+      return document.assignedToUserId === user.id || 
+             document.createdByUserId === user.id;
+    }
+
+    return false;
   }
 }
