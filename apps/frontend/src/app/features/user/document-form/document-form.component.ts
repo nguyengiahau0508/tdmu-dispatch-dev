@@ -402,11 +402,19 @@ export class DocumentFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('=== DocumentFormComponent ngOnInit ===');
+    console.log('Input document:', this.document);
+    console.log('Input documentType:', this.documentType);
+    
     this.loadDocumentCategories();
     this.loadWorkflowTemplates();
     
     if (this.document) {
       this.isEditMode = true;
+      console.log('✅ Setting edit mode - document provided');
+      console.log('Document ID:', this.document.id);
+      console.log('Document title:', this.document.title);
+      
       this.documentForm.patchValue({
         title: this.document.title,
         documentType: this.document.documentType,
@@ -415,10 +423,18 @@ export class DocumentFormComponent implements OnInit {
         status: this.document.status
       });
     } else if (this.documentType) {
+      this.isEditMode = false;
+      console.log('✅ Setting create mode - only documentType provided');
+      
       this.documentForm.patchValue({
         documentType: this.documentType
       });
+    } else {
+      this.isEditMode = false;
+      console.log('✅ Setting create mode - no document or documentType');
     }
+    
+    console.log('Final isEditMode:', this.isEditMode);
 
     // Debug: Log form value changes
     this.documentForm.valueChanges.subscribe(values => {
@@ -476,7 +492,14 @@ export class DocumentFormComponent implements OnInit {
   }
 
   onSubmit(): void {
+    console.log('=== DocumentFormComponent onSubmit ===');
+    console.log('isEditMode:', this.isEditMode);
+    console.log('document:', this.document);
+    console.log('documentForm.valid:', this.documentForm.valid);
+    console.log('documentForm.value:', this.documentForm.value);
+    
     if (this.documentForm.invalid) {
+      console.log('❌ Form is invalid, returning');
       return;
     }
 
@@ -489,6 +512,8 @@ export class DocumentFormComponent implements OnInit {
       documentCategoryId: parseInt(formValues.documentCategoryId, 10),
       workflowTemplateId: formValues.workflowTemplateId ? parseInt(formValues.workflowTemplateId, 10) : undefined
     };
+
+    console.log('Processed values:', processedValues);
 
     // Validate that documentCategoryId is a valid number
     if (isNaN(processedValues.documentCategoryId)) {
@@ -505,33 +530,39 @@ export class DocumentFormComponent implements OnInit {
     }
 
     if (this.isEditMode && this.document) {
+      console.log('✅ Executing UPDATE logic');
       const updateInput: UpdateDocumentInput = {
         id: this.document.id,
         ...processedValues
       };
       
+      console.log('Update input:', updateInput);
+      
       this.documentsService.updateDocument(updateInput).subscribe({
         next: (updatedDocument) => {
+          console.log('✅ Update successful:', updatedDocument);
           this.saved.emit(updatedDocument);
           this.isSubmitting = false;
         },
         error: (error) => {
-          console.error('Error updating document:', error);
+          console.error('❌ Error updating document:', error);
           this.isSubmitting = false;
         }
       });
     } else {
+      console.log('✅ Executing CREATE logic');
       const createInput: CreateDocumentInput = processedValues;
       
-      console.log('Creating document with input:', createInput);
+      console.log('Create input:', createInput);
       
       this.documentsService.createDocument(createInput, this.selectedFile || undefined).subscribe({
         next: (createdDocument) => {
+          console.log('✅ Create successful:', createdDocument);
           this.saved.emit(createdDocument);
           this.isSubmitting = false;
         },
         error: (error) => {
-          console.error('Error creating document:', error);
+          console.error('❌ Error creating document:', error);
           this.isSubmitting = false;
         }
       });

@@ -104,6 +104,7 @@ import { DocumentDetailComponent } from '../document-detail/document-detail.comp
 
     @if (showDocumentForm) {
       <app-document-form
+        [document]="documentToEdit"
         [documentType]="'INCOMING'"
         (saved)="onDocumentSaved($event)"
         (cancelled)="onDocumentFormCancelled()"
@@ -456,6 +457,7 @@ export class IncomingDocuments implements OnInit {
   statusFilter = '';
   showDocumentForm = false;
   selectedDocument?: Document;
+  documentToEdit?: Document;
   isLoading = false;
 
   constructor(private documentsService: DocumentsService) {
@@ -533,11 +535,13 @@ export class IncomingDocuments implements OnInit {
 
   onDocumentSaved(document: Document): void {
     this.showDocumentForm = false;
+    this.documentToEdit = undefined;
     this.loadDocuments();
   }
 
   onDocumentFormCancelled(): void {
     this.showDocumentForm = false;
+    this.documentToEdit = undefined;
   }
 
   onDocumentDetailClosed(): void {
@@ -545,9 +549,18 @@ export class IncomingDocuments implements OnInit {
   }
 
   onEditDocument(document: Document): void {
+    console.log('=== IncomingDocuments onEditDocument ===');
+    console.log('Document to edit:', document);
+    console.log('Document ID:', document?.id);
+    console.log('Document title:', document?.title);
+    
     this.selectedDocument = undefined;
-    // TODO: Implement edit functionality
-    console.log('Edit document:', document);
+    this.documentToEdit = document;
+    this.showDocumentForm = true;
+    
+    console.log('After setting:');
+    console.log('documentToEdit:', this.documentToEdit);
+    console.log('showDocumentForm:', this.showDocumentForm);
   }
 
   getStatusLabel(status: string): string {
