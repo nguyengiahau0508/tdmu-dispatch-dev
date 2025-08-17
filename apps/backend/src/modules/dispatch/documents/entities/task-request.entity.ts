@@ -45,19 +45,19 @@ export class TaskRequest {
   @Column()
   requestedByUserId: number;
 
-  @Field(() => User)
-  @ManyToOne(() => User)
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'requestedByUserId' })
-  requestedByUser: User;
+  requestedByUser?: User;
 
   @Field(() => Int)
   @Column()
   assignedToUserId: number;
 
-  @Field(() => User)
-  @ManyToOne(() => User)
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'assignedToUserId' })
-  assignedToUser: User;
+  assignedToUser?: User;
 
   @Field()
   @Column({ type: 'varchar', length: 255 })

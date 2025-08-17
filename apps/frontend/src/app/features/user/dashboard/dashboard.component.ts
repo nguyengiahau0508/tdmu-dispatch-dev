@@ -11,13 +11,13 @@ import { DocumentProcessingApolloService } from '../document-processing/services
   imports: [CommonModule],
   template: `
     <div class="dashboard-container">
-      <div class="dashboard-header">
+      <!-- <div class="dashboard-header">
         <h1>Bảng điều khiển</h1>
         <p class="dashboard-subtitle">Quản lý công văn và quy trình xử lý</p>
-      </div>
+      </div> -->
 
       <div class="quick-actions">
-        <h2>Thao tác nhanh</h2>
+        <!-- <h2>Thao tác nhanh</h2> -->
         <div class="action-grid">
           <div class="action-card primary" (click)="navigateToTaskManagement()">
             <div class="action-icon">
@@ -138,7 +138,7 @@ import { DocumentProcessingApolloService } from '../document-processing/services
   styles: [`
     .dashboard-container {
       padding: 24px;
-      max-width: 1200px;
+
       margin: 0 auto;
     }
 

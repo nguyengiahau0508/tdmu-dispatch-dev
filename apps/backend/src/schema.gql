@@ -138,6 +138,53 @@ type Assignment {
   unit: Unit!
 }
 
+type UserActivity {
+  """ID của hoạt động"""
+  id: Int!
+
+  """ID của người dùng"""
+  userId: Int!
+
+  """Loại hoạt động"""
+  activityType: ActivityType!
+
+  """Mô tả hoạt động"""
+  description: String
+
+  """Dữ liệu bổ sung"""
+  metadata: String
+
+  """IP address"""
+  ipAddress: String
+
+  """User agent"""
+  userAgent: String
+
+  """Thời gian tạo hoạt động"""
+  createdAt: DateTime!
+
+  """Người dùng thực hiện hoạt động"""
+  user: User!
+}
+
+"""Các loại hoạt động của người dùng"""
+enum ActivityType {
+  LOGIN
+  LOGOUT
+  PROFILE_UPDATE
+  PASSWORD_CHANGE
+  AVATAR_UPDATE
+  DOCUMENT_VIEW
+  DOCUMENT_CREATE
+  DOCUMENT_UPDATE
+  DOCUMENT_DELETE
+  TASK_ASSIGNED
+  TASK_COMPLETED
+  APPROVAL_REQUESTED
+  APPROVAL_APPROVED
+  APPROVAL_REJECTED
+}
+
 type User {
   """ID của người dùng"""
   id: Int!
@@ -162,6 +209,51 @@ type User {
 
   """Danh sách vai trò của người dùng"""
   roles: [Role!]!
+
+  """Số điện thoại của người dùng"""
+  phoneNumber: String
+
+  """Địa chỉ của người dùng"""
+  address: String
+
+  """Ngày sinh của người dùng"""
+  dateOfBirth: String
+
+  """Giới tính của người dùng"""
+  gender: String
+
+  """Chức danh của người dùng"""
+  jobTitle: String
+
+  """Mô tả về bản thân"""
+  bio: String
+
+  """Website cá nhân"""
+  website: String
+
+  """Tài khoản LinkedIn"""
+  linkedin: String
+
+  """Tài khoản Facebook"""
+  facebook: String
+
+  """Tài khoản Twitter"""
+  twitter: String
+
+  """Cho phép nhận thông báo email"""
+  emailNotifications: Boolean!
+
+  """Cho phép nhận thông báo push"""
+  pushNotifications: Boolean!
+
+  """Cho phép hiển thị thông tin công khai"""
+  isProfilePublic: Boolean!
+
+  """Thời gian đăng nhập cuối"""
+  lastLoginAt: DateTime
+
+  """Số lần đăng nhập"""
+  loginCount: Int!
   assignments: [Assignment!]!
 
   """Thời gian tạo tài khoản"""
@@ -175,6 +267,7 @@ type User {
   avatarFileId: Int
   avatarFile: File
   userPositions: [UserPosition!]!
+  activities: [UserActivity!]!
 }
 
 """Các vai trò của người dùng trong hệ thống"""
@@ -445,6 +538,22 @@ type GetRolesResponse {
 
   """Thông tin metadata của response"""
   metadata: Metadata!
+}
+
+type UpdateProfileResponse {
+  metadata: Metadata!
+  data: User!
+}
+
+type GetUserActivitiesResponse {
+  metadata: Metadata!
+  data: [UserActivity!]!
+  meta: PageMetaDto!
+}
+
+type UploadAvatarResponse {
+  metadata: Metadata!
+  data: User!
 }
 
 type StreamFileOutput {
@@ -989,9 +1098,9 @@ enum ApprovalLevel {
 type TaskRequest {
   id: Int!
   requestedByUserId: Int!
-  requestedByUser: User!
+  requestedByUser: User
   assignedToUserId: Int!
-  assignedToUser: User!
+  assignedToUser: User
   title: String!
   description: String
   priority: TaskPriority!
@@ -1039,7 +1148,7 @@ type Document {
   assignedToUserId: Int
   assignedToUser: User
   createdByUserId: Int!
-  createdByUser: User!
+  createdByUser: User
   comments: [DocumentComment!]
   versions: [DocumentVersion!]
   approvalHistory: [DocumentApprovalHistory!]
@@ -1222,11 +1331,11 @@ type DocumentHistoryResponse {
 type TaskAssignment {
   id: Int!
   documentId: Int!
-  document: Document!
+  document: Document
   assignedToUserId: Int!
-  assignedToUser: User!
+  assignedToUser: User
   assignedByUserId: Int!
-  assignedByUser: User!
+  assignedByUser: User
   taskDescription: String
   deadline: DateTime
   instructions: String
@@ -1467,6 +1576,10 @@ type Query {
   checkEmailExists(email: String!): Boolean!
   userStatistics: String!
   getUserRoles(userId: Int!): GetRolesResponse!
+  getUserActivities(input: GetUserActivitiesInput!): GetUserActivitiesResponse!
+  myProfile: User!
+  userProfile(id: Int!): User!
+  profileStats: String!
   files: [File!]!
   file(id: Int!): File!
   streamFile(id: String!): StreamFileOutput!
@@ -1651,6 +1764,14 @@ enum Order {
   DESC
 }
 
+input GetUserActivitiesInput {
+  page: Int! = 1
+  limit: Int! = 10
+  activityType: ActivityType
+  startDate: String
+  endDate: String
+}
+
 input GetUnitsPaginatedInput {
   """Thứ tự sắp xếp"""
   order: Order = ASC
@@ -1829,6 +1950,9 @@ type Mutation {
   changeRoles(id: Int!, roles: [Role!]!): UserResponse!
   addRole(input: AddRoleInput!): AddRoleResponse!
   removeRole(input: RemoveRoleInput!): RemoveRoleResponse!
+  updateProfile(input: UpdateProfileInput!): UpdateProfileResponse!
+  uploadAvatar(avatarFile: Upload!): UploadAvatarResponse!
+  removeAvatar: UploadAvatarResponse!
   createFile(createFileInput: CreateFileInput!): File!
   updateFile(updateFileInput: UpdateFileInput!): File!
   removeFile(id: Int!): File!
@@ -2003,6 +2127,25 @@ input RemoveRoleInput {
 
   """Role cần xóa khỏi user"""
   role: Role!
+}
+
+input UpdateProfileInput {
+  firstName: String
+  lastName: String
+  email: String
+  phoneNumber: String
+  address: String
+  dateOfBirth: String
+  gender: String
+  jobTitle: String
+  bio: String
+  website: String
+  linkedin: String
+  facebook: String
+  twitter: String
+  emailNotifications: Boolean
+  pushNotifications: Boolean
+  isProfilePublic: Boolean
 }
 
 input CreateFileInput {

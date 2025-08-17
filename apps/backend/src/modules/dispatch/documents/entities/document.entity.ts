@@ -130,10 +130,10 @@ export class Document {
   @Column()
   createdByUserId: number;
 
-  @Field(() => User)
-  @ManyToOne(() => User)
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'createdByUserId' })
-  createdByUser: User;
+  createdByUser?: User;
 
   @Field(() => [DocumentComment], { nullable: true })
   @OneToMany(() => DocumentComment, (comment) => comment.document)

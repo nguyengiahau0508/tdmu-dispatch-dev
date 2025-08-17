@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from 'src/modules/users/users.service';
+import { ProfileService } from 'src/modules/users/profile.service';
 import * as bcrypt from 'bcrypt';
 import { ErrorCode } from 'src/common/enums/error-code.enum';
 import { SignInOutput } from '../dto/sign-in/sign-in.output';
@@ -20,6 +21,7 @@ import { RefreshTokenOutput } from '../dto/refresh-token/refresh-token.output';
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
+    private readonly profileService: ProfileService,
     private readonly mailService: MailService,
     private readonly otpService: OtpService,
     private readonly tokenService: TokenService,
@@ -33,6 +35,7 @@ export class AuthService {
     email: string,
     pass: string,
     @Res({ passthrough: true }) res: Response,
+    @Req() req: Request,
   ): Promise<SignInOutput> {
     // Find user by email
     const user = await this.usersService.findOneByEmail(email);
@@ -78,6 +81,9 @@ export class AuthService {
       path: '/', // hoặc '/graphql' nếu bạn chỉ xử lý ở đó
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
     });
+
+    // Cập nhật thông tin đăng nhập và ghi log hoạt động
+    await this.profileService.updateLastLogin(user.id, req);
 
     // Return tokens and basic user info
     return {

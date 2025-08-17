@@ -34,28 +34,28 @@ export class TaskAssignment {
   @Column()
   documentId: number;
 
-  @Field(() => Document)
-  @ManyToOne(() => Document, { onDelete: 'CASCADE' })
+  @Field(() => Document, { nullable: true })
+  @ManyToOne(() => Document, { onDelete: 'CASCADE', nullable: true })
   @JoinColumn({ name: 'documentId' })
-  document: Document;
+  document?: Document;
 
   @Field(() => Int)
   @Column()
   assignedToUserId: number;
 
-  @Field(() => User)
-  @ManyToOne(() => User)
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'assignedToUserId' })
-  assignedToUser: User;
+  assignedToUser?: User;
 
   @Field(() => Int)
   @Column()
   assignedByUserId: number;
 
-  @Field(() => User)
-  @ManyToOne(() => User)
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'assignedByUserId' })
-  assignedByUser: User;
+  assignedByUser?: User;
 
   @Field({ nullable: true })
   @Column({ type: 'text', nullable: true })

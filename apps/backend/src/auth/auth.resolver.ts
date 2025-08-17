@@ -22,11 +22,13 @@ export class AuthResolver {
   async signIn(
     @Args('input') input: SignInInput,
     @Context('res') res: Response,
+    @Context('req') req: Request,
   ): Promise<SignInResponse> {
     const result = await this.authService.signIn(
       input.email,
       input.password,
       res,
+      req,
     );
     return {
       metadata: createResponseMetadata(HttpStatus.ACCEPTED, ''),

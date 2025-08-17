@@ -1,0 +1,142 @@
+# Profile Management Queries and Mutations
+
+# Get current user's profile
+query GetMyProfile {
+  myProfile {
+    id
+    email
+    firstName
+    lastName
+    fullName
+    avatar
+    phoneNumber
+    address
+    dateOfBirth
+    gender
+    jobTitle
+    bio
+    website
+    linkedin
+    facebook
+    twitter
+    emailNotifications
+    pushNotifications
+    isProfilePublic
+    lastLoginAt
+    loginCount
+    createdAt
+    updatedAt
+    roles
+  }
+}
+
+# Update profile
+mutation UpdateProfile($input: UpdateProfileInput!) {
+  updateProfile(input: $input) {
+    metadata {
+      statusCode
+      message
+    }
+    data {
+      id
+      email
+      firstName
+      lastName
+      fullName
+      phoneNumber
+      address
+      dateOfBirth
+      gender
+      jobTitle
+      bio
+      website
+      linkedin
+      facebook
+      twitter
+      emailNotifications
+      pushNotifications
+      isProfilePublic
+    }
+  }
+}
+
+# Upload avatar
+mutation UploadAvatar($avatarFile: Upload!) {
+  uploadAvatar(avatarFile: $avatarFile) {
+    metadata {
+      statusCode
+      message
+    }
+    data {
+      id
+      avatar
+      avatarFile {
+        id
+        driveFileId
+        originalName
+      }
+    }
+  }
+}
+
+# Remove avatar
+mutation RemoveAvatar {
+  removeAvatar {
+    metadata {
+      statusCode
+      message
+    }
+    data {
+      id
+      avatar
+      avatarFile {
+        id
+      }
+    }
+  }
+}
+
+# Get user activities
+query GetUserActivities($input: GetUserActivitiesInput!) {
+  getUserActivities(input: $input) {
+    metadata {
+      statusCode
+      message
+    }
+    data {
+      id
+      activityType
+      description
+      metadata
+      ipAddress
+      userAgent
+      createdAt
+    }
+    meta {
+      page
+      limit
+      itemCount
+      pageCount
+      hasPreviousPage
+      hasNextPage
+    }
+  }
+}
+
+# Get profile statistics
+query GetProfileStats {
+  profileStats
+}
+
+# Change password (existing functionality)
+mutation ChangePassword($input: ChangePasswordInput!) {
+  changePassword(input: $input) {
+    metadata {
+      statusCode
+      message
+    }
+    data {
+      status
+    }
+  }
+}

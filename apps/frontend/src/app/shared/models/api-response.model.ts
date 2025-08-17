@@ -9,7 +9,14 @@ export interface IApiResponse<TGenericData> {
 export interface IPaginatedResponse<TGenericData> {
   data?: TGenericData[]
   metadata: Metadata
-
+  meta?: {
+    page: number
+    limit: number
+    itemCount: number
+    pageCount: number
+    hasPreviousPage: boolean
+    hasNextPage: boolean
+  }
   totalCount?: number
   hasNextPage?: boolean
 }

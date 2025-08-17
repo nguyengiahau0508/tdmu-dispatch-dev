@@ -3,6 +3,7 @@ import { Role } from 'src/common/enums/role.enums';
 import { File } from 'src/modules/files/entities/file.entity';
 import { Assignment } from 'src/modules/organizational/assignments/entities/assignment.entity';
 import { UserPosition } from 'src/modules/organizational/user-positions/entities/user-position.entity';
+import { UserActivity } from './user-activity.entity';
 import {
   Entity,
   Column,
@@ -86,6 +87,67 @@ export class User {
   @Field(() => [Role], { description: 'Danh sách vai trò của người dùng' })
   roles: Role[];
 
+  // Thêm các trường mới cho profile
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true, description: 'Số điện thoại của người dùng' })
+  phoneNumber: string;
+
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true, description: 'Địa chỉ của người dùng' })
+  address: string;
+
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true, description: 'Ngày sinh của người dùng' })
+  dateOfBirth: string;
+
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true, description: 'Giới tính của người dùng' })
+  gender: string;
+
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true, description: 'Chức danh của người dùng' })
+  jobTitle: string;
+
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true, description: 'Mô tả về bản thân' })
+  bio: string;
+
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true, description: 'Website cá nhân' })
+  website: string;
+
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true, description: 'Tài khoản LinkedIn' })
+  linkedin: string;
+
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true, description: 'Tài khoản Facebook' })
+  facebook: string;
+
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true, description: 'Tài khoản Twitter' })
+  twitter: string;
+
+  @Column({ default: true })
+  @Field(() => Boolean, { description: 'Cho phép nhận thông báo email' })
+  emailNotifications: boolean;
+
+  @Column({ default: true })
+  @Field(() => Boolean, { description: 'Cho phép nhận thông báo push' })
+  pushNotifications: boolean;
+
+  @Column({ default: true })
+  @Field(() => Boolean, { description: 'Cho phép hiển thị thông tin công khai' })
+  isProfilePublic: boolean;
+
+  @Column({ nullable: true })
+  @Field(() => Date, { nullable: true, description: 'Thời gian đăng nhập cuối' })
+  lastLoginAt: Date;
+
+  @Column({ default: 0 })
+  @Field(() => Int, { description: 'Số lần đăng nhập' })
+  loginCount: number;
+
   @OneToMany(() => Assignment, (assignment) => assignment.user)
   @Field(() => [Assignment])
   assignments: Assignment[];
@@ -108,15 +170,19 @@ export class User {
 
   @Column({ nullable: true })
   @Field(() => Int, { nullable: true })
-  avatarFileId: number;
+  avatarFileId?: number;
 
   @ManyToOne(() => File, { nullable: true, cascade: true })
   @JoinColumn({ name: 'avatarFileId' }) // RÀNG BUỘC: Dùng đúng cột avatarFileId bạn tự khai báo
   @Field(() => File, { nullable: true })
-  avatarFile: File;
+  avatarFile?: File;
 
   // thêm vào cuối file
   @OneToMany(() => UserPosition, (up) => up.user)
   @Field(() => [UserPosition])
   userPositions: UserPosition[];
+
+  @OneToMany(() => UserActivity, (activity) => activity.user)
+  @Field(() => [UserActivity])
+  activities: UserActivity[];
 }

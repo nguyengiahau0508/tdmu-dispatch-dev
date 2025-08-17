@@ -8,6 +8,7 @@ import { TaskManagementComponent } from './task-assignment/task-management.compo
 import { TaskRequestListComponent } from './task-request/task-request-list.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { DocumentCreationComponent } from './document-creation/document-creation.component';
+import { ProfileManagementComponent } from './profile/profile-management.component';
 
 export const USER_ROUTES: Routes = [
   {
@@ -49,6 +50,11 @@ export const USER_ROUTES: Routes = [
     path: 'dashboard',
     component: DashboardComponent,
     title: 'Bảng điều khiển'
+  },
+  {
+    path: 'profile',
+    component: ProfileManagementComponent,
+    title: 'Quản lý Profile'
   },
   {
     path: '',

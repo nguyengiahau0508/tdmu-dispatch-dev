@@ -11,13 +11,30 @@ export interface IUser {
   isActive: boolean;
   isFirstLogin: boolean;
   roles: Role[];
-  avatar?: string
+  avatar?: string;
   createdAt: Date;
   updatedAt: Date;
   fullName?: string; // Đây là một trường tùy chọn, có thể được tạo ra ở client
   assignments: IAssignment[];
-  avatarFile?: IFile
-  avatarFileId?: number
+  avatarFile?: IFile;
+  avatarFileId?: number;
   userPositions: IUserPosition[]; // Thêm vào đây để quản lý vị trí người dùng
+  
+  // Profile fields
+  phoneNumber?: string;
+  address?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  jobTitle?: string;
+  bio?: string;
+  website?: string;
+  linkedin?: string;
+  facebook?: string;
+  twitter?: string;
+  emailNotifications?: boolean;
+  pushNotifications?: boolean;
+  isProfilePublic?: boolean;
+  lastLoginAt?: Date;
+  loginCount?: number;
 }
 
