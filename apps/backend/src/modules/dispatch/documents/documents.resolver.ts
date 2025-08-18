@@ -32,6 +32,10 @@ import {
   ProcessingStatistics, 
   ProcessingStatisticsResponse 
 } from './dto/document-processing/processing-statistics.output';
+import { 
+  DocumentProcessingHistoryItem,
+  DocumentProcessingHistoryResponse 
+} from './dto/document-processing/document-processing-history.output';
 import { GetDocumentsPaginatedResponse } from './dto/get-documents-paginated/get-documents-paginated.response';
 
 @ObjectType()
@@ -372,18 +376,18 @@ export class DocumentsResolver {
     }
   }
 
-  @Query(() => DocumentHistoryResponse)
-  async documentProcessingHistory(@Args('documentId', { type: () => Int }) documentId: number): Promise<DocumentHistoryResponse> {
+  @Query(() => DocumentProcessingHistoryResponse)
+  async documentProcessingHistory(@Args('documentId', { type: () => Int }) documentId: number): Promise<DocumentProcessingHistoryResponse> {
     try {
       const history = await this.documentProcessingService.getDocumentProcessingHistory(documentId);
       return {
-        metadata: createMetadata(200, 'Document processing history retrieved successfully'),
         data: history,
+        totalCount: history.length,
       };
     } catch (error) {
       return {
-        metadata: createMetadata(400, error.message),
         data: [],
+        totalCount: 0,
       };
     }
   }

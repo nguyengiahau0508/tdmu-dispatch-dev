@@ -1,11 +1,12 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DocumentProcessingInfo } from './services/document-processing-apollo.service';
+import { DocumentProcessingHistoryComponent } from './components/document-processing-history.component';
 
 @Component({
   selector: 'app-document-details',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DocumentProcessingHistoryComponent],
   template: `
     <div class="dialog-overlay" (click)="close()">
       <div class="dialog-container" (click)="$event.stopPropagation()">
@@ -144,27 +145,15 @@ import { DocumentProcessingInfo } from './services/document-processing-apollo.se
             </div>
           </div>
 
-          <!-- Document History (Mock) -->
+          <!-- Document History -->
           <div class="history-section">
             <h3 class="section-title">
               <span class="section-icon">📚</span>
               Lịch sử xử lý
             </h3>
-            <div class="history-list">
-              <div class="history-item" *ngFor="let item of getMockHistory()">
-                <div class="history-icon">{{ item.icon }}</div>
-                <div class="history-content">
-                  <div class="history-action">{{ item.action }}</div>
-                  <div class="history-details">
-                    <span class="history-user">{{ item.user }}</span>
-                    <span class="history-time">{{ item.time }}</span>
-                  </div>
-                  <div class="history-notes" *ngIf="item.notes">
-                    {{ item.notes }}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <app-document-processing-history 
+              [documentId]="document.documentId">
+            </app-document-processing-history>
           </div>
         </div>
 

@@ -17,6 +17,7 @@ import { DocumentComment } from './document-comment.entity';
 import { DocumentVersion } from './document-version.entity';
 import { DocumentApprovalHistory } from './document-approval-history.entity';
 import { TaskRequest } from './task-request.entity';
+import { WorkflowInstance } from '../../../workflow/workflow-instances/entities/workflow-instance.entity';
 
 export enum DocumentTypeEnum {
   OUTGOING = 'OUTGOING',
@@ -155,6 +156,15 @@ export class Document {
   @ManyToOne(() => TaskRequest, { nullable: true })
   @JoinColumn({ name: 'taskRequestId' })
   taskRequest?: TaskRequest;
+
+  @Field(() => Int, { nullable: true })
+  @Column({ nullable: true })
+  workflowInstanceId?: number;
+
+  @Field(() => WorkflowInstance, { nullable: true })
+  @OneToOne(() => WorkflowInstance, { nullable: true })
+  @JoinColumn({ name: 'workflowInstanceId' })
+  workflowInstance?: WorkflowInstance;
 
   @Field({ nullable: true })
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

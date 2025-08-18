@@ -9,6 +9,7 @@ import { TaskRequestListComponent } from './task-request/task-request-list.compo
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { DocumentCreationComponent } from './document-creation/document-creation.component';
 import { ProfileManagementComponent } from './profile/profile-management.component';
+import { WorkflowDetailComponent } from './workflow/workflow-detail/workflow-detail.component';
 
 export const USER_ROUTES: Routes = [
   {
@@ -55,6 +56,11 @@ export const USER_ROUTES: Routes = [
     path: 'profile',
     component: ProfileManagementComponent,
     title: 'Quản lý Profile'
+  },
+  {
+    path: 'workflow-detail/:documentId',
+    component: WorkflowDetailComponent,
+    title: 'Chi tiết quy trình'
   },
   {
     path: '',

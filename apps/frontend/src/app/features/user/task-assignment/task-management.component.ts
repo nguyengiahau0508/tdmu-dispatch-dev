@@ -210,7 +210,6 @@ import { TaskAssignmentService, TaskAssignment, TaskStatistics } from '../../../
   styles: [`
     .task-management-container {
       padding: 20px;
-     
       margin: 0 auto;
     }
 

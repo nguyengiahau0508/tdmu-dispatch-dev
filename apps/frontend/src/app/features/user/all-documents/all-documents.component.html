@@ -1,0 +1,137 @@
+<div class="all-documents-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Tất cả văn bản</h1>
+      <p>Quản lý và theo dõi tất cả văn bản trong hệ thống</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-primary" (click)="showDocumentForm = true">
+        <img src="/icons/add.svg" alt="Add">
+        <span>Tạo văn bản mới</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Đang tải danh sách văn bản...</p>
+  </div>
+
+  <!-- Document List -->
+  <div class="document-list" *ngIf="!loading && documents.length > 0">
+    <div class="document-card" *ngFor="let document of documents">
+      <div class="card-header">
+        <h3>{{ document.title }}</h3>
+        <div class="document-type" [class]="document.documentType.toLowerCase()">
+          {{ document.documentType }}
+        </div>
+      </div>
+      
+      <div class="card-content">
+        <div class="document-info">
+          <div class="info-item">
+            <label>Loại văn bản:</label>
+            <span>{{ document.documentType }}</span>
+          </div>
+          <div class="info-item">
+            <label>Trạng thái:</label>
+            <span class="status-badge" [class]="document.status?.toLowerCase() || 'draft'">
+              {{ document.status || 'DRAFT' }}
+            </span>
+          </div>
+          <div class="info-item">
+            <label>Ngày tạo:</label>
+            <span>{{ document.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn btn-secondary" (click)="onViewDocument(document)">
+          <img src="/icons/visibility.svg" alt="View">
+          <span>Xem</span>
+        </button>
+        <button class="btn btn-primary" (click)="onEditDocument(document)">
+          <img src="/icons/edit.svg" alt="Edit">
+          <span>Sửa</span>
+        </button>
+        <button class="btn btn-danger" (click)="onDeleteDocument(document)">
+          <img src="/icons/delete.svg" alt="Delete">
+          <span>Xóa</span>
+        </button>
+        <button class="btn btn-info" (click)="openWorkflowDetail(document.id)">
+          <img src="/icons/workflow.svg" alt="Workflow">
+          <span>Quy trình</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && documents.length === 0">
+    <img src="/icons/empty_documents.svg" alt="No documents">
+    <h3>Chưa có văn bản nào</h3>
+    <p>Bắt đầu tạo văn bản đầu tiên của bạn</p>
+    <button class="btn btn-primary" (click)="showDocumentForm = true">
+      <img src="/icons/add.svg" alt="Add">
+      <span>Tạo văn bản mới</span>
+    </button>
+  </div>
+
+  <!-- Document Form Modal -->
+  <div class="modal-overlay" *ngIf="showDocumentForm" (click)="onDocumentFormCancelled()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <app-document-form 
+        [document]="documentToEdit"
+        (documentSaved)="onDocumentSaved()"
+        (cancelled)="onDocumentFormCancelled()">
+      </app-document-form>
+    </div>
+  </div>
+
+  <!-- Document Detail Modal -->
+  <div class="modal-overlay" *ngIf="selectedDocument" (click)="selectedDocument = undefined">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="document-detail">
+        <div class="modal-header">
+          <h2>Chi tiết văn bản</h2>
+          <button class="btn-close" (click)="selectedDocument = undefined">
+            <img src="/icons/close.svg" alt="Close">
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="detail-section">
+            <h3>{{ selectedDocument.title }}</h3>
+            <div class="detail-info">
+              <div class="info-row">
+                <label>Loại văn bản:</label>
+                <span>{{ selectedDocument?.documentType }}</span>
+              </div>
+              <div class="info-row">
+                <label>Loại văn bản:</label>
+                <span>{{ selectedDocument.documentType }}</span>
+              </div>
+              <div class="info-row">
+                <label>Trạng thái:</label>
+                <span class="status-badge" [class]="selectedDocument?.status?.toLowerCase() || 'draft'">
+                  {{ selectedDocument?.status || 'DRAFT' }}
+                </span>
+              </div>
+              <div class="info-row">
+                <label>Ngày tạo:</label>
+                <span>{{ selectedDocument.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+              <div class="info-row" *ngIf="selectedDocument.content">
+                <label>Nội dung:</label>
+                <div class="content-preview">{{ selectedDocument.content }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

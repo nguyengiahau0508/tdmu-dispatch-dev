@@ -1154,6 +1154,8 @@ type Document {
   approvalHistory: [DocumentApprovalHistory!]
   taskRequestId: Int
   taskRequest: TaskRequest
+  workflowInstanceId: Int
+  workflowInstance: WorkflowInstance
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -1273,6 +1275,23 @@ type ProcessingStatisticsResponse {
   data: ProcessingStatistics!
 }
 
+type DocumentProcessingHistoryItem {
+  id: Int!
+  actionType: ActionType!
+  actionByUser: User
+  actionAt: DateTime!
+  note: String
+  metadata: String
+  stepName: String!
+  stepType: String!
+  createdAt: DateTime!
+}
+
+type DocumentProcessingHistoryResponse {
+  data: [DocumentProcessingHistoryItem!]!
+  totalCount: Int!
+}
+
 type GetDocumentsPaginatedResponse {
   """Dữ liệu trả về (danh sách)"""
   data: [Document!]
@@ -1321,11 +1340,6 @@ type DocumentHistoryItem {
   note: String
   stepName: String!
   stepType: String!
-}
-
-type DocumentHistoryResponse {
-  metadata: Metadata!
-  data: [DocumentHistoryItem!]!
 }
 
 type TaskAssignment {
@@ -1456,6 +1470,41 @@ type RoleLabelDto {
 type ActionTypeLabelDto {
   actionType: String!
   label: String!
+}
+
+type WorkflowStepInfo {
+  id: Int!
+  name: String!
+  description: String!
+  order: Int!
+  status: String!
+  assignedTo: String
+  startedAt: DateTime
+  completedAt: DateTime
+  notes: String
+  requiredActions: [String!]
+}
+
+type DocumentWorkflowInfo {
+  documentId: Int!
+  documentTitle: String!
+  documentType: String!
+  currentStatus: String!
+  workflowTemplateId: Int!
+  workflowTemplateName: String!
+  workflowTemplateDescription: String!
+  steps: [WorkflowStepInfo!]!
+  currentStepIndex: Int!
+  totalSteps: Int!
+  completedSteps: Int!
+  createdAt: DateTime!
+  estimatedCompletion: DateTime
+  processingGuide: String
+}
+
+type GetDocumentWorkflowResponse {
+  metadata: Metadata!
+  data: DocumentWorkflowInfo!
 }
 
 type GetDocumentCategoriesPaginatedResponse {
@@ -1599,6 +1648,7 @@ type Query {
   getAllDepartmentBySearch(search: String!): GetAllDepartmentResponse!
   department(input: GetDepartmentInput!): GetDepartmentResponse!
   getAllByUser(userId: Int!): GetAllByUserReponse!
+  getDocumentWorkflow(input: GetDocumentWorkflowInput!): GetDocumentWorkflowResponse!
 
   """Lấy tất cả workflow action logs"""
   workflowActionLogs: [WorkflowActionLog!]!
@@ -1716,7 +1766,7 @@ type Query {
   myDocumentsByStatus(status: String!): DocumentsResponse!
   myDocumentStatistics: DocumentStatisticsResponse!
   processingStatistics: ProcessingStatisticsResponse!
-  documentProcessingHistory(documentId: Int!): DocumentHistoryResponse!
+  documentProcessingHistory(documentId: Int!): DocumentProcessingHistoryResponse!
   searchDocuments(searchTerm: String, status: String, documentType: String, priority: String): DocumentsResponse!
   processedDocuments: ProcessedDocumentsResponse!
   urgentDocuments: DocumentsForProcessingResponse!
@@ -1840,6 +1890,10 @@ input GetDepartmentsPaginatedInput {
 input GetDepartmentInput {
   """ID phòng ban"""
   id: Int!
+}
+
+input GetDocumentWorkflowInput {
+  documentId: Int!
 }
 
 input GetWorkflowStepPaginatedInput {

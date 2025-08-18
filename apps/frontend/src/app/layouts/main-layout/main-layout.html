@@ -11,13 +11,13 @@
         <img src="/icons/dashboard.svg" alt="" title="Bảng điều khiển">
         <span class="sidebar__tooltip">Bảng điều khiển</span>
       </div>
-      <div class="sidebar__menu-item" routerLink="/workflow" routerLinkActive="active" (click)="refreshPendingWorkflowCount()">
+      <!-- <div class="sidebar__menu-item" routerLink="/workflow" routerLinkActive="active" (click)="refreshPendingWorkflowCount()">
         <img src="/icons/conversion_path.svg" alt="" title="Quy trình xử lý">
         <span class="sidebar__tooltip">Quy trình xử lý</span>
         @if (pendingWorkflowCount > 0) {
           <span class="notification-badge">{{ pendingWorkflowCount }}</span>
         }
-      </div>
+      </div> -->
       <div class="sidebar__menu-item" routerLink="/document-processing" routerLinkActive="active" (click)="refreshPendingDocumentCount()">
         <img src="/icons/grading.svg" alt="" title="Xử lý văn bản">
         <span class="sidebar__tooltip">Xử lý văn bản</span>

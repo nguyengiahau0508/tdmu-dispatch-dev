@@ -130,31 +130,48 @@ export class DocumentProcessingService {
   }
 
   /**
-   * Lấy lịch sử xử lý văn bản
+   * Lấy lịch sử xử lý tài liệu
    */
   async getDocumentProcessingHistory(documentId: number): Promise<any[]> {
-    // Lấy workflow instance của document
-    const workflows = await this.workflowInstancesService.findByDocumentId(documentId);
-    
-    if (workflows.length === 0) {
-      return [];
+    // Tìm document và workflow instance
+    const document = await this.documentRepository.findOne({
+      where: { id: documentId },
+      relations: ['workflowInstance']
+    });
+
+    if (!document) {
+      throw new NotFoundException(`Document with ID ${documentId} not found`);
     }
 
-    const workflow = workflows[0];
-    
-    // Lấy action logs của workflow
-    const actionLogs = await this.workflowActionLogsService.findByInstanceId(workflow.id);
-    
-    // Format logs thành lịch sử xử lý
-    return actionLogs.map(log => ({
-      id: log.id,
-      actionType: log.actionType,
-      actionByUser: log.actionByUser,
-      actionAt: log.actionAt,
-      note: log.note,
-      stepName: log.step?.name || 'Unknown Step',
-      stepType: log.step?.type || 'Unknown',
-    }));
+    // Nếu có workflow instance, lấy logs từ workflow
+    if (document.workflowInstance) {
+      const workflowLogs = await this.workflowActionLogsService.findByInstanceId(document.workflowInstance.id);
+      
+      return workflowLogs.map(log => ({
+        id: log.id,
+        actionType: log.actionType,
+        actionByUser: log.actionByUser,
+        actionAt: log.actionAt,
+        note: log.note,
+        metadata: log.metadata,
+        stepName: log.step?.name || 'Unknown Step',
+        stepType: log.step?.type || 'Unknown',
+        createdAt: log.createdAt
+      }));
+    }
+
+    // Nếu không có workflow, trả về lịch sử cơ bản từ document
+    return [{
+      id: 1,
+      actionType: 'START',
+      actionByUser: document.createdByUser,
+      actionAt: document.createdAt,
+      note: 'Tài liệu được tạo',
+      metadata: null,
+      stepName: 'Tạo tài liệu',
+      stepType: 'START',
+      createdAt: document.createdAt
+    }];
   }
 
   /**
@@ -344,7 +361,7 @@ export class DocumentProcessingService {
     // Tìm document
     const document = await this.documentRepository.findOne({
       where: { id: documentId },
-      relations: ['documentCategory', 'file', 'createdByUser', 'assignedToUser']
+      relations: ['documentCategory', 'file', 'createdByUser', 'assignedToUser', 'workflowInstance']
     });
 
     if (!document) {
@@ -385,14 +402,28 @@ export class DocumentProcessingService {
     // Lưu document
     const updatedDocument = await this.documentRepository.save(document);
 
-    // Tạo workflow action log
-    await this.workflowActionLogsService.create({
-      instanceId: 1, // TODO: Get from workflow service
-      stepId: 1, // TODO: Get from workflow service
-      actionType,
-      note: notes,
-      metadata: JSON.stringify({ documentId }),
-    }, user);
+    // Tạo workflow action log nếu có workflow instance
+    if (document.workflowInstance) {
+      try {
+        await this.workflowActionLogsService.logAction(
+          document.workflowInstance.id,
+          document.workflowInstance.currentStepId || 1,
+          actionType,
+          user,
+          notes,
+          { 
+            documentId: document.id,
+            documentTitle: document.title,
+            actionType: actionType,
+            previousStatus: document.status,
+            newStatus: updatedDocument.status
+          }
+        );
+      } catch (error) {
+        console.error('Error creating workflow action log:', error);
+        // Không throw error vì document đã được cập nhật thành công
+      }
+    }
 
     return updatedDocument;
   }

@@ -98,6 +98,37 @@ const GET_DOCUMENTS_PAGINATED = gql`
   }
 `;
 
+const GET_DOCUMENTS = gql`
+  query GetDocuments {
+    documents {
+      metadata {
+        statusCode
+        message
+      }
+      data {
+        id
+        title
+        content
+        documentType
+        documentCategoryId
+        documentCategory {
+          id
+          name
+        }
+        fileId
+        file {
+          id
+          driveFileId
+          isPublic
+        }
+        status
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`;
+
 const GET_DOCUMENT = gql`
   query GetDocument($id: Int!) {
     document(id: $id) {
@@ -246,6 +277,19 @@ export class DocumentsService {
     );
   }
 
+  getDocuments(): Observable<{ data: Document[] }> {
+    return this.apollo.watchQuery<{
+      documents: ApiResponse<Document[]>
+    }>({
+      query: GET_DOCUMENTS,
+      fetchPolicy: 'network-only'
+    }).valueChanges.pipe(
+      map(result => ({
+        data: result.data.documents.data || []
+      }))
+    );
+  }
+
   createDocument(input: CreateDocumentInput, file?: File): Observable<Document> {
     return this.apollo.mutate<{
       createDocument: ApiResponse<Document>
@@ -298,6 +342,10 @@ export class DocumentsService {
     }).pipe(
       map(result => result.data!.removeDocument.data.success)
     );
+  }
+
+  deleteDocument(id: number): Observable<boolean> {
+    return this.removeDocument(id);
   }
 
   // Helper methods for specific document types

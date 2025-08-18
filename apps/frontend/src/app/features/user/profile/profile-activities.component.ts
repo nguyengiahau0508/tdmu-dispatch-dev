@@ -10,16 +10,13 @@ import { NotificationService } from '../../../core/services/notification.service
   imports: [CommonModule, FormsModule],
   template: `
     <div class="activities-container">
-      <div class="activities-header">
-        <h2>Lịch sử hoạt động</h2>
-        <p>Theo dõi các hoạt động của bạn trong hệ thống</p>
-      </div>
 
       <!-- Filters -->
       <div class="filters-section">
+        <h3>Bộ lọc</h3>
         <div class="filter-row">
           <div class="filter-group">
-            <label for="activityType">Loại hoạt động:</label>
+            <label for="activityType">Loại hoạt động</label>
             <select 
               id="activityType" 
               [(ngModel)]="filters.activityType" 
@@ -45,7 +42,7 @@ import { NotificationService } from '../../../core/services/notification.service
           </div>
 
           <div class="filter-group">
-            <label for="startDate">Từ ngày:</label>
+            <label for="startDate">Từ ngày</label>
             <input 
               type="date" 
               id="startDate" 
@@ -56,7 +53,7 @@ import { NotificationService } from '../../../core/services/notification.service
           </div>
 
           <div class="filter-group">
-            <label for="endDate">Đến ngày:</label>
+            <label for="endDate">Đến ngày</label>
             <input 
               type="date" 
               id="endDate" 
@@ -72,7 +69,7 @@ import { NotificationService } from '../../../core/services/notification.service
       <div class="activities-list" *ngIf="!isLoading && activities.length > 0">
         <div class="activity-item" *ngFor="let activity of activities">
           <div class="activity-icon">
-            <i [class]="getActivityIcon(activity.activityType)"></i>
+            <img [src]="getActivityIcon(activity.activityType)" [alt]="getActivityTitle(activity.activityType)">
           </div>
           <div class="activity-content">
             <div class="activity-header">
@@ -133,7 +130,6 @@ import { NotificationService } from '../../../core/services/notification.service
   `,
   styles: [`
     .activities-container {
-      max-width: 1000px;
       margin: 0 auto;
       padding: 20px;
     }
@@ -154,11 +150,19 @@ import { NotificationService } from '../../../core/services/notification.service
     }
 
     .filters-section {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
+      background: var(--color-background-primary);
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-default);
+      border: 1px solid var(--color-border);
+      margin-bottom: 24px;
+    }
+
+    .filters-section h3 {
+      color: var(--color-text-primary);
+      margin: 0 0 20px 0;
+      font-size: 18px;
+      font-weight: 600;
     }
 
     .filter-row {
@@ -173,34 +177,46 @@ import { NotificationService } from '../../../core/services/notification.service
     }
 
     .filter-group label {
-      margin-bottom: 5px;
+      margin-bottom: 8px;
       font-weight: 500;
-      color: #333;
-    }
-
-    .form-control {
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      color: var(--color-text-primary);
       font-size: 14px;
     }
 
-    .activities-list {
-      background: #fff;
+    .form-control {
+      padding: 12px 16px;
+      border: 1px solid var(--color-border);
       border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      font-size: 14px;
+      background-color: var(--color-background-secondary);
+      color: var(--color-text-primary);
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+      background-color: var(--color-background-primary);
+    }
+
+    .activities-list {
+      background: var(--color-background-primary);
+      border-radius: 12px;
+      box-shadow: var(--shadow-default);
+      border: 1px solid var(--color-border);
       overflow: hidden;
     }
 
     .activity-item {
       display: flex;
       padding: 20px;
-      border-bottom: 1px solid #f0f0f0;
-      transition: background-color 0.3s;
+      border-bottom: 1px solid var(--color-border);
+      transition: background-color 0.2s ease;
     }
 
     .activity-item:hover {
-      background-color: #f8f9fa;
+      background-color: var(--color-background-secondary);
     }
 
     .activity-item:last-child {
@@ -208,20 +224,23 @@ import { NotificationService } from '../../../core/services/notification.service
     }
 
     .activity-icon {
-      width: 50px;
-      height: 50px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
-      background: #007bff;
+      background: var(--color-primary);
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-right: 15px;
+      margin-right: 16px;
       flex-shrink: 0;
     }
 
-    .activity-icon i {
-      font-size: 18px;
+    .activity-icon img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
     }
 
     .activity-content {
@@ -415,22 +434,22 @@ export class ProfileActivitiesComponent implements OnInit {
 
   getActivityIcon(activityType: string): string {
     const icons: { [key: string]: string } = {
-      'LOGIN': 'fas fa-sign-in-alt',
-      'LOGOUT': 'fas fa-sign-out-alt',
-      'PROFILE_UPDATE': 'fas fa-user-edit',
-      'PASSWORD_CHANGE': 'fas fa-key',
-      'AVATAR_UPDATE': 'fas fa-image',
-      'DOCUMENT_VIEW': 'fas fa-eye',
-      'DOCUMENT_CREATE': 'fas fa-plus',
-      'DOCUMENT_UPDATE': 'fas fa-edit',
-      'DOCUMENT_DELETE': 'fas fa-trash',
-      'TASK_ASSIGNED': 'fas fa-tasks',
-      'TASK_COMPLETED': 'fas fa-check-circle',
-      'APPROVAL_REQUESTED': 'fas fa-clock',
-      'APPROVAL_APPROVED': 'fas fa-thumbs-up',
-      'APPROVAL_REJECTED': 'fas fa-thumbs-down'
+      'LOGIN': '/icons/login.svg',
+      'LOGOUT': '/icons/logout.svg',
+      'PROFILE_UPDATE': '/icons/account_circle.svg',
+      'PASSWORD_CHANGE': '/icons/key.svg',
+      'AVATAR_UPDATE': '/icons/image.svg',
+      'DOCUMENT_VIEW': '/icons/visibility.svg',
+      'DOCUMENT_CREATE': '/icons/add.svg',
+      'DOCUMENT_UPDATE': '/icons/edit.svg',
+      'DOCUMENT_DELETE': '/icons/delete.svg',
+      'TASK_ASSIGNED': '/icons/assignment.svg',
+      'TASK_COMPLETED': '/icons/check_circle.svg',
+      'APPROVAL_REQUESTED': '/icons/schedule.svg',
+      'APPROVAL_APPROVED': '/icons/thumb_up.svg',
+      'APPROVAL_REJECTED': '/icons/thumb_down.svg'
     };
-    return icons[activityType] || 'fas fa-info-circle';
+    return icons[activityType] || '/icons/info.svg';
   }
 
   getActivityTitle(activityType: string): string {

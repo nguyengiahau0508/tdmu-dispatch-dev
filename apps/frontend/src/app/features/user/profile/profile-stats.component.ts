@@ -9,16 +9,15 @@ import { NotificationService } from '../../../core/services/notification.service
   imports: [CommonModule],
   template: `
     <div class="stats-container">
-      <div class="stats-header">
-        <h2>Thống kê Profile</h2>
-        <p>Tổng quan về hoạt động và thông tin tài khoản</p>
-      </div>
 
       <div class="stats-content" *ngIf="stats">
         <!-- User Info Card -->
         <div class="stats-card user-info-card">
           <div class="card-header">
-            <h3><i class="fas fa-user"></i> Thông tin cơ bản</h3>
+            <h3>
+              <img src="/icons/account_circle.svg" alt="User">
+              <span>Thông tin cơ bản</span>
+            </h3>
           </div>
           <div class="card-content">
             <div class="user-avatar">
@@ -30,10 +29,22 @@ import { NotificationService } from '../../../core/services/notification.service
             </div>
             <div class="user-details">
               <h4>{{ stats.user.fullName }}</h4>
-              <p><i class="fas fa-envelope"></i> {{ stats.user.email }}</p>
-              <p><i class="fas fa-calendar"></i> Tham gia: {{ formatDate(stats.user.createdAt) }}</p>
-              <p><i class="fas fa-sign-in-alt"></i> Đăng nhập cuối: {{ formatDate(stats.user.lastLoginAt || null) }}</p>nnn
-              <p><i class="fas fa-chart-line"></i> Số lần đăng nhập: {{ stats.user.loginCount }}</p>
+              <p>
+                <img src="/icons/email.svg" alt="Email">
+                <span>{{ stats.user.email }}</span>
+              </p>
+              <p>
+                <img src="/icons/calendar.svg" alt="Calendar">
+                <span>Tham gia: {{ formatDate(stats.user.createdAt) }}</span>
+              </p>
+              <p>
+                <img src="/icons/login.svg" alt="Login">
+                <span>Đăng nhập cuối: {{ formatDate(stats.user.lastLoginAt || null) }}</span>
+              </p>
+              <p>
+                <img src="/icons/analytics.svg" alt="Analytics">
+                <span>Số lần đăng nhập: {{ stats.user.loginCount }}</span>
+              </p>
             </div>
           </div>
         </div>
@@ -126,36 +137,20 @@ import { NotificationService } from '../../../core/services/notification.service
   `,
   styles: [`
     .stats-container {
-      max-width: 1200px;
       margin: 0 auto;
-      padding: 20px;
-    }
-
-    .stats-header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .stats-header h2 {
-      color: #333;
-      margin-bottom: 10px;
-    }
-
-    .stats-header p {
-      color: #666;
-      font-size: 16px;
     }
 
     .stats-content {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
+      gap: 24px;
     }
 
     .stats-card {
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      background: var(--color-background-primary);
+      border-radius: 12px;
+      box-shadow: var(--shadow-default);
+      border: 1px solid var(--color-border);
       overflow: hidden;
     }
 
@@ -164,17 +159,25 @@ import { NotificationService } from '../../../core/services/notification.service
     }
 
     .card-header {
-      background: #007bff;
-      color: white;
-      padding: 15px 20px;
+      background: var(--color-primary);
+      color: var(--color-text-on-primary);
+      padding: 20px 24px;
     }
 
     .card-header h3 {
       margin: 0;
       font-size: 18px;
+      font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+    }
+
+    .card-header img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
     }
 
     .card-content {

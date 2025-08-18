@@ -34,6 +34,27 @@ export interface DocumentActionInput {
   transferToUserId?: number;
 }
 
+export interface DocumentProcessingHistoryItem {
+  id: number;
+  actionType: string;
+  actionByUser?: {
+    id: number;
+    fullName: string;
+    email: string;
+  };
+  actionAt: Date;
+  note?: string;
+  metadata?: string;
+  stepName: string;
+  stepType: string;
+  createdAt: Date;
+}
+
+export interface DocumentProcessingHistoryResponse {
+  data: DocumentProcessingHistoryItem[];
+  totalCount: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -195,11 +216,24 @@ export class DocumentProcessingApolloService {
             message
           }
           data {
-            documentId
-            workflowInstanceId
-            actionType
-            message
-            workflowStatus
+            id
+            title
+            content
+            documentType
+            documentCategoryId
+            documentCategory {
+              id
+              name
+            }
+            fileId
+            file {
+              id
+              driveFileId
+              isPublic
+            }
+            status
+            createdAt
+            updatedAt
           }
         }
       }
@@ -217,6 +251,39 @@ export class DocumentProcessingApolloService {
   getPendingDocumentCount(): Observable<number> {
     return this.getDocumentsForProcessing().pipe(
       map(documents => documents.length)
+    );
+  }
+
+  // Get document processing history
+  getDocumentProcessingHistory(documentId: number): Observable<DocumentProcessingHistoryResponse> {
+    const query = gql`
+      query GetDocumentProcessingHistory($documentId: Int!) {
+        documentProcessingHistory(documentId: $documentId) {
+          data {
+            id
+            actionType
+            actionByUser {
+              id
+              fullName
+              email
+            }
+            actionAt
+            note
+            metadata
+            stepName
+            stepType
+            createdAt
+          }
+          totalCount
+        }
+      }
+    `;
+
+    return this.apollo.watchQuery<any>({ 
+      query, 
+      variables: { documentId } 
+    }).valueChanges.pipe(
+      map(result => result.data.documentProcessingHistory)
     );
   }
 }

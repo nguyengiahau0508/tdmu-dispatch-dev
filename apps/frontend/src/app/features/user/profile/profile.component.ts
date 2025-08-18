@@ -12,17 +12,12 @@ import { NotificationService } from '../../../core/services/notification.service
   imports: [CommonModule, ReactiveFormsModule],
   template: `
     <div class="profile-container">
-      <div class="profile-header">
-        <h1>Quản lý Profile</h1>
-        <p>Cập nhật thông tin cá nhân và cài đặt tài khoản</p>
-      </div>
-
       <div class="profile-content" *ngIf="profile">
         <!-- Avatar Section -->
         <div class="avatar-section">
           <div class="avatar-container">
             <img 
-              [src]="profile.avatar || '/assets/images/default-avatar.png'" 
+              [src]="profile.avatar || '/icons/account_circle.svg'" 
               alt="Avatar" 
               class="avatar-image"
             />
@@ -39,7 +34,8 @@ import { NotificationService } from '../../../core/services/notification.service
                 class="btn btn-primary btn-sm" 
                 (click)="fileInput.click()"
               >
-                <i class="fas fa-camera"></i> Thay đổi
+                <img src="/icons/camera.svg" alt="Change">
+                <span>Thay đổi</span>
               </button>
               <button 
                 type="button" 
@@ -47,7 +43,8 @@ import { NotificationService } from '../../../core/services/notification.service
                 (click)="removeAvatar()"
                 *ngIf="profile.avatar"
               >
-                <i class="fas fa-trash"></i> Xóa
+                <img src="/icons/delete.svg" alt="Remove">
+                <span>Xóa</span>
               </button>
             </div>
           </div>
@@ -264,6 +261,7 @@ import { NotificationService } from '../../../core/services/notification.service
               class="btn btn-primary" 
               [disabled]="profileForm.invalid || isSubmitting"
             >
+              <img *ngIf="!isSubmitting" src="/icons/save.svg" alt="Save">
               <span *ngIf="isSubmitting">Đang cập nhật...</span>
               <span *ngIf="!isSubmitting">Cập nhật Profile</span>
             </button>
@@ -272,7 +270,8 @@ import { NotificationService } from '../../../core/services/notification.service
               class="btn btn-secondary" 
               (click)="resetForm()"
             >
-              Đặt lại
+              <img src="/icons/refresh.svg" alt="Reset">
+              <span>Đặt lại</span>
             </button>
           </div>
         </form>
@@ -286,36 +285,23 @@ import { NotificationService } from '../../../core/services/notification.service
 
       <!-- Error State -->
       <div class="error-state" *ngIf="error">
+        <img src="/icons/error.svg" alt="Error">
         <p>{{ error }}</p>
-        <button class="btn btn-primary" (click)="loadProfile()">Thử lại</button>
+        <button class="btn btn-primary" (click)="loadProfile()">
+          <img src="/icons/refresh.svg" alt="Retry">
+          <span>Thử lại</span>
+        </button>
       </div>
     </div>
   `,
   styles: [`
     .profile-container {
-      max-width: 800px;
       margin: 0 auto;
-      padding: 20px;
-    }
-
-    .profile-header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .profile-header h1 {
-      color: #333;
-      margin-bottom: 10px;
-    }
-
-    .profile-header p {
-      color: #666;
-      font-size: 16px;
     }
 
     .avatar-section {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 32px;
     }
 
     .avatar-container {
@@ -328,8 +314,9 @@ import { NotificationService } from '../../../core/services/notification.service
       height: 120px;
       border-radius: 50%;
       object-fit: cover;
-      border: 3px solid #fff;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border: 3px solid var(--color-background-primary);
+      box-shadow: var(--shadow-default);
+      background-color: var(--color-background-secondary);
     }
 
     .avatar-overlay {
@@ -338,9 +325,9 @@ import { NotificationService } from '../../../core/services/notification.service
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      gap: 5px;
+      gap: 8px;
       opacity: 0;
-      transition: opacity 0.3s;
+      transition: opacity 0.3s ease;
     }
 
     .avatar-container:hover .avatar-overlay {
@@ -348,10 +335,11 @@ import { NotificationService } from '../../../core/services/notification.service
     }
 
     .profile-form {
-      background: #fff;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      background: var(--color-background-primary);
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-default);
+      border: 1px solid var(--color-border);
     }
 
     .form-row {
@@ -366,46 +354,53 @@ import { NotificationService } from '../../../core/services/notification.service
 
     .form-group label {
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
       font-weight: 500;
-      color: #333;
+      color: var(--color-text-primary);
+      font-size: 14px;
     }
 
     .form-control {
       width: 100%;
-      padding: 10px 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: 12px 16px;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
       font-size: 14px;
-      transition: border-color 0.3s;
+      transition: all 0.2s ease;
+      background-color: var(--color-background-secondary);
+      color: var(--color-text-primary);
     }
 
     .form-control:focus {
       outline: none;
-      border-color: #007bff;
-      box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+      background-color: var(--color-background-primary);
     }
 
     .form-control.error {
-      border-color: #dc3545;
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px color-mix(in srgb, #ef4444 20%, transparent);
     }
 
     .error-message {
-      color: #dc3545;
+      color: #ef4444;
       font-size: 12px;
-      margin-top: 5px;
+      margin-top: 6px;
+      font-weight: 500;
     }
 
     .section-title {
-      margin: 30px 0 20px 0;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #f0f0f0;
+      margin: 32px 0 24px 0;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--color-border);
     }
 
     .section-title h3 {
-      color: #333;
+      color: var(--color-text-primary);
       margin: 0;
       font-size: 18px;
+      font-weight: 600;
     }
 
     .checkbox-group {
@@ -416,82 +411,135 @@ import { NotificationService } from '../../../core/services/notification.service
       display: flex;
       align-items: center;
       cursor: pointer;
-      font-weight: normal;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      font-size: 14px;
     }
 
     .checkbox-label input[type="checkbox"] {
-      margin-right: 10px;
+      margin-right: 12px;
+      width: 16px;
+      height: 16px;
+      accent-color: var(--color-primary);
     }
 
     .form-actions {
       display: flex;
-      gap: 15px;
+      gap: 16px;
       justify-content: center;
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid #eee;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--color-border);
     }
 
     .btn {
-      padding: 10px 20px;
+      padding: 12px 24px;
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
       font-weight: 500;
-      transition: all 0.3s;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 120px;
+      justify-content: center;
     }
 
     .btn-primary {
-      background: #007bff;
-      color: white;
+      background: var(--color-primary);
+      color: var(--color-text-on-primary);
     }
 
     .btn-primary:hover:not(:disabled) {
-      background: #0056b3;
+      background: color-mix(in srgb, var(--color-primary) 80%, black);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-default);
     }
 
     .btn-primary:disabled {
-      background: #ccc;
+      background: var(--color-background-secondary);
+      color: var(--color-text-secondary);
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
 
     .btn-secondary {
-      background: #6c757d;
-      color: white;
+      background: var(--color-background-secondary);
+      color: var(--color-text-primary);
+      border: 1px solid var(--color-border);
     }
 
     .btn-secondary:hover {
-      background: #545b62;
+      background: var(--color-background-primary);
+      border-color: var(--color-primary);
+      color: var(--color-primary);
     }
 
     .btn-danger {
-      background: #dc3545;
+      background: #ef4444;
       color: white;
     }
 
     .btn-danger:hover {
-      background: #c82333;
+      background: #dc2626;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-default);
     }
 
     .btn-sm {
-      padding: 5px 10px;
+      padding: 8px 16px;
       font-size: 12px;
+      min-width: auto;
+    }
+
+    .btn img {
+      width: 16px;
+      height: 16px;
+      object-fit: contain;
+      filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+    }
+
+    .btn-secondary img {
+      filter: brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+    }
+
+    .btn-secondary:hover img {
+      filter: brightness(0) saturate(100%) invert(27%) sepia(87%) saturate(5091%) hue-rotate(202deg) brightness(94%) contrast(101%);
     }
 
     .loading-state, .error-state {
       text-align: center;
-      padding: 40px;
+      padding: 48px 24px;
+      background: var(--color-background-primary);
+      border-radius: 12px;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-default);
     }
 
     .spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #007bff;
+      border: 4px solid var(--color-background-secondary);
+      border-top: 4px solid var(--color-primary);
       border-radius: 50%;
       width: 40px;
       height: 40px;
       animation: spin 1s linear infinite;
-      margin: 0 auto 20px;
+      margin: 0 auto 16px;
+    }
+
+    .error-state img {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      opacity: 0.6;
+    }
+
+    .error-state p {
+      color: var(--color-text-secondary);
+      margin-bottom: 16px;
+      font-size: 16px;
     }
 
     @keyframes spin {
@@ -506,6 +554,16 @@ import { NotificationService } from '../../../core/services/notification.service
       
       .form-actions {
         flex-direction: column;
+        gap: 12px;
+      }
+
+      .btn {
+        min-width: auto;
+        width: 100%;
+      }
+
+      .profile-form {
+        padding: 24px 16px;
       }
     }
   `]
