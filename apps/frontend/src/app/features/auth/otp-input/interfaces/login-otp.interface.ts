@@ -5,4 +5,5 @@ export interface ILoginOtpInput {
 
 export interface ILoginOtpOutput {
   accessToken: string;
+  refreshToken?: string;
 }

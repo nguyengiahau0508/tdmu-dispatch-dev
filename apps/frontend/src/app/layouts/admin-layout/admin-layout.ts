@@ -83,7 +83,14 @@ export class AdminLayout {
   onLogout() {
     this.authService.logout().subscribe({
       next: response => {
-        this.router.navigate(['auth'])
+        console.log('Logout successful:', response);
+        // Force redirect to auth page
+        window.location.href = '/auth/login';
+      },
+      error: error => {
+        console.error('Logout error:', error);
+        // Use forceLogout method for consistent cleanup
+        this.authService.forceLogout();
       }
     })
   }

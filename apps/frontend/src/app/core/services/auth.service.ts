@@ -11,12 +11,16 @@ import { ILoginOtpInput, ILoginOtpOutput } from '../../features/auth/otp-input/i
 import { ISentOtpInput, ISentOtpOutput } from '../../features/auth/otp-input/interfaces/sent-otp.interface';
 import { LOGOUT_MUTATION, REFRESH_TOKEN_MUTAION } from '../../features/auth/auth.mutations';
 import { UserState } from '../state/user.state';
+import { TokenRefreshHttpService } from './token-refresh-http.service';
+import { AuthStateManagerService } from './auth-state-manager.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private apollo = inject(Apollo);
   private authState = inject(AuthState)
   private userState = inject(UserState)
+  private tokenRefreshService = inject(TokenRefreshHttpService)
+  private authStateManager = inject(AuthStateManagerService)
 
   login(credentials: ILoginInput): Observable<IApiResponse<ILoginOutput>> {
     return this.apollo.mutate<{
@@ -28,6 +32,7 @@ export class AuthService {
       tap(response => {
         const accessToken = response.data?.signIn.data?.accessToken
         if (accessToken) this.authState.setAccessToken(accessToken)
+        // Backend không trả về refresh token, nên không lưu
       }),
       map(response => response.data!.signIn)
     );
@@ -43,6 +48,7 @@ export class AuthService {
       tap(response => {
         const accessToken = response.data?.signInWithOtp.data?.accessToken
         if (accessToken) this.authState.setAccessToken(accessToken)
+        // Backend không trả về refresh token, nên không lưu
       }),
       map(response => response.data!.signInWithOtp)
     )
@@ -72,11 +78,21 @@ export class AuthService {
       tap(response => {
         const accessToken = response.data?.refreshToken.data?.accessToken
         if (accessToken) this.authState.setAccessToken(accessToken)
+        // Backend không trả về refresh token mới
       }),
       map(response => response.data!.refreshToken)
     )
   }
 
+  /**
+   * Force logout ngay cả khi API call thất bại
+   */
+  forceLogout(): void {
+    // Clear Apollo cache trước
+    this.authStateManager.clearApolloCache(this.apollo.client);
+    // Sau đó force logout
+    this.authStateManager.forceLogout();
+  }
 
   logout(): Observable<IApiResponse<{ status: boolean }>> {
     return this.apollo.mutate<{
@@ -85,8 +101,11 @@ export class AuthService {
       mutation: LOGOUT_MUTATION
     }).pipe(
       tap(() => {
-        this.authState.clearAccessToken();
-        this.userState.clearUser();
+        // Clear Apollo cache trước
+        this.authStateManager.clearApolloCache(this.apollo.client);
+        // Sau đó force logout
+        this.authStateManager.forceLogout();
+        console.log('Logout completed: All data cleared');
       }),
       map(response => response.data!.logout)
     );

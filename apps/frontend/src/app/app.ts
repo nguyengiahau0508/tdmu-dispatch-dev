@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
-import { AuthService } from './core/services/auth.service';
-import { UsersService } from './core/services/users.service';
 
 @Component({
   selector: 'app-root',
@@ -12,18 +10,9 @@ import { UsersService } from './core/services/users.service';
 export class App {
   protected title = 'frontend';
   constructor(
-    private authService: AuthService,
-    private usersService: UsersService,
     private router: Router,
-    //private toastr: ToastrService
   ) {
-    this.authService.refreshToken().subscribe({
-      next: () => {
-        this.usersService.getCurrentUserData().subscribe()
-      },
-      error: () => {
-        this.router.navigate(['auth'])
-      }
-    })
+    // App initialization đã được xử lý trong app.init.ts
+    // Không cần refresh token ở đây để tránh vòng lặp
   }
 }

@@ -41,10 +41,13 @@ import { DocumentDetailComponent } from '../document-detail/document-detail.comp
             </select>
             <select [(ngModel)]="selectedStatus" (change)="applyFilters()" class="filter-select">
               <option value="">Tất cả trạng thái</option>
-              <option value="draft">Nháp</option>
-              <option value="pending">Chờ xử lý</option>
-              <option value="approved">Đã duyệt</option>
-              <option value="rejected">Từ chối</option>
+              <option value="DRAFT">Nháp</option>
+              <option value="PENDING">Chờ xử lý</option>
+              <option value="PROCESSING">Đang xử lý</option>
+              <option value="APPROVED">Đã duyệt</option>
+              <option value="REJECTED">Từ chối</option>
+              <option value="COMPLETED">Đã hoàn thành</option>
+              <option value="CANCELLED">Đã hủy</option>
             </select>
           </div>
         </div>
@@ -727,19 +730,12 @@ export class AllDocuments implements OnInit {
   }
 
   applyFilters(): void {
-    // console.log('applyFilters called');
-    // console.log('this.documents:', this.documents);
-    // console.log('this.documents length:', this.documents?.length);
-    
     if (!this.documents) {
-      console.log('Documents is null/undefined, setting empty array');
       this.filteredDocuments = [];
       return;
     }
 
     this.filteredDocuments = this.documents.filter(document => {
-      // console.log('Filtering document:', document);
-      
       // Search filter
       const matchesSearch = !this.searchTerm || 
         document.title?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
@@ -751,16 +747,10 @@ export class AllDocuments implements OnInit {
 
       // Status filter
       const matchesStatus = !this.selectedStatus || 
-        (document.status || 'DRAFT') === this.selectedStatus;
+        document.status === this.selectedStatus;
 
-      const matches = matchesSearch && matchesType && matchesStatus;
-      // console.log(`Document ${document.id} matches:`, matches, 'search:', matchesSearch, 'type:', matchesType, 'status:', matchesStatus);
-      
-      return matches;
+      return matchesSearch && matchesType && matchesStatus;
     });
-    
-    // console.log('Filtered documents:', this.filteredDocuments);
-    // console.log('Filtered documents length:', this.filteredDocuments.length);
   }
 
   changePage(page: number): void {

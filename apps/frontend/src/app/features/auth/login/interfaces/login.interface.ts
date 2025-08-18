@@ -8,6 +8,6 @@ export interface ILoginInput {
 
 export interface ILoginOutput {
   accessToken: string;
-  //refreshToken: string;
+  refreshToken?: string;
   user: IUser; // Sử dụng User interface đã được chuyển đổi cho Angular
 }

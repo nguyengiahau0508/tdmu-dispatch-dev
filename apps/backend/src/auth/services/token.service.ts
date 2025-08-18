@@ -131,23 +131,38 @@ export class TokenService {
   }
 
   async extractToken(token: string) {
-    const decode: ITokenPayload = await this.jwtService.verifyAsync(token, {
-      secret: this.jwtConfig.secret,
-    });
-    if (!decode)
-      throw new UnauthorizedException({
-        message: 'Có lổi xảy ra vui lòng thử lại',
-        code: ErrorCode.TOKEN_INVALID,
+    try {
+      const decode: ITokenPayload = await this.jwtService.verifyAsync(token, {
+        secret: this.jwtConfig.secret,
       });
+      if (!decode)
+        throw new UnauthorizedException({
+          message: 'Có lổi xảy ra vui lòng thử lại',
+          code: ErrorCode.TOKEN_INVALID,
+        });
 
-    const key = CacheKeyBuilder.token(decode.tokenId);
-    const existsToken = this.cacheService.get(key);
-    if (!existsToken)
-      throw new UnauthorizedException({
-        message: 'Có lổi xảy ra vui lòng thử lại',
-        code: ErrorCode.TOKEN_INVALID,
-      });
+      const key = CacheKeyBuilder.token(decode.tokenId);
+      const existsToken = await this.cacheService.get(key);
+      if (!existsToken)
+        throw new UnauthorizedException({
+          message: 'Có lổi xảy ra vui lòng thử lại',
+          code: ErrorCode.TOKEN_INVALID,
+        });
 
-    return decode;
+      return decode;
+    } catch (error) {
+      // Nếu token đã hết hạn, thử decode mà không verify để lấy thông tin user
+      if (error.name === 'TokenExpiredError') {
+        try {
+          const decoded = this.jwtService.decode(token) as ITokenPayload;
+          if (decoded && decoded.sub && decoded.email && decoded.role) {
+            return decoded;
+          }
+        } catch (decodeError) {
+          console.error('Error decoding expired token:', decodeError);
+        }
+      }
+      throw error;
+    }
   }
 }

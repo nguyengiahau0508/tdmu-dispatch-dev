@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { routeAnimations } from '../../shared/animations/route-animations';
-import { UserState } from '../../core/state/user.state';
+import { AuthenticationFlowService } from '../../core/services/authentication-flow.service';
 
 @Component({
   selector: 'app-auth-layout',
@@ -10,16 +10,18 @@ import { UserState } from '../../core/state/user.state';
   styleUrl: './auth-layout.css',
   animations: [routeAnimations]
 })
-export class AuthLayout {
+export class AuthLayout implements OnInit {
   getAnimationData() {
     return location.pathname; // hoặc router url để thay đổi animation khi route đổi
   }
 
   constructor(
     private router: Router,
-    private userState: UserState
-  ) {
-    const currentUser = this.userState.getUser()
-    if (currentUser) this.router.navigate([''])
+    private authFlowService: AuthenticationFlowService
+  ) {}
+
+  ngOnInit() {
+    // Kiểm tra authentication status
+    this.authFlowService.checkAuthLayoutStatus();
   }
 }

@@ -10,6 +10,11 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private authState: AuthState) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    // Chỉ áp dụng cho non-GraphQL requests để tránh xung đột với TokenInterceptor
+    if (req.url.includes('/graphql')) {
+      return next.handle(req);
+    }
+
     const token = this.authState.getAccessToken();
 
     if (token) {

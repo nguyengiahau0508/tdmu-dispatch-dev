@@ -10,6 +10,7 @@ import { appInitializerFactory } from './core/init/app.init';
 import { providePrimeNG } from 'primeng/config';
 import { Tdmu } from '../theme/tdmu';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+import { TokenInterceptor } from './core/interceptors/token-interceptor';
 import Aura from '@primeuix/themes/aura';
 
 export const appConfig: ApplicationConfig = {
@@ -30,6 +31,11 @@ export const appConfig: ApplicationConfig = {
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
       multi: true
     }
   ]

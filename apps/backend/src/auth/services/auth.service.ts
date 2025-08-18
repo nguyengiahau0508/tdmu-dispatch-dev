@@ -144,35 +144,70 @@ export class AuthService {
   }
 
   async refreshToken(@Req() req: Request): Promise<RefreshTokenOutput> {
-    const refreshToken = req.cookies['refreshToken'];
-    if (!refreshToken)
+    // Thử lấy token từ cookies trước
+    let token = req.cookies['refreshToken'];
+    
+    // Nếu không có trong cookies, thử lấy từ Authorization header
+    if (!token) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7); // Bỏ 'Bearer ' prefix
+      }
+    }
+    
+    if (!token)
       throw new UnauthorizedException({
         message: 'Có lổi xảy ra',
         code: ErrorCode.TOKEN_INVALID,
       });
-    const decode = await this.tokenService.extractToken(refreshToken);
+      
+    try {
+      const decode = await this.tokenService.extractToken(token);
+      
+      // Tạo access token mới từ thông tin user
+      const accessToken = await this.tokenService.generateAccessToken({
+        sub: decode.sub,
+        email: decode.email,
+        role: decode.role,
+      });
 
-    const accessToken = await this.tokenService.generateAccessToken({
-      sub: decode.sub,
-      email: decode.email,
-      role: decode.role,
-    });
-
-    return {
-      accessToken,
-    };
+      return {
+        accessToken,
+      };
+    } catch (error) {
+      console.error('Error refreshing token:', error);
+      throw new UnauthorizedException({
+        message: 'Token không hợp lệ hoặc đã hết hạn',
+        code: ErrorCode.TOKEN_INVALID,
+      });
+    }
   }
 
   async logout(@Req() req: Request, @Res() res: Response) {
-    const refreshToken = req.cookies['refreshToken'];
-    if (!refreshToken)
-      throw new UnauthorizedException({
-        message: 'Có lổi xảy ra',
-        code: ErrorCode.TOKEN_INVALID,
-      });
-    const decode = await this.tokenService.extractToken(refreshToken);
-
-    await this.tokenService.revokeToken(decode.tokenId);
-    res.clearCookie('refreshToken');
+    try {
+      // Thử lấy refreshToken từ cookies
+      const refreshToken = req.cookies['refreshToken'];
+      
+      if (refreshToken) {
+        try {
+          const decode = await this.tokenService.extractToken(refreshToken);
+          // Revoke token nếu có
+          await this.tokenService.revokeToken(decode.tokenId);
+        } catch (error) {
+          console.log('Error revoking token:', error);
+          // Continue with logout even if token revocation fails
+        }
+      }
+      
+      // Clear cookie nếu có
+      res.clearCookie('refreshToken');
+      
+      // Logout thành công ngay cả khi không có refreshToken
+      console.log('User logged out successfully');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Vẫn clear cookie và cho phép logout
+      res.clearCookie('refreshToken');
+    }
   }
 }
