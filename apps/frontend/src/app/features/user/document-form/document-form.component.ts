@@ -14,140 +14,199 @@ import { TaskAssignmentModalComponent } from '../task-assignment/task-assignment
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, TaskAssignmentModalComponent],
   template: `
-    <div class="document-form-overlay" (click)="close()">
-      <div class="document-form-modal" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h3>{{ isEditMode ? 'Chỉnh sửa văn bản' : 'Tạo văn bản mới' }}</h3>
-          <button class="close-btn" (click)="close()">&times;</button>
+    <div class="document-form__backdrop" (click)="close()">
+      <div class="document-form" (click)="$event.stopPropagation()">
+        <div class="document-form__header">
+          <div class="header__content">
+            <h3 class="header__title">{{ isEditMode ? 'Chỉnh sửa văn bản' : 'Tạo văn bản mới' }}</h3>
+            <p class="header__subtitle">{{ isEditMode ? 'Cập nhật thông tin văn bản' : 'Tạo văn bản mới trong hệ thống' }}</p>
+          </div>
+          <button class="header__close-btn" (click)="close()" title="Đóng">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
 
-        <form [formGroup]="documentForm" (ngSubmit)="onSubmit()" class="form-content">
-          <div class="form-group">
-            <label for="title">Tiêu đề *</label>
-            <input 
-              type="text" 
-              id="title"
-              formControlName="title"
-              class="form-control"
-              placeholder="Nhập tiêu đề văn bản"
-            />
-            @if (documentForm.get('title')?.invalid && documentForm.get('title')?.touched) {
-              <div class="error-message">Tiêu đề là bắt buộc</div>
-            }
-          </div>
+        <form [formGroup]="documentForm" (ngSubmit)="onSubmit()" class="document-form__content">
+          <div class="form-section">
+            <h4 class="form-section__title">Thông tin cơ bản</h4>
+            
+            <div class="form-group">
+              <label for="title" class="form-group__label">
+                Tiêu đề văn bản <span class="required">*</span>
+              </label>
+              <input 
+                type="text" 
+                id="title"
+                formControlName="title"
+                class="form-group__input"
+                placeholder="Nhập tiêu đề văn bản"
+              />
+              @if (documentForm.get('title')?.invalid && documentForm.get('title')?.touched) {
+                <div class="form-group__error">Tiêu đề là bắt buộc</div>
+              }
+            </div>
 
-          <div class="form-group">
-            <label for="documentType">Loại văn bản *</label>
-            <select 
-              id="documentType"
-              formControlName="documentType"
-              class="form-control"
-            >
-              <option value="">Chọn loại văn bản</option>
-              <option value="INCOMING">Công văn đến</option>
-              <option value="OUTGOING">Công văn đi</option>
-              <option value="INTERNAL">Nội bộ</option>
-            </select>
-            @if (documentForm.get('documentType')?.invalid && documentForm.get('documentType')?.touched) {
-              <div class="error-message">Loại văn bản là bắt buộc</div>
-            }
-          </div>
-
-          <div class="form-group">
-            <label for="documentCategoryId">Nhóm văn bản *</label>
-            @if (isLoadingCategories) {
-              <div class="loading-categories">Đang tải nhóm văn bản...</div>
-            } @else {
-              <select 
-                id="documentCategoryId"
-                formControlName="documentCategoryId"
-                class="form-control"
-              >
-                <option value="">Chọn nhóm văn bản</option>
-                @for (category of documentCategories; track category.id) {
-                  <option [value]="category.id">{{ category.name }}</option>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="documentType" class="form-group__label">
+                  Loại văn bản <span class="required">*</span>
+                </label>
+                <select 
+                  id="documentType"
+                  formControlName="documentType"
+                  class="form-group__select"
+                >
+                  <option value="">Chọn loại văn bản</option>
+                  <option value="INCOMING">📥 Công văn đến</option>
+                  <option value="OUTGOING">📤 Công văn đi</option>
+                  <option value="INTERNAL">🏢 Nội bộ</option>
+                </select>
+                @if (documentForm.get('documentType')?.invalid && documentForm.get('documentType')?.touched) {
+                  <div class="form-group__error">Loại văn bản là bắt buộc</div>
                 }
-                @if (documentCategories.length === 0) {
-                  <option value="" disabled>Không có nhóm văn bản nào</option>
-                }
-              </select>
-            }
-            @if (documentForm.get('documentCategoryId')?.invalid && documentForm.get('documentCategoryId')?.touched) {
-              <div class="error-message">Nhóm văn bản là bắt buộc</div>
-            }
-            <button type="button" class="btn btn-secondary btn-sm" (click)="testDocumentCategories()" style="margin-top: 8px;">
-              Test API
-            </button>
-          </div>
-
-          <div class="form-group">
-            <label for="content">Nội dung</label>
-            <textarea 
-              id="content"
-              formControlName="content"
-              class="form-control"
-              rows="4"
-              placeholder="Nhập nội dung văn bản"
-            ></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="status">Trạng thái</label>
-            <select 
-              id="status"
-              formControlName="status"
-              class="form-control"
-            >
-              <option value="DRAFT">Bản nháp</option>
-              <option value="PENDING">Chờ xử lý</option>
-              <option value="PROCESSING">Đang xử lý</option>
-              <option value="APPROVED">Đã phê duyệt</option>
-              <option value="REJECTED">Đã từ chối</option>
-              <option value="COMPLETED">Đã hoàn thành</option>
-              <option value="CANCELLED">Đã hủy</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="workflowTemplateId">Quy trình xét duyệt</label>
-            @if (isLoadingTemplates) {
-              <div class="loading-templates">Đang tải quy trình...</div>
-            } @else {
-              <select 
-                id="workflowTemplateId"
-                formControlName="workflowTemplateId"
-                class="form-control"
-              >
-                <option value="">Chọn quy trình xét duyệt (tùy chọn)</option>
-                @for (template of workflowTemplates; track template.id) {
-                  <option [value]="template.id">{{ template.name }}</option>
-                }
-                @if (workflowTemplates.length === 0) {
-                  <option value="" disabled>Không có quy trình nào</option>
-                }
-              </select>
-            }
-            <small class="form-text">Nếu không chọn, hệ thống sẽ tự động chọn quy trình mặc định</small>
-          </div>
-
-          <div class="form-group">
-            <label for="file">File đính kèm</label>
-            <input 
-              type="file" 
-              id="file"
-              (change)="onFileSelected($event)"
-              class="form-control"
-              accept=".pdf,.doc,.docx,.xls,.xlsx,.txt"
-            />
-            @if (selectedFile) {
-              <div class="file-info">
-                <span>{{ selectedFile.name }}</span>
-                <button type="button" class="remove-file-btn" (click)="removeFile()">Xóa</button>
               </div>
-            }
+
+              <div class="form-group">
+                <label for="status" class="form-group__label">Trạng thái</label>
+                <select 
+                  id="status"
+                  formControlName="status"
+                  class="form-group__select"
+                >
+                  <option value="DRAFT">📝 Bản nháp</option>
+                  <option value="PENDING">⏳ Chờ xử lý</option>
+                  <option value="PROCESSING">🔄 Đang xử lý</option>
+                  <option value="APPROVED">✅ Đã phê duyệt</option>
+                  <option value="REJECTED">❌ Đã từ chối</option>
+                  <option value="COMPLETED">🏁 Đã hoàn thành</option>
+                  <option value="CANCELLED">🚫 Đã hủy</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="documentCategoryId" class="form-group__label">
+                Nhóm văn bản <span class="required">*</span>
+              </label>
+              @if (isLoadingCategories) {
+                <div class="form-group__loading">
+                  <div class="loading-spinner"></div>
+                  <span>Đang tải nhóm văn bản...</span>
+                </div>
+              } @else {
+                <select 
+                  id="documentCategoryId"
+                  formControlName="documentCategoryId"
+                  class="form-group__select"
+                >
+                  <option value="">Chọn nhóm văn bản</option>
+                  @for (category of documentCategories; track category.id) {
+                    <option [value]="category.id">{{ category.name }}</option>
+                  }
+                  @if (documentCategories.length === 0) {
+                    <option value="" disabled>Không có nhóm văn bản nào</option>
+                  }
+                </select>
+              }
+              @if (documentForm.get('documentCategoryId')?.invalid && documentForm.get('documentCategoryId')?.touched) {
+                <div class="form-group__error">Nhóm văn bản là bắt buộc</div>
+              }
+            </div>
           </div>
 
-          <div class="form-actions">
+          <div class="form-section">
+            <h4 class="form-section__title">Nội dung và quy trình</h4>
+            
+            <div class="form-group">
+              <label for="content" class="form-group__label">Nội dung văn bản</label>
+              <textarea 
+                id="content"
+                formControlName="content"
+                class="form-group__textarea"
+                rows="4"
+                placeholder="Nhập nội dung văn bản..."
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="workflowTemplateId" class="form-group__label">Quy trình xét duyệt</label>
+              @if (isLoadingTemplates) {
+                <div class="form-group__loading">
+                  <div class="loading-spinner"></div>
+                  <span>Đang tải quy trình...</span>
+                </div>
+              } @else {
+                <select 
+                  id="workflowTemplateId"
+                  formControlName="workflowTemplateId"
+                  class="form-group__select"
+                >
+                  <option value="">Chọn quy trình xét duyệt (tùy chọn)</option>
+                  @for (template of workflowTemplates; track template.id) {
+                    <option [value]="template.id">{{ template.name }}</option>
+                  }
+                  @if (workflowTemplates.length === 0) {
+                    <option value="" disabled>Không có quy trình nào</option>
+                  }
+                </select>
+              }
+              <div class="form-group__help">Nếu không chọn, hệ thống sẽ tự động chọn quy trình mặc định</div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4 class="form-section__title">File đính kèm</h4>
+            
+            <div class="form-group">
+              <label for="file" class="form-group__label">File đính kèm</label>
+              <div class="file-upload">
+                <input 
+                  type="file" 
+                  id="file"
+                  (change)="onFileSelected($event)"
+                  class="file-upload__input"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.txt"
+                />
+                <label for="file" class="file-upload__label">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7,10 12,15 17,10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span>Chọn file hoặc kéo thả vào đây</span>
+                  <small>Hỗ trợ: PDF, DOC, DOCX, XLS, XLSX, TXT</small>
+                </label>
+              </div>
+              @if (selectedFile) {
+                <div class="file-info">
+                  <div class="file-info__content">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14,2 14,8 20,8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                      <polyline points="10,9 9,9 8,9"></polyline>
+                    </svg>
+                    <div class="file-info__details">
+                      <span class="file-info__name">{{ selectedFile.name }}</span>
+                      <span class="file-info__size">{{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB</span>
+                    </div>
+                  </div>
+                  <button type="button" class="file-info__remove" (click)="removeFile()" title="Xóa file">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="document-form__actions">
             @if (isEditMode && document) {
               <button 
                 type="button" 
@@ -155,27 +214,32 @@ import { TaskAssignmentModalComponent } from '../task-assignment/task-assignment
                 (click)="showTaskAssignmentModal = true"
                 title="Giao việc cho nhân viên"
               >
-                <img src="/icons/assignment.svg" alt="Giao việc" style="width: 16px; height: 16px; margin-right: 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                </svg>
                 Giao việc
               </button>
             }
-            <button 
-              type="button" 
-              class="btn btn-secondary" 
-              (click)="close()"
-            >
-              Hủy
-            </button>
-            <button 
-              type="submit" 
-              class="btn btn-primary"
-              [disabled]="documentForm.invalid || isSubmitting"
-            >
-              @if (isSubmitting) {
-                <span class="loading-spinner"></span>
-              }
-              {{ isEditMode ? 'Cập nhật' : 'Tạo' }}
-            </button>
+            <div class="actions__group">
+              <button 
+                type="button" 
+                class="btn btn-secondary" 
+                (click)="close()"
+              >
+                Hủy
+              </button>
+              <button 
+                type="submit" 
+                class="btn btn-primary"
+                [disabled]="documentForm.invalid || isSubmitting"
+              >
+                @if (isSubmitting) {
+                  <div class="loading-spinner"></div>
+                }
+                {{ isEditMode ? 'Cập nhật' : 'Tạo văn bản' }}
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -191,155 +255,385 @@ import { TaskAssignmentModalComponent } from '../task-assignment/task-assignment
     }
   `,
   styles: [`
-    .document-form-overlay {
+    /* ===== Backdrop ===== */
+    .document-form__backdrop {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.5);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 1000;
+      padding: 1rem;
+      box-sizing: border-box;
+      backdrop-filter: blur(4px);
     }
 
-    .document-form-modal {
-      background: var(--color-background-primary);
-      border-radius: 8px;
-      width: 90%;
-      max-width: 600px;
+    /* ===== Container chính ===== */
+    .document-form {
+      background-color: var(--color-background-primary);
+      border-radius: 12px;
+      box-shadow: var(--shadow-default);
+      width: 100%;
+      max-width: 800px;
       max-height: 90vh;
       overflow-y: auto;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 0.25s ease-in-out;
+      border: 1px solid var(--color-border);
     }
 
-    .modal-header {
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.98) translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    /* ===== Header ===== */
+    .document-form__header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 20px;
+      align-items: flex-start;
+      padding: 2rem 2rem 1.5rem 2rem;
       border-bottom: 1px solid var(--color-border);
+      background: linear-gradient(135deg, var(--color-background-primary) 0%, var(--color-background-secondary) 100%);
     }
 
-    .modal-header h3 {
-      margin: 0;
-      font-size: 1.25rem;
-      font-weight: 600;
+    .header__content {
+      flex: 1;
+    }
+
+    .header__title {
+      font-size: 1.75rem;
+      font-weight: 700;
       color: var(--color-text-primary);
+      margin: 0 0 0.5rem 0;
+      line-height: 1.2;
     }
 
-    .close-btn {
+    .header__subtitle {
+      font-size: 0.95rem;
+      color: var(--color-text-secondary);
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .header__close-btn {
       background: none;
       border: none;
-      font-size: 1.5rem;
       cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 8px;
       color: var(--color-text-secondary);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 1rem;
     }
 
-    .close-btn:hover {
-      color: var(--color-text-primary);
-    }
-
-    .form-content {
-      padding: 20px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: var(--color-text-primary);
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--color-border);
-      border-radius: 6px;
-      font-size: 14px;
+    .header__close-btn:hover {
       background-color: var(--color-background-secondary);
       color: var(--color-text-primary);
+      transform: scale(1.05);
     }
 
-    .form-control:focus {
+    /* ===== Content ===== */
+    .document-form__content {
+      padding: 2rem;
+      flex: 1;
+    }
+
+    /* ===== Form Sections ===== */
+    .form-section {
+      margin-bottom: 2rem;
+    }
+
+    .form-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-section__title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin: 0 0 1.25rem 0;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--color-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-section__title::before {
+      content: '';
+      width: 4px;
+      height: 1.1rem;
+      background: var(--color-primary);
+      border-radius: 2px;
+    }
+
+    /* ===== Form Groups ===== */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-group__label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+    }
+
+    .required {
+      color: #dc2626;
+      font-weight: 600;
+    }
+
+    .form-group__input,
+    .form-group__select,
+    .form-group__textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      background-color: var(--color-background-secondary);
+      color: var(--color-text-primary);
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+
+    .form-group__input:focus,
+    .form-group__select:focus,
+    .form-group__textarea:focus {
       outline: none;
       border-color: var(--color-primary);
       box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
+      background-color: var(--color-background-primary);
     }
 
-    .error-message {
+    .form-group__textarea {
+      resize: vertical;
+      min-height: 120px;
+      font-family: inherit;
+    }
+
+    .form-group__error {
       color: #dc2626;
-      font-size: 12px;
-      margin-top: 4px;
+      font-size: 0.8rem;
+      margin-top: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
     }
 
-    .loading-categories {
-      padding: 10px 12px;
-      background: var(--color-background-secondary);
-      border: 1px solid var(--color-border);
-      border-radius: 6px;
+    .form-group__error::before {
+      content: '⚠️';
+      font-size: 0.75rem;
+    }
+
+    .form-group__help {
       color: var(--color-text-secondary);
-      font-size: 14px;
+      font-size: 0.8rem;
+      margin-top: 0.25rem;
       font-style: italic;
     }
 
+    .form-group__loading {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: var(--color-background-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      color: var(--color-text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* ===== Form Row ===== */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    /* ===== File Upload ===== */
+    .file-upload {
+      position: relative;
+    }
+
+    .file-upload__input {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .file-upload__label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      border: 2px dashed var(--color-border);
+      border-radius: 8px;
+      background-color: var(--color-background-secondary);
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      gap: 0.5rem;
+    }
+
+    .file-upload__label:hover {
+      border-color: var(--color-primary);
+      background-color: color-mix(in srgb, var(--color-primary) 5%, var(--color-background-secondary));
+      color: var(--color-primary);
+    }
+
+    .file-upload__label svg {
+      color: var(--color-text-secondary);
+      transition: color 0.2s ease;
+    }
+
+    .file-upload__label:hover svg {
+      color: var(--color-primary);
+    }
+
+    .file-upload__label span {
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .file-upload__label small {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+
+    /* ===== File Info ===== */
     .file-info {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-top: 8px;
-      padding: 8px 12px;
-      background: var(--color-background-secondary);
-      border-radius: 6px;
-      font-size: 14px;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      background: color-mix(in srgb, var(--color-primary) 5%, var(--color-background-secondary));
+      border: 1px solid color-mix(in srgb, var(--color-primary) 20%, var(--color-border));
+      border-radius: 8px;
+      margin-top: 0.75rem;
+    }
+
+    .file-info__content {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex: 1;
+    }
+
+    .file-info__content svg {
+      color: var(--color-primary);
+      flex-shrink: 0;
+    }
+
+    .file-info__details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .file-info__name {
+      font-weight: 500;
+      color: var(--color-text-primary);
+      font-size: 0.9rem;
+    }
+
+    .file-info__size {
+      font-size: 0.8rem;
       color: var(--color-text-secondary);
     }
 
-    .remove-file-btn {
-      background: #ef4444;
-      color: white;
+    .file-info__remove {
+      background: none;
       border: none;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
       cursor: pointer;
-    }
-
-    .form-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: flex-end;
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid var(--color-border);
-    }
-
-    .btn {
-      padding: 10px 20px;
-      border: none;
+      padding: 0.5rem;
       border-radius: 6px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
+      color: var(--color-text-secondary);
+      transition: all 0.2s ease;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+    }
+
+    .file-info__remove:hover {
+      background-color: #dc2626;
+      color: white;
+      transform: scale(1.05);
+    }
+
+    /* ===== Actions ===== */
+    .document-form__actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      border-top: 1px solid var(--color-border);
+      background: var(--color-background-secondary);
+      gap: 1rem;
+    }
+
+    .actions__group {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    /* ===== Buttons ===== */
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      white-space: nowrap;
     }
 
     .btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
-      background-color: var(--color-background-disabled);
-      color: var(--color-text-secondary);
+      transform: none !important;
     }
 
     .btn-primary {
       background: var(--color-primary);
       color: var(--color-text-on-primary);
+      box-shadow: 0 2px 4px color-mix(in srgb, var(--color-primary) 30%, transparent);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--color-primary) 90%, black);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px color-mix(in srgb, var(--color-primary) 40%, transparent);
     }
 
     .btn-secondary {
@@ -347,15 +641,27 @@ import { TaskAssignmentModalComponent } from '../task-assignment/task-assignment
       color: var(--color-text-on-primary);
     }
 
-    .btn-sm {
-      padding: 6px 12px;
-      font-size: 12px;
+    .btn-secondary:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--color-text-secondary) 90%, black);
+      transform: translateY(-1px);
     }
 
+    .btn-info {
+      background: color-mix(in srgb, var(--color-primary) 15%, var(--color-background-secondary));
+      color: var(--color-primary);
+      border: 1px solid color-mix(in srgb, var(--color-primary) 30%, var(--color-border));
+    }
+
+    .btn-info:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--color-primary) 25%, var(--color-background-secondary));
+      transform: translateY(-1px);
+    }
+
+    /* ===== Loading Spinner ===== */
     .loading-spinner {
       width: 16px;
       height: 16px;
-      border: 2px solid var(--color-text-on-primary);
+      border: 2px solid currentColor;
       border-top: 2px solid transparent;
       border-radius: 50%;
       animation: spin 1s linear infinite;
@@ -364,6 +670,71 @@ import { TaskAssignmentModalComponent } from '../task-assignment/task-assignment
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+
+    /* ===== Responsive Design ===== */
+    @media (max-width: 768px) {
+      .document-form {
+        max-width: 95%;
+        margin: 0.5rem;
+      }
+
+      .document-form__header {
+        padding: 1.5rem 1.5rem 1rem 1.5rem;
+      }
+
+      .document-form__content {
+        padding: 1.5rem;
+      }
+
+      .document-form__actions {
+        padding: 1rem 1.5rem;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .actions__group {
+        width: 100%;
+        justify-content: stretch;
+      }
+
+      .btn {
+        flex: 1;
+        justify-content: center;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .header__title {
+        font-size: 1.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .document-form__backdrop {
+        padding: 0.5rem;
+      }
+
+      .document-form {
+        max-width: 100%;
+        margin: 0;
+        border-radius: 8px;
+      }
+
+      .document-form__header {
+        padding: 1rem;
+      }
+
+      .document-form__content {
+        padding: 1rem;
+      }
+
+      .document-form__actions {
+        padding: 1rem;
+      }
     }
   `]
 })
