@@ -1,0 +1,219 @@
+@startuml Notification_Sequence_Diagram
+
+!theme plain
+skinparam sequence {
+    ArrowColor DarkBlue
+    ActorBorderColor DarkBlue
+    LifeLineBorderColor DarkBlue
+    LifeLineBackgroundColor LightBlue
+    ParticipantBorderColor DarkBlue
+    ParticipantBackgroundColor LightBlue
+}
+
+title Sơ đồ tuần tự - Thông báo và Báo cáo
+
+actor "User" as U
+participant "Frontend" as F
+participant "NotificationService" as NS
+participant "ReportService" as RS
+participant "WebSocketService" as WSS
+participant "MailService" as MS
+participant "Database" as DB
+participant "Cache" as C
+
+== Nhận thông báo real-time ==
+
+U -> F: Mở ứng dụng
+F -> NS: subscribeToNotifications(userId)
+NS -> WSS: createConnection(userId)
+WSS --> NS: WebSocket connection
+NS --> F: Connection established
+
+loop Real-time notifications
+    NS -> WSS: sendNotification(notification)
+    WSS -> F: WebSocket message
+    F -> F: Update notification badge
+    F -> F: Show notification toast
+    F --> U: Hiển thị thông báo mới
+end
+
+== Xem danh sách thông báo ==
+
+U -> F: Truy cập trang notifications
+F -> NS: getNotifications(userId, pagination)
+NS -> DB: SELECT * FROM notifications WHERE userId = ? ORDER BY createdAt DESC LIMIT ? OFFSET ?
+DB --> NS: notifications list
+NS --> F: Notification array
+F --> U: Hiển thị danh sách thông báo
+
+== Đánh dấu đã đọc ==
+
+U -> F: Click vào thông báo
+F -> NS: markAsRead(notificationId)
+NS -> DB: UPDATE notifications SET isRead = true WHERE id = ?
+DB --> NS: Success
+NS -> C: updateNotificationCount(userId)
+C --> NS: Success
+NS --> F: Success response
+F -> F: Update notification badge
+F --> U: Cập nhật trạng thái đã đọc
+
+== Cấu hình thông báo ==
+
+U -> F: Truy cập cài đặt thông báo
+F -> NS: getNotificationSettings(userId)
+NS -> DB: SELECT * FROM user_notification_settings WHERE userId = ?
+DB --> NS: settings data
+NS --> F: NotificationSettings object
+F --> U: Hiển thị form cài đặt
+
+U -> F: Thay đổi cài đặt
+F -> NS: updateNotificationSettings(userId, settings)
+NS -> DB: UPDATE user_notification_settings SET emailNotifications = ?, pushNotifications = ? WHERE userId = ?
+DB --> NS: Success
+NS --> F: Success response
+F --> U: Hiển thị thông báo cập nhật thành công
+
+== Gửi thông báo workflow ==
+
+NS -> NS: sendWorkflowNotification(workflowId, action, targetRole)
+NS -> DB: SELECT * FROM users WHERE roles LIKE ?
+DB --> NS: target users list
+
+loop Cho mỗi target user
+    NS -> DB: INSERT INTO notifications (userId, type, title, message, metadata)
+    DB --> NS: notificationId
+    
+    alt Email notifications enabled
+        NS -> MS: sendWorkflowEmail(user.email, notification)
+        MS --> NS: Success
+    end
+    
+    alt Push notifications enabled
+        NS -> WSS: sendPushNotification(userId, notification)
+        WSS --> NS: Success
+    end
+end
+
+== Xem báo cáo tổng quan ==
+
+U -> F: Truy cập trang dashboard
+F -> RS: getDashboardReport(userId)
+RS -> DB: SELECT COUNT(*) FROM documents WHERE status = 'PENDING'
+DB --> RS: pending documents count
+RS -> DB: SELECT COUNT(*) FROM workflow_instances WHERE status = 'IN_PROGRESS'
+DB --> RS: active workflows count
+RS -> DB: SELECT COUNT(*) FROM documents WHERE createdAt >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+DB --> RS: documents this month count
+RS -> DB: SELECT AVG(TIMESTAMPDIFF(HOUR, created_at, updated_at)) FROM workflow_instances WHERE status = 'COMPLETED'
+DB --> RS: average processing time
+RS --> F: DashboardReport object
+F --> U: Hiển thị dashboard tổng quan
+
+== Tạo báo cáo tùy chỉnh ==
+
+U -> F: Chọn loại báo cáo và tham số
+F -> RS: generateCustomReport(reportInput)
+RS -> RS: Validate report parameters
+
+alt Validation failed
+    RS --> F: Throw BadRequestException
+    F --> U: Hiển thị lỗi validation
+else Validation passed
+    alt Report type = "Document Statistics"
+        RS -> DB: SELECT documentType, COUNT(*) FROM documents WHERE createdAt BETWEEN ? AND ? GROUP BY documentType
+        DB --> RS: document stats
+        RS -> DB: SELECT status, COUNT(*) FROM documents WHERE createdAt BETWEEN ? AND ? GROUP BY status
+        DB --> RS: status stats
+        
+    else Report type = "Workflow Performance"
+        RS -> DB: SELECT templateId, AVG(TIMESTAMPDIFF(HOUR, created_at, updated_at)) FROM workflow_instances WHERE status = 'COMPLETED' AND createdAt BETWEEN ? AND ? GROUP BY templateId
+        DB --> RS: workflow performance
+        RS -> DB: SELECT action, COUNT(*) FROM workflow_action_logs WHERE createdAt BETWEEN ? AND ? GROUP BY action
+        DB --> RS: action stats
+        
+    else Report type = "User Activity"
+        RS -> DB: SELECT userId, COUNT(*) FROM user_activities WHERE createdAt BETWEEN ? AND ? GROUP BY userId
+        DB --> RS: user activity
+        RS -> DB: SELECT activityType, COUNT(*) FROM user_activities WHERE createdAt BETWEEN ? AND ? GROUP BY activityType
+        DB --> RS: activity type stats
+    end
+    
+    RS -> RS: generateReport(data, reportInput.format)
+    RS --> F: CustomReport object
+    F --> U: Hiển thị báo cáo tùy chỉnh
+end
+
+== Xuất báo cáo ==
+
+U -> F: Click nút "Xuất báo cáo"
+F -> RS: exportReport(reportId, format)
+RS -> RS: getReportData(reportId)
+
+alt Format = "PDF"
+    RS -> RS: generatePDF(reportData)
+    RS --> F: PDF blob
+    F -> F: Create download link
+    F --> U: Tự động download PDF
+    
+else Format = "Excel"
+    RS -> RS: generateExcel(reportData)
+    RS --> F: Excel blob
+    F -> F: Create download link
+    F --> U: Tự động download Excel
+    
+else Format = "CSV"
+    RS -> RS: generateCSV(reportData)
+    RS --> F: CSV blob
+    F -> F: Create download link
+    F --> U: Tự động download CSV
+end
+
+== Xem thống kê workflow ==
+
+U -> F: Truy cập trang thống kê workflow
+F -> RS: getWorkflowStatistics(timeRange)
+RS -> DB: SELECT status, COUNT(*) FROM workflow_instances WHERE createdAt BETWEEN ? AND ? GROUP BY status
+DB --> RS: workflow status stats
+RS -> DB: SELECT templateId, COUNT(*) FROM workflow_instances WHERE createdAt BETWEEN ? AND ? GROUP BY templateId
+DB --> RS: template usage stats
+RS -> DB: SELECT AVG(TIMESTAMPDIFF(HOUR, created_at, updated_at)) FROM workflow_instances WHERE status = 'COMPLETED' AND createdAt BETWEEN ? AND ?
+DB --> RS: average completion time
+RS -> DB: SELECT MAX(TIMESTAMPDIFF(HOUR, created_at, updated_at)) FROM workflow_instances WHERE status = 'COMPLETED' AND createdAt BETWEEN ? AND ?
+DB --> RS: max completion time
+RS --> F: WorkflowStatistics object
+F --> U: Hiển thị thống kê workflow
+
+== Lập lịch báo cáo ==
+
+U -> F: Tạo báo cáo định kỳ
+F -> RS: scheduleReport(scheduleInput)
+RS -> RS: Validate schedule parameters
+
+alt Validation failed
+    RS --> F: Throw BadRequestException
+    F --> U: Hiển thị lỗi validation
+else Validation passed
+    RS -> DB: INSERT INTO report_schedules (userId, reportType, frequency, recipients, parameters)
+    DB --> RS: scheduleId
+    RS --> F: ReportSchedule object
+    F --> U: Hiển thị thông báo lập lịch thành công
+end
+
+== Gửi báo cáo định kỳ ==
+
+RS -> RS: checkScheduledReports()
+RS -> DB: SELECT * FROM report_schedules WHERE nextRun <= NOW()
+DB --> RS: due schedules list
+
+loop Cho mỗi schedule
+    RS -> RS: generateReport(schedule.reportType, schedule.parameters)
+    RS -> RS: generatePDF(reportData)
+    RS -> MS: sendScheduledReport(schedule.recipients, reportPDF, schedule.reportType)
+    MS --> RS: Success
+    RS -> DB: UPDATE report_schedules SET lastRun = NOW(), nextRun = calculateNextRun(schedule.frequency) WHERE id = ?
+    DB --> RS: Success
+end
+
+@enduml
+

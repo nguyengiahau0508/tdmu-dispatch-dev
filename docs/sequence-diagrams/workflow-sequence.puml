@@ -1,0 +1,188 @@
+@startuml Workflow_Sequence_Diagram
+
+!theme plain
+skinparam sequence {
+    ArrowColor DarkBlue
+    ActorBorderColor DarkBlue
+    LifeLineBorderColor DarkBlue
+    LifeLineBackgroundColor LightBlue
+    ParticipantBorderColor DarkBlue
+    ParticipantBackgroundColor LightBlue
+}
+
+title Sơ đồ tuần tự - Quản lý Workflow
+
+actor "User" as U
+participant "Frontend" as F
+participant "WorkflowService" as WS
+participant "WorkflowPermissionsService" as WPS
+participant "NotificationService" as NS
+participant "Database" as DB
+participant "Cache" as C
+
+== Tạo workflow template ==
+
+U -> F: Nhập thông tin template
+F -> WS: createWorkflowTemplate(templateInput)
+WS -> WS: Validate template data
+
+alt Validation failed
+    WS --> F: Throw BadRequestException
+    F --> U: Hiển thị lỗi validation
+else Validation passed
+    WS -> DB: INSERT INTO workflow_templates (...)
+    DB --> WS: templateId
+    
+    loop Cho mỗi step
+        WS -> DB: INSERT INTO workflow_steps (templateId, ...)
+        DB --> WS: stepId
+    end
+    
+    WS --> F: WorkflowTemplate object
+    F --> U: Hiển thị thông báo tạo template thành công
+end
+
+== Tạo workflow instance ==
+
+U -> F: Chọn template và document
+F -> WS: createWorkflowInstance(instanceInput)
+WS -> WPS: canCreateWorkflow(user, templateId)
+
+alt Không có quyền
+    WPS --> WS: false
+    WS --> F: Throw ForbiddenException
+    F --> U: Hiển thị lỗi "Không có quyền tạo workflow"
+else Có quyền
+    WPS --> WS: true
+    WS -> DB: INSERT INTO workflow_instances (...)
+    DB --> WS: instanceId
+    
+    WS -> DB: SELECT * FROM workflow_steps WHERE templateId = ? ORDER BY orderNumber
+    DB --> WS: steps list
+    
+    WS -> DB: UPDATE workflow_instances SET currentStepId = ? WHERE id = ?
+    DB --> WS: Success
+    
+    WS -> NS: sendWorkflowNotification(instanceId, "CREATED")
+    NS --> WS: Success
+    
+    WS --> F: WorkflowInstance object
+    F --> U: Hiển thị thông báo tạo workflow thành công
+end
+
+== Thực hiện workflow action ==
+
+U -> F: Chọn action (APPROVE/REJECT/TRANSFER/CANCEL/COMPLETE)
+F -> WS: executeAction(actionInput)
+WS -> WPS: canPerformAction(user, currentStep, actionType)
+
+alt Không có quyền
+    WPS --> WS: false
+    WS --> F: Throw ForbiddenException
+    F --> U: Hiển thị lỗi "Không có quyền thực hiện action này"
+else Có quyền
+    WPS --> WS: true
+    
+    alt Action = APPROVE
+        WS -> WS: handleApproveAction(instance)
+        WS -> DB: SELECT * FROM workflow_steps WHERE id > currentStepId ORDER BY orderNumber LIMIT 1
+        DB --> WS: nextStep
+        
+        alt Có bước tiếp theo
+            WS -> DB: UPDATE workflow_instances SET currentStepId = ? WHERE id = ?
+            DB --> WS: Success
+            WS -> NS: sendWorkflowNotification(instanceId, "APPROVED")
+        else Không có bước tiếp theo (hoàn thành)
+            WS -> DB: UPDATE workflow_instances SET status = 'COMPLETED', currentStepId = NULL WHERE id = ?
+            DB --> WS: Success
+            WS -> NS: sendWorkflowNotification(instanceId, "COMPLETED")
+        end
+        
+    else Action = REJECT
+        WS -> WS: handleRejectAction(instance)
+        WS -> DB: UPDATE workflow_instances SET status = 'REJECTED' WHERE id = ?
+        DB --> WS: Success
+        WS -> NS: sendWorkflowNotification(instanceId, "REJECTED")
+        
+    else Action = TRANSFER
+        WS -> WS: handleTransferAction(instance, targetStepId)
+        WS -> DB: UPDATE workflow_instances SET currentStepId = ? WHERE id = ?
+        DB --> WS: Success
+        WS -> NS: sendWorkflowNotification(instanceId, "TRANSFERRED")
+        
+    else Action = CANCEL
+        WS -> WS: handleCancelAction(instance)
+        WS -> DB: UPDATE workflow_instances SET status = 'CANCELLED' WHERE id = ?
+        DB --> WS: Success
+        WS -> NS: sendWorkflowNotification(instanceId, "CANCELLED")
+        
+    else Action = COMPLETE
+        WS -> WS: handleCompleteAction(instance)
+        WS -> DB: UPDATE workflow_instances SET status = 'COMPLETED' WHERE id = ?
+        DB --> WS: Success
+        WS -> NS: sendWorkflowNotification(instanceId, "COMPLETED")
+    end
+    
+    WS -> DB: INSERT INTO workflow_action_logs (...)
+    DB --> WS: logId
+    
+    WS --> F: Updated WorkflowInstance
+    F -> F: Refresh workflow list
+    F --> U: Hiển thị thông báo action thành công
+end
+
+== Xem danh sách workflow đang chờ ==
+
+U -> F: Truy cập trang workflow pending
+F -> WS: getMyPendingWorkflows(userId)
+WS -> DB: SELECT * FROM workflow_instances WHERE currentStepId IN (SELECT id FROM workflow_steps WHERE assignedRole IN ?) AND status = 'IN_PROGRESS'
+DB --> WS: pending workflows list
+WS --> F: WorkflowInstance array
+F --> U: Hiển thị danh sách workflow cần xử lý
+
+== Xem chi tiết workflow ==
+
+U -> F: Click vào workflow
+F -> WS: getWorkflowInstance(id)
+WS -> WPS: canViewWorkflow(user, instance)
+
+alt Không có quyền xem
+    WPS --> WS: false
+    WS --> F: Throw ForbiddenException
+    F --> U: Hiển thị lỗi "Không có quyền xem workflow này"
+else Có quyền xem
+    WPS --> WS: true
+    WS -> DB: SELECT * FROM workflow_instances WHERE id = ?
+    DB --> WS: instance data
+    
+    WS -> DB: SELECT * FROM workflow_action_logs WHERE instanceId = ? ORDER BY createdAt
+    DB --> WS: action logs
+    
+    WS -> DB: SELECT * FROM workflow_steps WHERE templateId = ? ORDER BY orderNumber
+    DB --> WS: steps list
+    
+    WS --> F: WorkflowInstanceDetail { instance, logs, steps }
+    F --> U: Hiển thị chi tiết workflow
+end
+
+== Tìm kiếm workflow ==
+
+U -> F: Nhập từ khóa tìm kiếm
+F -> WS: searchWorkflows(keyword, filters)
+WS -> DB: SELECT * FROM workflow_instances WHERE notes LIKE ? OR id IN (SELECT instanceId FROM workflow_action_logs WHERE note LIKE ?)
+DB --> WS: workflows list
+WS --> F: WorkflowInstance array
+F --> U: Hiển thị kết quả tìm kiếm
+
+== Lọc workflow theo trạng thái ==
+
+U -> F: Chọn bộ lọc trạng thái
+F -> WS: getWorkflowsByStatus(status, pagination)
+WS -> DB: SELECT * FROM workflow_instances WHERE status = ? ORDER BY updatedAt DESC LIMIT ? OFFSET ?
+DB --> WS: workflows list
+WS -> DB: SELECT COUNT(*) FROM workflow_instances WHERE status = ?
+DB --> WS: total count
+WS --> F: PaginatedResponse { data, totalCount, hasNextPage }
+F --> U: Hiển thị danh sách đã lọc
+
+@enduml

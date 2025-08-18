@@ -1,0 +1,225 @@
+@startuml Approval_Sequence_Diagram
+
+!theme plain
+skinparam sequence {
+    ArrowColor DarkBlue
+    ActorBorderColor DarkBlue
+    LifeLineBorderColor DarkBlue
+    LifeLineBackgroundColor LightBlue
+    ParticipantBorderColor DarkBlue
+    ParticipantBackgroundColor LightBlue
+}
+
+title Sơ đồ tuần tự - Quản lý Phê duyệt
+
+actor "Approver" as A
+participant "Frontend" as F
+participant "ApprovalService" as APS
+participant "WorkflowService" as WS
+participant "DocumentService" as DS
+participant "NotificationService" as NS
+participant "Database" as DB
+participant "MailService" as MS
+
+== Phê duyệt văn bản ==
+
+A -> F: Chọn văn bản cần phê duyệt
+F -> WS: getWorkflowInstance(documentId)
+WS -> DB: SELECT * FROM workflow_instances WHERE documentId = ?
+DB --> WS: workflow data
+WS --> F: WorkflowInstance object
+F --> A: Hiển thị form phê duyệt
+
+A -> F: Nhập ý kiến và chọn "Phê duyệt"
+F -> APS: approveDocument(approvalInput)
+APS -> APS: Validate approval data
+
+alt Validation failed
+    APS --> F: Throw BadRequestException
+    F --> A: Hiển thị lỗi validation
+else Validation passed
+    APS -> WS: executeAction(APPROVE, approvalInput)
+    WS -> WS: handleApproveAction(workflowInstance)
+    
+    WS -> DB: SELECT * FROM workflow_steps WHERE id > currentStepId ORDER BY orderNumber LIMIT 1
+    DB --> WS: nextStep
+    
+    alt Có bước tiếp theo
+        WS -> DB: UPDATE workflow_instances SET currentStepId = ? WHERE id = ?
+        DB --> WS: Success
+        
+        WS -> DB: INSERT INTO approval_history (workflowId, stepId, action, approverId, comment)
+        DB --> WS: historyId
+        
+        WS -> NS: sendApprovalNotification(workflowId, "APPROVED", nextStep.assignedRole)
+        NS --> WS: Success
+        
+        WS -> MS: sendApprovalEmail(approver.email, document.title, "APPROVED")
+        MS --> WS: Success
+        
+        WS --> APS: Success
+        APS --> F: ApprovalResult { status: "APPROVED", nextStep }
+        F --> A: Hiển thị thông báo "Đã phê duyệt thành công"
+        
+    else Không có bước tiếp theo (hoàn thành)
+        WS -> DB: UPDATE workflow_instances SET status = 'COMPLETED', currentStepId = NULL WHERE id = ?
+        DB --> WS: Success
+        
+        WS -> DB: INSERT INTO approval_history (workflowId, stepId, action, approverId, comment)
+        DB --> WS: historyId
+        
+        WS -> DS: updateDocumentStatus(documentId, 'APPROVED')
+        DS -> DB: UPDATE documents SET status = 'APPROVED' WHERE id = ?
+        DB --> DS: Success
+        
+        WS -> NS: sendCompletionNotification(workflowId, "COMPLETED")
+        NS --> WS: Success
+        
+        WS -> MS: sendCompletionEmail(creator.email, document.title, "APPROVED")
+        MS --> WS: Success
+        
+        WS --> APS: Success
+        APS --> F: ApprovalResult { status: "COMPLETED" }
+        F --> A: Hiển thị thông báo "Văn bản đã được phê duyệt hoàn toàn"
+    end
+end
+
+== Từ chối văn bản ==
+
+A -> F: Chọn văn bản và nhập lý do từ chối
+F -> APS: rejectDocument(rejectionInput)
+APS -> APS: Validate rejection data
+
+alt Validation failed
+    APS --> F: Throw BadRequestException
+    F --> A: Hiển thị lỗi validation
+else Validation passed
+    APS -> WS: executeAction(REJECT, rejectionInput)
+    WS -> WS: handleRejectAction(workflowInstance)
+    
+    WS -> DB: UPDATE workflow_instances SET status = 'REJECTED' WHERE id = ?
+    DB --> WS: Success
+    
+    WS -> DB: INSERT INTO approval_history (workflowId, stepId, action, approverId, comment)
+    DB --> WS: historyId
+    
+    WS -> DS: updateDocumentStatus(documentId, 'REJECTED')
+    DS -> DB: UPDATE documents SET status = 'REJECTED' WHERE id = ?
+    DB --> DS: Success
+    
+    WS -> NS: sendRejectionNotification(workflowId, "REJECTED")
+    NS --> WS: Success
+    
+    WS -> MS: sendRejectionEmail(creator.email, document.title, rejectionInput.comment)
+    MS --> WS: Success
+    
+    WS --> APS: Success
+    APS --> F: RejectionResult { status: "REJECTED" }
+    F --> A: Hiển thị thông báo "Đã từ chối văn bản"
+end
+
+== Yêu cầu chỉnh sửa ==
+
+A -> F: Chọn văn bản và nhập yêu cầu chỉnh sửa
+F -> APS: requestRevision(revisionInput)
+APS -> APS: Validate revision data
+
+alt Validation failed
+    APS --> F: Throw BadRequestException
+    F --> A: Hiển thị lỗi validation
+else Validation passed
+    APS -> WS: executeAction(TRANSFER, revisionInput)
+    WS -> WS: handleTransferAction(workflowInstance, revisionStepId)
+    
+    WS -> DB: UPDATE workflow_instances SET currentStepId = ? WHERE id = ?
+    DB --> WS: Success
+    
+    WS -> DB: INSERT INTO approval_history (workflowId, stepId, action, approverId, comment)
+    DB --> WS: historyId
+    
+    WS -> DS: updateDocumentStatus(documentId, 'REVISION_REQUESTED')
+    DS -> DB: UPDATE documents SET status = 'REVISION_REQUESTED' WHERE id = ?
+    DB --> DS: Success
+    
+    WS -> NS: sendRevisionNotification(workflowId, "REVISION_REQUESTED")
+    NS --> WS: Success
+    
+    WS -> MS: sendRevisionEmail(creator.email, document.title, revisionInput.comment)
+    MS --> WS: Success
+    
+    WS --> APS: Success
+    APS --> F: RevisionResult { status: "REVISION_REQUESTED" }
+    F --> A: Hiển thị thông báo "Đã yêu cầu chỉnh sửa văn bản"
+end
+
+== Xem lịch sử phê duyệt ==
+
+A -> F: Click vào văn bản để xem lịch sử
+F -> APS: getApprovalHistory(documentId)
+APS -> DB: SELECT * FROM approval_history WHERE workflowId = ? ORDER BY createdAt DESC
+DB --> APS: history list
+APS --> F: ApprovalHistory array
+F --> A: Hiển thị lịch sử phê duyệt
+
+== Tạo báo cáo phê duyệt ==
+
+A -> F: Chọn khoảng thời gian và bộ lọc
+F -> APS: generateApprovalReport(reportInput)
+APS -> DB: SELECT * FROM approval_history WHERE createdAt BETWEEN ? AND ? AND action = ?
+DB --> APS: approval data
+APS -> DB: SELECT COUNT(*) FROM approval_history WHERE action = 'APPROVED' AND createdAt BETWEEN ? AND ?
+DB --> APS: approved count
+APS -> DB: SELECT COUNT(*) FROM approval_history WHERE action = 'REJECTED' AND createdAt BETWEEN ? AND ?
+DB --> APS: rejected count
+APS -> APS: generateReport(approval data, approved count, rejected count)
+APS --> F: ApprovalReport object
+F --> A: Hiển thị báo cáo phê duyệt
+
+== Xem văn bản cần phê duyệt ==
+
+A -> F: Truy cập trang pending approvals
+F -> APS: getPendingApprovals(userId)
+APS -> DB: SELECT * FROM workflow_instances WHERE currentStepId IN (SELECT id FROM workflow_steps WHERE assignedRole IN ?) AND status = 'IN_PROGRESS'
+DB --> APS: pending workflows list
+APS --> F: PendingApproval array
+F --> A: Hiển thị danh sách văn bản cần phê duyệt
+
+== Phê duyệt hàng loạt ==
+
+A -> F: Chọn nhiều văn bản và action
+F -> APS: batchApprove(batchInput)
+APS -> APS: Validate batch input
+
+alt Validation failed
+    APS --> F: Throw BadRequestException
+    F --> A: Hiển thị lỗi validation
+else Validation passed
+    loop Cho mỗi documentId
+        APS -> APS: approveDocument(documentId, batchInput.comment)
+        APS -> WS: executeAction(APPROVE, approvalInput)
+        WS -> WS: handleApproveAction(workflowInstance)
+        WS -> DB: UPDATE workflow_instances SET currentStepId = ? WHERE id = ?
+        DB --> WS: Success
+        WS -> DB: INSERT INTO approval_history (...)
+        DB --> WS: historyId
+    end
+    
+    APS -> NS: sendBatchApprovalNotification(batchInput.documentIds, "BATCH_APPROVED")
+    NS --> APS: Success
+    
+    APS --> F: BatchApprovalResult { processed: count, success: count }
+    F --> A: Hiển thị thông báo "Đã phê duyệt hàng loạt thành công"
+end
+
+== Thống kê phê duyệt ==
+
+A -> F: Truy cập trang thống kê
+F -> APS: getApprovalStatistics(timeRange)
+APS -> DB: SELECT action, COUNT(*) FROM approval_history WHERE createdAt BETWEEN ? AND ? GROUP BY action
+DB --> APS: statistics data
+APS -> DB: SELECT AVG(TIMESTAMPDIFF(HOUR, created_at, updated_at)) FROM workflow_instances WHERE status = 'COMPLETED' AND createdAt BETWEEN ? AND ?
+DB --> APS: average processing time
+APS --> F: ApprovalStatistics object
+F --> A: Hiển thị thống kê phê duyệt
+
+@enduml

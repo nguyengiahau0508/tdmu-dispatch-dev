@@ -1,0 +1,397 @@
+@startuml TDMU_Dispatch_Use_Case_Diagram
+
+!theme plain
+skinparam actorStyle awesome
+skinparam usecase {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+    ArrowColor DarkBlue
+}
+
+title Biểu đồ Use Case - Hệ thống TDMU Dispatch
+
+' Actors
+actor "SYSTEM_ADMIN\n(Quản trị viên hệ thống)" as SA
+actor "UNIVERSITY_LEADER\n(Lãnh đạo cấp cao)" as UL
+actor "DEPARTMENT_HEAD\n(Trưởng đơn vị)" as DH
+actor "DEPARTMENT_STAFF\n(Chuyên viên/Nhân viên)" as DS
+actor "CLERK\n(Văn thư)" as CL
+actor "DEGREE_MANAGER\n(Quản lý văn bằng)" as DM
+actor "BASIC_USER\n(Người dùng cơ bản)" as BU
+
+' Use Cases - Authentication & Authorization
+rectangle "Quản lý Xác thực và Phân quyền" {
+    usecase "Đăng nhập bằng mật khẩu" as UC1
+    usecase "Đăng nhập bằng OTP" as UC2
+    usecase "Gửi mã OTP" as UC3
+    usecase "Đặt lại mật khẩu" as UC4
+    usecase "Đăng xuất" as UC5
+    usecase "Tạo tài khoản người dùng" as UC6
+    usecase "Cập nhật thông tin người dùng" as UC7
+    usecase "Phân quyền cho người dùng" as UC8
+    usecase "Vô hiệu hóa/kích hoạt tài khoản" as UC9
+    usecase "Xem danh sách người dùng" as UC10
+}
+
+' Use Cases - Organization Management
+rectangle "Quản lý Tổ chức" {
+    usecase "Tạo đơn vị mới" as UC11
+    usecase "Cập nhật thông tin đơn vị" as UC12
+    usecase "Xóa đơn vị" as UC13
+    usecase "Xem cấu trúc tổ chức" as UC14
+    usecase "Tạo chức vụ mới" as UC15
+    usecase "Cập nhật chức vụ" as UC16
+    usecase "Xóa chức vụ" as UC17
+    usecase "Phân công chức vụ cho người dùng" as UC18
+}
+
+' Use Cases - Document Management
+rectangle "Quản lý Văn bản" {
+    usecase "Tạo văn bản mới" as UC19
+    usecase "Chỉnh sửa văn bản" as UC20
+    usecase "Xóa văn bản" as UC21
+    usecase "Upload file đính kèm" as UC22
+    usecase "Download file đính kèm" as UC23
+    usecase "Xem danh sách văn bản" as UC24
+    usecase "Tìm kiếm văn bản" as UC25
+    usecase "Lọc văn bản theo loại" as UC26
+    usecase "Tạo loại văn bản mới" as UC27
+    usecase "Cập nhật loại văn bản" as UC28
+    usecase "Tạo nhóm văn bản mới" as UC29
+    usecase "Cập nhật nhóm văn bản" as UC30
+}
+
+' Use Cases - Workflow Management
+rectangle "Quản lý Workflow" {
+    usecase "Tạo workflow template mới" as UC31
+    usecase "Cập nhật workflow template" as UC32
+    usecase "Xóa workflow template" as UC33
+    usecase "Thiết lập các bước trong workflow" as UC34
+    usecase "Phân quyền cho từng bước" as UC35
+    usecase "Tạo workflow instance" as UC36
+    usecase "Thực hiện action (APPROVE/REJECT/TRANSFER/CANCEL/COMPLETE)" as UC37
+    usecase "Xem trạng thái workflow" as UC38
+    usecase "Xem lịch sử workflow" as UC39
+    usecase "Xem danh sách workflow đang chờ xử lý" as UC40
+    usecase "Xem chi tiết workflow" as UC41
+    usecase "Tìm kiếm workflow" as UC42
+    usecase "Lọc workflow theo trạng thái" as UC43
+}
+
+' Use Cases - Approval Process
+rectangle "Quản lý Phê duyệt" {
+    usecase "Phê duyệt văn bản" as UC44
+    usecase "Từ chối văn bản" as UC45
+    usecase "Yêu cầu chỉnh sửa" as UC46
+    usecase "Xem lịch sử phê duyệt" as UC47
+    usecase "Tạo báo cáo phê duyệt" as UC48
+    usecase "Tạo quy trình phê duyệt" as UC49
+    usecase "Cập nhật quy trình phê duyệt" as UC50
+    usecase "Thiết lập người phê duyệt" as UC51
+    usecase "Xem thống kê phê duyệt" as UC52
+}
+
+' Use Cases - File Management
+rectangle "Quản lý File và Tài liệu" {
+    usecase "Upload file lên Google Drive" as UC53
+    usecase "Download file từ Google Drive" as UC54
+    usecase "Xem thông tin file" as UC55
+    usecase "Chia sẻ file" as UC56
+    usecase "Tạo tài liệu mới" as UC57
+    usecase "Cập nhật tài liệu" as UC58
+    usecase "Xóa tài liệu" as UC59
+    usecase "Phân loại tài liệu" as UC60
+}
+
+' Use Cases - Notifications & Reports
+rectangle "Thông báo và Báo cáo" {
+    usecase "Nhận thông báo real-time" as UC61
+    usecase "Xem danh sách thông báo" as UC62
+    usecase "Đánh dấu đã đọc" as UC63
+    usecase "Cấu hình thông báo" as UC64
+    usecase "Xem báo cáo tổng quan" as UC65
+    usecase "Tạo báo cáo tùy chỉnh" as UC66
+    usecase "Xuất báo cáo" as UC67
+    usecase "Xem thống kê workflow" as UC68
+}
+
+' Use Cases - Degree Management
+rectangle "Quản lý Văn bằng" {
+    usecase "Tạo phôi bằng mới" as UC69
+    usecase "Cập nhật phôi bằng" as UC70
+    usecase "In phôi bằng" as UC71
+    usecase "Cấp phát văn bằng" as UC72
+    usecase "Xác minh văn bằng" as UC73
+}
+
+' SYSTEM_ADMIN relationships
+SA --> UC1
+SA --> UC2
+SA --> UC3
+SA --> UC4
+SA --> UC5
+SA --> UC6
+SA --> UC7
+SA --> UC8
+SA --> UC9
+SA --> UC10
+SA --> UC11
+SA --> UC12
+SA --> UC13
+SA --> UC14
+SA --> UC15
+SA --> UC16
+SA --> UC17
+SA --> UC18
+SA --> UC19
+SA --> UC20
+SA --> UC21
+SA --> UC22
+SA --> UC23
+SA --> UC24
+SA --> UC25
+SA --> UC26
+SA --> UC27
+SA --> UC28
+SA --> UC29
+SA --> UC30
+SA --> UC31
+SA --> UC32
+SA --> UC33
+SA --> UC34
+SA --> UC35
+SA --> UC36
+SA --> UC37
+SA --> UC38
+SA --> UC39
+SA --> UC40
+SA --> UC41
+SA --> UC42
+SA --> UC43
+SA --> UC44
+SA --> UC45
+SA --> UC46
+SA --> UC47
+SA --> UC48
+SA --> UC49
+SA --> UC50
+SA --> UC51
+SA --> UC52
+SA --> UC53
+SA --> UC54
+SA --> UC55
+SA --> UC56
+SA --> UC57
+SA --> UC58
+SA --> UC59
+SA --> UC60
+SA --> UC61
+SA --> UC62
+SA --> UC63
+SA --> UC64
+SA --> UC65
+SA --> UC66
+SA --> UC67
+SA --> UC68
+
+' UNIVERSITY_LEADER relationships
+UL --> UC1
+UL --> UC2
+UL --> UC3
+UL --> UC4
+UL --> UC5
+UL --> UC14
+UL --> UC24
+UL --> UC25
+UL --> UC26
+UL --> UC38
+UL --> UC39
+UL --> UC40
+UL --> UC41
+UL --> UC42
+UL --> UC43
+UL --> UC44
+UL --> UC45
+UL --> UC46
+UL --> UC47
+UL --> UC48
+UL --> UC52
+UL --> UC53
+UL --> UC54
+UL --> UC55
+UL --> UC56
+UL --> UC61
+UL --> UC62
+UL --> UC63
+UL --> UC64
+UL --> UC65
+UL --> UC66
+UL --> UC67
+UL --> UC68
+
+' DEPARTMENT_HEAD relationships
+DH --> UC1
+DH --> UC2
+DH --> UC3
+DH --> UC4
+DH --> UC5
+DH --> UC11
+DH --> UC12
+DH --> UC13
+DH --> UC14
+DH --> UC19
+DH --> UC20
+DH --> UC21
+DH --> UC22
+DH --> UC23
+DH --> UC24
+DH --> UC25
+DH --> UC26
+DH --> UC36
+DH --> UC37
+DH --> UC38
+DH --> UC39
+DH --> UC40
+DH --> UC41
+DH --> UC42
+DH --> UC43
+DH --> UC44
+DH --> UC45
+DH --> UC46
+DH --> UC47
+DH --> UC48
+DH --> UC52
+DH --> UC53
+DH --> UC54
+DH --> UC55
+DH --> UC56
+DH --> UC61
+DH --> UC62
+DH --> UC63
+DH --> UC64
+DH --> UC65
+DH --> UC66
+DH --> UC67
+DH --> UC68
+
+' DEPARTMENT_STAFF relationships
+DS --> UC1
+DS --> UC2
+DS --> UC3
+DS --> UC4
+DS --> UC5
+DS --> UC19
+DS --> UC20
+DS --> UC21
+DS --> UC22
+DS --> UC23
+DS --> UC24
+DS --> UC25
+DS --> UC26
+DS --> UC36
+DS --> UC37
+DS --> UC38
+DS --> UC39
+DS --> UC40
+DS --> UC41
+DS --> UC42
+DS --> UC43
+DS --> UC44
+DS --> UC45
+DS --> UC46
+DS --> UC47
+DS --> UC53
+DS --> UC54
+DS --> UC55
+DS --> UC56
+DS --> UC61
+DS --> UC62
+DS --> UC63
+DS --> UC64
+
+' CLERK relationships
+CL --> UC1
+CL --> UC2
+CL --> UC3
+CL --> UC4
+CL --> UC5
+CL --> UC19
+CL --> UC20
+CL --> UC21
+CL --> UC22
+CL --> UC23
+CL --> UC24
+CL --> UC25
+CL --> UC26
+CL --> UC27
+CL --> UC28
+CL --> UC29
+CL --> UC30
+CL --> UC36
+CL --> UC37
+CL --> UC38
+CL --> UC39
+CL --> UC40
+CL --> UC41
+CL --> UC42
+CL --> UC43
+CL --> UC53
+CL --> UC54
+CL --> UC55
+CL --> UC56
+CL --> UC57
+CL --> UC58
+CL --> UC59
+CL --> UC60
+CL --> UC61
+CL --> UC62
+CL --> UC63
+CL --> UC64
+
+' DEGREE_MANAGER relationships
+DM --> UC1
+DM --> UC2
+DM --> UC3
+DM --> UC4
+DM --> UC5
+DM --> UC24
+DM --> UC25
+DM --> UC26
+DM --> UC53
+DM --> UC54
+DM --> UC55
+DM --> UC56
+DM --> UC61
+DM --> UC62
+DM --> UC63
+DM --> UC64
+DM --> UC69
+DM --> UC70
+DM --> UC71
+DM --> UC72
+DM --> UC73
+
+' BASIC_USER relationships
+BU --> UC1
+BU --> UC2
+BU --> UC3
+BU --> UC4
+BU --> UC5
+BU --> UC61
+BU --> UC62
+BU --> UC63
+BU --> UC64
+
+' Include relationships
+UC19 ..> UC22 : <<include>>
+UC37 ..> UC8 : <<include>>
+UC44 ..> UC61 : <<include>>
+UC45 ..> UC61 : <<include>>
+UC46 ..> UC61 : <<include>>
+
+' Extend relationships
+UC6 ..> UC8 : <<extend>>
+UC31 ..> UC19 : <<extend>>
+UC65 ..> UC40 : <<extend>>
+
+@enduml

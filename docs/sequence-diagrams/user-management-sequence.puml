@@ -1,0 +1,215 @@
+@startuml User_Management_Sequence_Diagram
+
+!theme plain
+skinparam sequence {
+    ArrowColor DarkBlue
+    ActorBorderColor DarkBlue
+    LifeLineBorderColor DarkBlue
+    LifeLineBackgroundColor LightBlue
+    ParticipantBorderColor DarkBlue
+    ParticipantBackgroundColor LightBlue
+}
+
+title Sơ đồ tuần tự - Quản lý Người dùng
+
+actor "SYSTEM_ADMIN" as SA
+participant "Frontend" as F
+participant "UserService" as US
+participant "AuthService" as AS
+participant "AssignmentService" as ASS
+participant "Database" as DB
+participant "MailService" as MS
+
+== Tạo tài khoản người dùng ==
+
+SA -> F: Nhập thông tin người dùng
+F -> F: Validate form data
+F -> US: createUser(createUserInput)
+US -> US: Validate user data
+
+alt Validation failed
+    US --> F: Throw BadRequestException
+    F --> SA: Hiển thị lỗi validation
+else Validation passed
+    US -> US: Check email uniqueness
+    US -> DB: SELECT COUNT(*) FROM users WHERE email = ?
+    DB --> US: count
+    
+    alt Email đã tồn tại
+        US --> F: Throw BadRequestException
+        F --> SA: Hiển thị lỗi "Email đã tồn tại"
+    else Email chưa tồn tại
+        US -> AS: hashPassword(password)
+        AS --> US: hashedPassword
+        US -> DB: INSERT INTO users (...)
+        DB --> US: userId
+        
+        alt Có phân công chức vụ
+            US -> ASS: createAssignment(userId, positionId, unitId)
+            ASS -> DB: INSERT INTO assignments (...)
+            DB --> ASS: assignmentId
+            ASS --> US: assignment
+        end
+        
+        US -> MS: sendWelcomeEmail(user.email, defaultPassword)
+        MS --> US: Success
+        
+        US --> F: User object
+        F --> SA: Hiển thị thông báo tạo user thành công
+    end
+end
+
+== Cập nhật thông tin người dùng ==
+
+SA -> F: Chọn user cần sửa
+F -> US: getUserById(id)
+US -> DB: SELECT * FROM users WHERE id = ?
+DB --> US: user data
+US --> F: User object
+F --> SA: Hiển thị form chỉnh sửa
+
+SA -> F: Cập nhật thông tin
+F -> US: updateUser(updateUserInput)
+US -> US: Validate update data
+
+alt Validation failed
+    US --> F: Throw BadRequestException
+    F --> SA: Hiển thị lỗi validation
+else Validation passed
+    US -> DB: UPDATE users SET ... WHERE id = ?
+    DB --> US: Success
+    
+    alt Có thay đổi email
+        US -> US: Check email uniqueness
+        US -> DB: SELECT COUNT(*) FROM users WHERE email = ? AND id != ?
+        DB --> US: count
+        
+        alt Email đã tồn tại
+            US --> F: Throw BadRequestException
+            F --> SA: Hiển thị lỗi "Email đã tồn tại"
+        else Email hợp lệ
+            US -> DB: UPDATE users SET email = ? WHERE id = ?
+            DB --> US: Success
+        end
+    end
+    
+    US --> F: Updated user
+    F --> SA: Hiển thị thông báo cập nhật thành công
+end
+
+== Phân quyền cho người dùng ==
+
+SA -> F: Chọn user và roles
+F -> US: updateUserRoles(userId, roles)
+US -> US: Validate roles
+
+alt Validation failed
+    US --> F: Throw BadRequestException
+    F --> SA: Hiển thị lỗi "Roles không hợp lệ"
+else Validation passed
+    US -> DB: UPDATE users SET roles = ? WHERE id = ?
+    DB --> US: Success
+    
+    US -> US: clearUserCache(userId)
+    US --> F: Success response
+    F --> SA: Hiển thị thông báo phân quyền thành công
+end
+
+== Vô hiệu hóa/Kích hoạt tài khoản ==
+
+SA -> F: Chọn user và action
+F -> US: toggleUserStatus(userId, isActive)
+US -> DB: UPDATE users SET isActive = ? WHERE id = ?
+DB --> US: Success
+
+alt Vô hiệu hóa tài khoản
+    US -> US: revokeAllUserTokens(userId)
+    US -> DB: UPDATE tokens SET isRevoked = true WHERE userId = ?
+    DB --> US: Success
+    US --> F: Success response
+    F --> SA: Hiển thị thông báo "Đã vô hiệu hóa tài khoản"
+else Kích hoạt tài khoản
+    US --> F: Success response
+    F --> SA: Hiển thị thông báo "Đã kích hoạt tài khoản"
+end
+
+== Xem danh sách người dùng ==
+
+SA -> F: Truy cập trang quản lý users
+F -> US: getUsersPaginated(pagination, filters)
+US -> DB: SELECT * FROM users ORDER BY createdAt DESC LIMIT ? OFFSET ?
+DB --> US: users list
+US -> DB: SELECT COUNT(*) FROM users
+DB --> US: total count
+US --> F: PaginatedResponse { data, totalCount, hasNextPage }
+F --> SA: Hiển thị danh sách users
+
+== Tìm kiếm người dùng ==
+
+SA -> F: Nhập từ khóa tìm kiếm
+F -> US: searchUsers(keyword)
+US -> DB: SELECT * FROM users WHERE firstName LIKE ? OR lastName LIKE ? OR email LIKE ?
+DB --> US: users list
+US --> F: Users array
+F --> SA: Hiển thị kết quả tìm kiếm
+
+== Lọc người dùng theo role ==
+
+SA -> F: Chọn role để lọc
+F -> US: getUsersByRole(role)
+US -> DB: SELECT * FROM users WHERE JSON_CONTAINS(roles, ?)
+DB --> US: users list
+US --> F: Users array
+F --> SA: Hiển thị danh sách users theo role
+
+== Phân công chức vụ ==
+
+SA -> F: Chọn user và chức vụ
+F -> ASS: createAssignment(assignmentInput)
+ASS -> ASS: Validate assignment data
+
+alt Validation failed
+    ASS --> F: Throw BadRequestException
+    F --> SA: Hiển thị lỗi validation
+else Validation passed
+    ASS -> DB: INSERT INTO assignments (...)
+    DB --> ASS: assignmentId
+    ASS --> F: Assignment object
+    F --> SA: Hiển thị thông báo phân công thành công
+end
+
+== Xem thông tin chi tiết user ==
+
+SA -> F: Click vào user
+F -> US: getUserDetail(id)
+US -> DB: SELECT * FROM users WHERE id = ?
+DB --> US: user data
+
+US -> DB: SELECT * FROM assignments WHERE userId = ?
+DB --> US: assignments list
+
+US -> DB: SELECT * FROM user_activities WHERE userId = ? ORDER BY createdAt DESC LIMIT 10
+DB --> US: recent activities
+
+US --> F: UserDetail { user, assignments, activities }
+F --> SA: Hiển thị thông tin chi tiết user
+
+== Đặt lại mật khẩu ==
+
+SA -> F: Chọn user và action "Reset Password"
+F -> US: resetUserPassword(userId)
+US -> AS: generateTemporaryPassword()
+AS --> US: tempPassword
+US -> AS: hashPassword(tempPassword)
+AS --> US: hashedPassword
+
+US -> DB: UPDATE users SET passwordHash = ?, isFirstLogin = true WHERE id = ?
+DB --> US: Success
+
+US -> MS: sendPasswordResetEmail(user.email, tempPassword)
+MS --> US: Success
+
+US --> F: Success response
+F --> SA: Hiển thị thông báo "Đã gửi mật khẩu mới qua email"
+
+@enduml

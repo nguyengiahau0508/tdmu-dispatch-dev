@@ -1,0 +1,120 @@
+@startuml Authentication_Sequence_Diagram
+
+!theme plain
+skinparam sequence {
+    ArrowColor DarkBlue
+    ActorBorderColor DarkBlue
+    LifeLineBorderColor DarkBlue
+    LifeLineBackgroundColor LightBlue
+    ParticipantBorderColor DarkBlue
+    ParticipantBackgroundColor LightBlue
+}
+
+title Sơ đồ tuần tự - Đăng nhập hệ thống
+
+actor "User" as U
+participant "Frontend" as F
+participant "AuthService" as AS
+participant "UserService" as US
+participant "TokenService" as TS
+participant "Database" as DB
+participant "Cache" as C
+
+== Đăng nhập bằng mật khẩu ==
+
+U -> F: Nhập email và password
+F -> AS: signIn(email, password)
+AS -> US: findOneByEmail(email)
+US -> DB: SELECT * FROM users WHERE email = ?
+DB --> US: User data
+US --> AS: User object
+
+alt User không tồn tại
+    AS --> F: Throw BadRequestException
+    F --> U: Hiển thị lỗi "Tài khoản không tồn tại"
+else User tồn tại
+    AS -> AS: verifyPassword(password, user.passwordHash)
+    
+    alt Mật khẩu sai
+        AS --> F: Throw UnauthorizedException
+        F --> U: Hiển thị lỗi "Mật khẩu không đúng"
+    else Mật khẩu đúng
+        alt Lần đầu đăng nhập
+            AS --> F: Throw FirstLoginChangePasswordRequired
+            F --> U: Chuyển đến trang OTP
+        else Đăng nhập bình thường
+            AS -> TS: generateAccessToken(payload)
+            TS --> AS: accessToken
+            AS -> AS: setRefreshTokenCookie(res, refreshToken)
+            AS --> F: SignInOutput { accessToken, user }
+            F -> F: Lưu token vào localStorage
+            F --> U: Chuyển đến trang chính
+        end
+    end
+end
+
+== Đăng nhập bằng OTP ==
+
+U -> F: Nhập email và OTP
+F -> AS: signInWithOtp(email, otp)
+AS -> US: findOneByEmail(email)
+US -> DB: SELECT * FROM users WHERE email = ?
+DB --> US: User data
+US --> AS: User object
+
+alt User không tồn tại
+    AS --> F: Throw BadRequestException
+    F --> U: Hiển thị lỗi "Tài khoản không tồn tại"
+else User tồn tại
+    AS -> AS: validateOTP(user.id, otp)
+    AS -> C: get(otp_key)
+    C --> AS: cached_otp
+    
+    alt OTP không hợp lệ
+        AS --> F: Throw UnauthorizedException
+        F --> U: Hiển thị lỗi "Mã OTP không hợp lệ"
+    else OTP hợp lệ
+        AS -> AS: clearOTP(user.id)
+        AS -> C: del(otp_key)
+        AS -> TS: generateAccessOneTimeToken(payload)
+        TS --> AS: accessToken
+        AS --> F: SignInOtpOutput { accessToken }
+        F -> F: Lưu token vào localStorage
+        F --> U: Chuyển đến trang đặt lại mật khẩu
+    end
+end
+
+== Gửi mã OTP ==
+
+U -> F: Nhập email
+F -> AS: sentOtp(email)
+AS -> US: findOneByEmail(email)
+US -> DB: SELECT * FROM users WHERE email = ?
+DB --> US: User data
+US --> AS: User object
+
+alt User không tồn tại
+    AS --> F: Throw BadRequestException
+    F --> U: Hiển thị lỗi "Tài khoản không tồn tại"
+else User tồn tại
+    AS -> AS: generateOTP(user.id)
+    AS -> C: set(otp_key, otp, 300)
+    AS -> AS: sendOtpEmail(user.email, otp)
+    AS --> F: Success response
+    F --> U: Hiển thị thông báo "Mã OTP đã được gửi"
+end
+
+== Đặt lại mật khẩu ==
+
+U -> F: Nhập mật khẩu mới
+F -> AS: resetPassword(userId, newPassword)
+AS -> AS: hashPassword(newPassword)
+AS -> US: updatePassword(userId, hashedPassword)
+US -> DB: UPDATE users SET passwordHash = ? WHERE id = ?
+DB --> US: Success
+US --> AS: Success
+AS -> AS: set isFirstLogin = false
+AS --> F: Success response
+F --> U: Chuyển đến trang chính
+
+@enduml

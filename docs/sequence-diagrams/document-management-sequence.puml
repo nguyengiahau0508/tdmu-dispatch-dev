@@ -1,0 +1,175 @@
+@startuml Document_Management_Sequence_Diagram
+
+!theme plain
+skinparam sequence {
+    ArrowColor DarkBlue
+    ActorBorderColor DarkBlue
+    LifeLineBorderColor DarkBlue
+    LifeLineBackgroundColor LightBlue
+    ParticipantBorderColor DarkBlue
+    ParticipantBackgroundColor LightBlue
+}
+
+title Sơ đồ tuần tự - Quản lý Văn bản
+
+actor "User" as U
+participant "Frontend" as F
+participant "DocumentService" as DS
+participant "GoogleDriveService" as GDS
+participant "FileService" as FS
+participant "WorkflowService" as WS
+participant "Database" as DB
+participant "Google Drive" as GD
+
+== Tạo văn bản mới ==
+
+U -> F: Nhập thông tin văn bản + chọn file
+F -> F: Validate form data
+F -> DS: createDocument(createInput, file)
+DS -> DS: Validate required fields
+
+alt Validation failed
+    DS --> F: Throw BadRequestException
+    F --> U: Hiển thị lỗi validation
+else Validation passed
+    alt Có file upload
+        DS -> GDS: uploadFile(file)
+        GDS -> GD: Upload file to Google Drive
+        GD --> GDS: fileId
+        GDS --> DS: driveFileId
+        DS -> FS: createFileEntity(driveFileId, fileInfo)
+        FS -> DB: INSERT INTO files (...)
+        DB --> FS: fileEntity
+        FS --> DS: fileEntity
+    end
+    
+    DS -> DS: createDocumentEntity(input, fileEntity)
+    DS -> DB: INSERT INTO documents (...)
+    DB --> DS: documentEntity
+    
+    alt Tạo workflow
+        DS -> WS: createWorkflowInstance(documentId, templateId)
+        WS -> DB: INSERT INTO workflow_instances (...)
+        DB --> WS: workflowInstance
+        WS --> DS: workflowInstance
+    end
+    
+    DS --> F: Document object
+    F -> F: Refresh document list
+    F --> U: Hiển thị thông báo thành công
+end
+
+== Chỉnh sửa văn bản ==
+
+U -> F: Chọn văn bản cần sửa
+F -> DS: getDocument(id)
+DS -> DB: SELECT * FROM documents WHERE id = ?
+DB --> DS: document data
+DS --> F: Document object
+F --> U: Hiển thị form chỉnh sửa
+
+U -> F: Cập nhật thông tin + chọn file mới (nếu có)
+F -> DS: updateDocument(updateInput, newFile)
+DS -> DS: Validate input
+
+alt Validation failed
+    DS --> F: Throw BadRequestException
+    F --> U: Hiển thị lỗi validation
+else Validation passed
+    alt Có file mới
+        DS -> GDS: uploadFile(newFile)
+        GDS -> GD: Upload new file
+        GD --> GDS: newFileId
+        GDS --> DS: newDriveFileId
+        
+        DS -> FS: updateFileEntity(oldFileId, newDriveFileId)
+        FS -> DB: UPDATE files SET driveFileId = ? WHERE id = ?
+        DB --> FS: Success
+        FS --> DS: Success
+    end
+    
+    DS -> DB: UPDATE documents SET ... WHERE id = ?
+    DB --> DS: Success
+    DS --> F: Updated document
+    F -> F: Refresh document list
+    F --> U: Hiển thị thông báo cập nhật thành công
+end
+
+== Xóa văn bản ==
+
+U -> F: Chọn văn bản cần xóa
+F -> F: Hiển thị dialog xác nhận
+U -> F: Xác nhận xóa
+F -> DS: removeDocument(id)
+DS -> DS: Check user permissions
+
+alt Không có quyền
+    DS --> F: Throw ForbiddenException
+    F --> U: Hiển thị lỗi "Không có quyền xóa"
+else Có quyền
+    DS -> DB: SELECT * FROM documents WHERE id = ?
+    DB --> DS: document data
+    
+    alt Có file đính kèm
+        DS -> GDS: deleteFile(document.file.driveFileId)
+        GDS -> GD: Delete file from Google Drive
+        GD --> GDS: Success
+        GDS --> DS: Success
+    end
+    
+    DS -> DB: DELETE FROM documents WHERE id = ?
+    DB --> DS: Success
+    DS --> F: Success response
+    F -> F: Refresh document list
+    F --> U: Hiển thị thông báo xóa thành công
+end
+
+== Upload file ==
+
+U -> F: Chọn file để upload
+F -> F: Validate file (size, type)
+F -> DS: uploadFile(file)
+DS -> GDS: uploadFile(file)
+GDS -> GD: Upload file to Google Drive
+GD --> GDS: fileId
+GDS --> DS: driveFileId
+DS -> FS: createFileEntity(driveFileId, fileInfo)
+FS -> DB: INSERT INTO files (...)
+DB --> FS: fileEntity
+FS --> DS: fileEntity
+DS --> F: File object
+F --> U: Hiển thị thông báo upload thành công
+
+== Download file ==
+
+U -> F: Click nút download
+F -> FS: downloadFile(driveFileId)
+FS -> GDS: downloadFile(driveFileId)
+GDS -> GD: Get file from Google Drive
+GD --> GDS: file stream
+GDS --> FS: file stream
+FS -> F: Return file blob
+F -> F: Create download link
+F --> U: Tự động download file
+
+== Tìm kiếm văn bản ==
+
+U -> F: Nhập từ khóa tìm kiếm
+F -> DS: searchDocuments(keyword, filters)
+DS -> DB: SELECT * FROM documents WHERE title LIKE ? OR content LIKE ?
+DB --> DS: documents list
+DS --> F: Documents array
+F --> U: Hiển thị kết quả tìm kiếm
+
+== Lọc văn bản ==
+
+U -> F: Chọn bộ lọc (loại, trạng thái, ngày)
+F -> DS: getDocumentsPaginated(input)
+DS -> DB: SELECT * FROM documents WHERE documentType = ? AND status = ? ORDER BY createdAt DESC LIMIT ? OFFSET ?
+DB --> DS: documents list
+DS -> DB: SELECT COUNT(*) FROM documents WHERE documentType = ? AND status = ?
+DB --> DS: total count
+DS --> F: PaginatedResponse { data, totalCount, hasNextPage }
+F --> U: Hiển thị danh sách đã lọc
+
+@enduml
