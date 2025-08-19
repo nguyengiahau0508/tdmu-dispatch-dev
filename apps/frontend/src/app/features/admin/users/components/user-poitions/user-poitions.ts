@@ -21,11 +21,13 @@ import { UserPositionCreate } from '../../../organizational/user-positions/compo
 import { UserPositionUpdate } from '../../../organizational/user-positions/components/user-position-update/user-position-update';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
+import { ImagePreview } from '../../../../../shared/components/image-preview/image-preview';
+
 @Component({
   selector: 'app-user-poitions',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, TableModule, DatePipe, SplitButtonModule, PanelModule, ToolbarModule, ButtonModule, ConfirmDialogModule,
-    UserPositionCreate
+    UserPositionCreate, ImagePreview
   ],
   providers: [ConfirmationService],
   templateUrl: './user-poitions.html',
@@ -39,8 +41,12 @@ export class UserPoitions implements OnInit {
   @Output() close = new EventEmitter<void>();
   @Output() updated = new EventEmitter<void>();
 
-  userPositions: IUserPosition[] = []
+  userPositions: (IUserPosition & { showActions?: boolean })[] = []
   isOpenCreateFormUserPosition: boolean = false
+
+  get activePositionsCount(): number {
+    return this.userPositions.filter(p => !p.endDate).length;
+  }
 
   constructor(
     private readonly userPositionsService: UserPositionsService,
@@ -59,6 +65,7 @@ export class UserPoitions implements OnInit {
         this.userPositions = response.data!.userPositions.map(
           userPosition => ({
             ...userPosition,
+            showActions: false,
             actions: this.getMenuItemsForUserPosition(userPosition)
           })
         )
@@ -87,6 +94,18 @@ export class UserPoitions implements OnInit {
         command: () => this.onUserPostionEnd(userPosition.id)
       }
     ];
+  }
+
+  toggleActions(event: Event, userPosition: IUserPosition & { showActions?: boolean }) {
+    event.stopPropagation();
+    // Close all other dropdowns
+    this.userPositions.forEach(pos => {
+      if (pos.id !== userPosition.id) {
+        pos.showActions = false;
+      }
+    });
+    // Toggle current dropdown
+    userPosition.showActions = !userPosition.showActions;
   }
 
   onUserPostionCreate() {

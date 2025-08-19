@@ -1,87 +1,223 @@
 @if(isOpen) {
-  <!-- Backdrop phủ mờ -->
-  <div class="user-update__backdrop">
-    <div class="user-update">
-      <form class="user-form" [formGroup]="userUpdateForm" (ngSubmit)="onSubmit()">
-        <h2 class="user-form__title">Cập nhật người dùng</h2>
-        <p class="user-form__subtitle">Chỉnh sửa thông tin người dùng</p>
-
-        <!-- Email -->
-        <div class="form-group">
-          <label for="email" class="form-group__label">Email</label>
-          <input
-            type="email"
-            id="email"
-            class="form-group__input"
-            formControlName="email"
-            placeholder="example@email.com"
-          />
-        </div>
-
-        <!-- Họ & Tên nằm ngang -->
-        <div class="form-row">
-          <!-- Họ -->
-          <div class="form-group">
-            <label for="lastName" class="form-group__label">Họ</label>
-            <input
-              type="text"
-              id="lastName"
-              class="form-group__input"
-              formControlName="lastName"
-              placeholder="Nguyễn"
-            />
-          </div>
-
-          <!-- Tên -->
-          <div class="form-group">
-            <label for="firstName" class="form-group__label">Tên</label>
-            <input
-              type="text"
-              id="firstName"
-              class="form-group__input"
-              formControlName="firstName"
-              placeholder="Văn A"
-            />
-          </div>
-        </div>
-
-        <!-- Kích hoạt -->
-        <div class="form-group">
-          <label class="form-group__label">
-            <input type="checkbox" formControlName="isActive" /> Kích hoạt tài khoản
-          </label>
-        </div>
-
-        <!-- Avatar -->
-        <div class="form-group">
-          <label for="avatarImageFile" class="form-group__label">Ảnh đại diện</label>
-          <input
-            type="file"
-            id="avatarImageFile"
-            class="form-group__input"
-            (change)="onFileChange($event)"
-            accept="image/*"
-          />
-
-          <!-- Ảnh preview -->
-          @if(avatarPreviewUrl){
-            <div class="avatar-preview">
-              <img [src]="avatarPreviewUrl" alt="Xem trước ảnh đại diện" />
-              <button type="button" class="avatar-preview__remove" (click)="clearAvatarPreview()">Xóa</button>
+  <div class="user-update-modal" (click)="onFormClose()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <!-- Header -->
+      <div class="modal-header">
+        <div class="header-content">
+          <div class="header-title">
+            <div class="title-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
             </div>
-          }
+            <div class="title-text">
+              <h2>Cập nhật người dùng</h2>
+              <p>Chỉnh sửa thông tin người dùng {{ user.fullName || (user.lastName + ' ' + user.firstName) }}</p>
+            </div>
+          </div>
         </div>
+        <button class="close-button" (click)="onFormClose()" title="Đóng">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
 
-        <!-- Actions -->
-        <div class="user-form__actions">
-          <button type="submit" class="user-form__submit-button" [disabled]="isLoading">
-            {{ isLoading ? 'Đang cập nhật...' : 'Cập nhật' }}
-          </button>
-          <button type="button" class="user-form__cancel-button" (click)="onFormClose()">
-            Hủy
-          </button>
-        </div>
-      </form>
+      <!-- Form Content -->
+      <div class="modal-content">
+        <form class="user-form" [formGroup]="userUpdateForm" (ngSubmit)="onSubmit()">
+          <!-- User Avatar Section -->
+          <div class="avatar-section">
+            <div class="avatar-container">
+              @if(avatarPreviewUrl) {
+                <img [src]="avatarPreviewUrl" alt="Avatar preview" class="avatar-image" />
+              } @else {
+                <div class="avatar-placeholder">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                </div>
+              }
+              <div class="avatar-overlay">
+                <label for="avatarImageFile" class="avatar-upload-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7,10 12,15 17,10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Thay đổi ảnh
+                </label>
+                @if(avatarPreviewUrl) {
+                  <button type="button" class="avatar-remove-btn" (click)="clearAvatarPreview()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3,6 5,6 21,6"></polyline>
+                      <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
+                    </svg>
+                    Xóa
+                  </button>
+                }
+              </div>
+            </div>
+            <input
+              type="file"
+              id="avatarImageFile"
+              class="hidden-input"
+              (change)="onFileChange($event)"
+              accept="image/*"
+            />
+          </div>
+
+          <!-- Form Fields -->
+          <div class="form-fields">
+            <!-- Email Field -->
+            <div class="form-group">
+              <label for="email" class="form-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                class="form-input"
+                formControlName="email"
+                placeholder="example@email.com"
+                [class.form-input--error]="userUpdateForm.get('email')?.invalid && userUpdateForm.get('email')?.touched"
+              />
+              @if(userUpdateForm.get('email')?.invalid && userUpdateForm.get('email')?.touched) {
+                <div class="error-message">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                  </svg>
+                  Email không hợp lệ
+                </div>
+              }
+            </div>
+
+            <!-- Name Fields -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="lastName" class="form-label">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                  Họ
+                </label>
+                <input
+                  type="text"
+                  id="lastName"
+                  class="form-input"
+                  formControlName="lastName"
+                  placeholder="Nguyễn"
+                  [class.form-input--error]="userUpdateForm.get('lastName')?.invalid && userUpdateForm.get('lastName')?.touched"
+                />
+                @if(userUpdateForm.get('lastName')?.invalid && userUpdateForm.get('lastName')?.touched) {
+                  <div class="error-message">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="15" y1="9" x2="9" y2="15"></line>
+                      <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                    Họ là bắt buộc
+                  </div>
+                }
+              </div>
+
+              <div class="form-group">
+                <label for="firstName" class="form-label">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                  Tên
+                </label>
+                <input
+                  type="text"
+                  id="firstName"
+                  class="form-input"
+                  formControlName="firstName"
+                  placeholder="Văn A"
+                  [class.form-input--error]="userUpdateForm.get('firstName')?.invalid && userUpdateForm.get('firstName')?.touched"
+                />
+                @if(userUpdateForm.get('firstName')?.invalid && userUpdateForm.get('firstName')?.touched) {
+                  <div class="error-message">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="15" y1="9" x2="9" y2="15"></line>
+                      <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                    Tên là bắt buộc
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Active Status -->
+            <div class="form-group">
+              <div class="checkbox-group">
+                <label class="checkbox-label">
+                  <input 
+                    type="checkbox" 
+                    formControlName="isActive"
+                    class="checkbox-input"
+                  />
+                  <span class="checkbox-custom"></span>
+                  <div class="checkbox-content">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22,4 12,14.01 9,11.01"></polyline>
+                    </svg>
+                    <span>Kích hoạt tài khoản</span>
+                  </div>
+                </label>
+                <p class="checkbox-description">Tài khoản sẽ có thể đăng nhập và sử dụng hệ thống</p>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="onFormClose()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          Hủy
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary" 
+          [disabled]="isLoading || userUpdateForm.invalid"
+          (click)="onSubmit()"
+        >
+          @if(isLoading) {
+            <svg class="loading-spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12a9 9 0 11-6.219-8.56"></path>
+            </svg>
+            Đang cập nhật...
+          } @else {
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 12l2 2 4-4"></path>
+              <path d="M21 12c-1 0-2.4-.4-3.5-1.5S16 9 16 8s.4-2.5 1.5-3.5S20 3 21 3s2.4.4 3.5 1.5S26 7 26 8s-.4 2.5-1.5 3.5S22 12 21 12z"></path>
+            </svg>
+            Cập nhật
+          }
+        </button>
+      </div>
     </div>
   </div>
 }

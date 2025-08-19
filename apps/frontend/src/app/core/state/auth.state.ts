@@ -21,6 +21,7 @@ export class AuthState {
   private initializeTokens(): void {
     const storedAccessToken = localStorage.getItem('accessToken');
     const storedRefreshToken = localStorage.getItem('refreshToken');
+    const storedEmailForOtp = localStorage.getItem('emailForOtp');
     
     if (storedAccessToken) {
       this.accessToken.next(storedAccessToken);
@@ -28,6 +29,10 @@ export class AuthState {
     
     if (storedRefreshToken) {
       this.refreshToken.next(storedRefreshToken);
+    }
+
+    if (storedEmailForOtp) {
+      this.emailForOtp.next(storedEmailForOtp);
     }
   }
 
@@ -37,10 +42,12 @@ export class AuthState {
 
   setEmailForOtp(email: string): void {
     this.emailForOtp.next(email);
+    localStorage.setItem('emailForOtp', email);
   }
 
   clearEmailForOtp(): void {
     this.emailForOtp.next(null);
+    localStorage.removeItem('emailForOtp');
   }
 
   getAccessToken(): string | null {
@@ -76,6 +83,16 @@ export class AuthState {
     this.clearAccessToken();
     this.clearRefreshToken();
     this.clearEmailForOtp();
+  }
+
+  // Kiểm tra xem có đang trong quá trình đăng nhập lần đầu không
+  isInFirstLoginFlow(): boolean {
+    return !!this.getEmailForOtp();
+  }
+
+  // Lấy email cho OTP
+  getFirstLoginEmail(): string | null {
+    return this.getEmailForOtp();
   }
 
   // Kiểm tra xem user có đang đăng nhập không

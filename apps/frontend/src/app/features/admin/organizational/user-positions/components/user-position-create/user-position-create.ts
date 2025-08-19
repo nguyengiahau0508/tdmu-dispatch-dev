@@ -13,6 +13,7 @@ import { UserPositionsService } from '../../../../../../core/services/oraganizat
 import { ICreateUserPositionInput } from '../../interfaces/create-user-position.interfaces';
 import { ToastrService } from 'ngx-toastr';
 import { DatePickerModule } from 'primeng/datepicker';
+
 @Component({
   selector: 'app-user-position-create',
   imports: [PanelModule, SelectModule, InputGroupModule, InputGroupAddonModule, ButtonModule,DatePickerModule,
@@ -28,6 +29,7 @@ export class UserPositionCreate implements OnInit {
 
   searchDepertmentText: string = ''
   userPositionCreateForm!: FormGroup
+  today: string = new Date().toISOString().split('T')[0]
 
   departments: IDepartment[] = []
   positionsOfDepartment: IPosition[] = []
@@ -50,6 +52,16 @@ export class UserPositionCreate implements OnInit {
     })
   }
 
+  getDepartmentName(departmentId: number): string {
+    const department = this.departments.find(d => d.id === departmentId);
+    return department ? department.name : '';
+  }
+
+  getPositionName(positionId: number): string {
+    const position = this.positionsOfDepartment.find(p => p.id === positionId);
+    return position ? position.positionName : '';
+  }
+
   fetchDepartmnets() {
     this.departmentsService.getAllDepartments(this.searchDepertmentText).subscribe({
       next: response => {
@@ -62,7 +74,7 @@ export class UserPositionCreate implements OnInit {
   }
 
   onDepartmentChange(event: any) {
-    const selectedDepartmentId = event.value;
+    const selectedDepartmentId = event.target.value;
 
     if (selectedDepartmentId) {
       this.positionsService.getPostionsByDepartmnetId(selectedDepartmentId).subscribe({
@@ -73,6 +85,9 @@ export class UserPositionCreate implements OnInit {
           console.log(err)
         }
       })
+    } else {
+      this.positionsOfDepartment = [];
+      this.userPositionCreateForm.patchValue({ positionId: null });
     }
   }
 
@@ -82,6 +97,7 @@ export class UserPositionCreate implements OnInit {
     this.userPositionsService.createUserPosition(userPositionCreateFormData).subscribe({
       next: (response) => {
         this.toasrt.success("Thêm thành công chức vụ cho người dùng")
+        this.onClose()
       },
       error: err => {
         //console.log(err)

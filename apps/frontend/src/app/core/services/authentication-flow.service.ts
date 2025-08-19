@@ -33,6 +33,17 @@ export class AuthenticationFlowService {
     console.log('Starting authentication initialization...');
 
     try {
+      // Kiểm tra xem có đang trong quá trình đăng nhập lần đầu không
+      const emailForOtp = this.authState.getEmailForOtp();
+      const isOnOtpPage = window.location.pathname.includes('/auth/otp-input');
+      const isOnResetPage = window.location.pathname.includes('/auth/reset-password');
+      
+      // Nếu đang trong quá trình đăng nhập lần đầu, không can thiệp
+      if (emailForOtp && (isOnOtpPage || isOnResetPage)) {
+        console.log('User is in first login flow, skipping authentication check');
+        return;
+      }
+
       const accessToken = this.authState.getAccessToken();
       
       if (!accessToken) {
@@ -41,7 +52,7 @@ export class AuthenticationFlowService {
         return;
       }
 
-      // Kiểm tra token validity
+      // Kiểm tra token validity với support cho one-time token
       if (!this.tokenValidationService.isTokenValid(accessToken)) {
         console.log('Access token is invalid/expired, clearing and redirecting to login');
         this.clearAuthenticationData();

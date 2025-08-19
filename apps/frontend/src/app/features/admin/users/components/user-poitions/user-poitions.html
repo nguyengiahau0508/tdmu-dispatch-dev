@@ -1,43 +1,242 @@
 @if(isOpen) {
-<div class="user-poitions__backdrop">
-  <p-panel header="Quản lí chức vụ người dùng">
-    <p-toolbar>
-      <ng-template #end>
-        <p-button label="Thêm vị trí mới" (onClick)="onUserPostionCreate()" />
-      </ng-template>
-    </p-toolbar>
-    <p-table [value]="userPositions" [tableStyle]="{ 'min-width': '50rem' }">
-      <ng-template #header>
-        <tr>
-          <th>ID</th>
-          <th>Vị trí</th>
-          <th>Phòng ban</th>
-          <th>Ngày bắt đầu</th>
-          <th>Ngày kết thúc</th>
-          <th></th>
-        </tr>
-      </ng-template>
-      <ng-template #body let-userPosition>
-        <tr>
-          <td>{{ userPosition.id }}</td>
-          <td>{{ userPosition.position.positionName }}</td>
-          <td>{{ userPosition.position.department.name }}</td>
-          <td>{{ userPosition.startDate | date:'d/M/yy' }}</td>
-          <td>
-            {{ userPosition.endDate | date:'d/M/yy' }}</td>
-          <td><p-splitbutton label="Cài đặt" icon="pi pi-check" dropdownIcon="pi pi-cog"
-              [model]="userPosition.actions" /></td>
-        </tr>
-      </ng-template>
-    </p-table>
-    <div class="actions"><p-button label="Thoát ra" (onClick)="onClose()" /></div>
-  </p-panel>
-</div>
+  <div class="user-positions-modal" (click)="onClose()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <!-- Header -->
+      <div class="modal-header">
+        <div class="header-content">
+          <div class="header-title">
+            <div class="title-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <div class="title-text">
+              <h2>Quản lý chức vụ người dùng</h2>
+              <p>Quản lý các chức vụ và phòng ban của {{ user.fullName || (user.lastName + ' ' + user.firstName) }}</p>
+            </div>
+          </div>
+        </div>
+        <button class="close-button" (click)="onClose()" title="Đóng">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- User Info Card -->
+      <div class="user-info-card">
+        <div class="user-avatar">
+          @if(user.avatarFileId) {
+            <app-image-preview [fileId]="user.avatarFileId" alt="Avatar" class="avatar-image" />
+          } @else {
+            <div class="avatar-placeholder">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+          }
+        </div>
+        <div class="user-details">
+          <h3 class="user-name">{{ user.fullName || (user.lastName + ' ' + user.firstName) }}</h3>
+          <p class="user-email">{{ user.email }}</p>
+          <div class="user-stats">
+            <span class="stat-item">
+              <span class="stat-label">Tổng chức vụ:</span>
+              <span class="stat-value">{{ userPositions.length }}</span>
+            </span>
+            <span class="stat-item">
+              <span class="stat-label">Đang hoạt động:</span>
+              <span class="stat-value">{{ activePositionsCount }}</span>
+            </span>
+          </div>
+        </div>
+        <div class="user-actions">
+          <button class="btn btn-primary" (click)="onUserPostionCreate()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Thêm chức vụ mới
+          </button>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="modal-content">
+        @if(userPositions.length > 0) {
+          <div class="positions-grid">
+            @for(userPosition of userPositions; track userPosition.id) {
+              <div class="position-card" [class.position-card--ended]="userPosition.endDate">
+                <div class="position-header">
+                  <div class="position-status">
+                    @if(userPosition.endDate) {
+                      <span class="status-badge status-badge--ended">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="15" y1="9" x2="9" y2="15"></line>
+                          <line x1="9" y1="9" x2="15" y2="15"></line>
+                        </svg>
+                        Đã kết thúc
+                      </span>
+                    } @else {
+                      <span class="status-badge status-badge--active">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <path d="M8 12l3 3 5-5"></path>
+                        </svg>
+                        Đang hoạt động
+                      </span>
+                    }
+                  </div>
+                  <div class="position-actions">
+                    <button class="action-button" (click)="toggleActions($event, userPosition)">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <circle cx="19" cy="12" r="1"></circle>
+                        <circle cx="5" cy="12" r="1"></circle>
+                      </svg>
+                    </button>
+                    <div class="actions-menu" [class.actions-menu--open]="userPosition.showActions">
+                      <button class="menu-item" (click)="onUserPositionUpdate()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        Cập nhật
+                      </button>
+                      <button class="menu-item" (click)="onUserPositionRemove()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="3,6 5,6 21,6"></polyline>
+                          <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
+                        </svg>
+                        Xóa khỏi phòng ban
+                      </button>
+                      @if(!userPosition.endDate) {
+                        <button class="menu-item menu-item--danger" (click)="onUserPostionEnd(userPosition.id)">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                          </svg>
+                          Kết thúc chức vụ
+                        </button>
+                      }
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="position-content">
+                  <div class="position-info">
+                    <div class="info-item">
+                      <div class="info-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                          <circle cx="9" cy="7" r="4"></circle>
+                          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        Chức vụ
+                      </div>
+                      <div class="info-value">{{ userPosition.position.positionName }}</div>
+                    </div>
+                    
+                    <div class="info-item">
+                      <div class="info-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                          <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                        </svg>
+                        Phòng ban
+                      </div>
+                      <div class="info-value">{{ userPosition.position.department.name }}</div>
+                    </div>
+                    
+                    <div class="info-item">
+                      <div class="info-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                          <line x1="16" y1="2" x2="16" y2="6"></line>
+                          <line x1="8" y1="2" x2="8" y2="6"></line>
+                          <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        Ngày bắt đầu
+                      </div>
+                      <div class="info-value">{{ userPosition.startDate | date:'dd/MM/yyyy' }}</div>
+                    </div>
+                    
+                    <div class="info-item">
+                      <div class="info-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                          <line x1="16" y1="2" x2="16" y2="6"></line>
+                          <line x1="8" y1="2" x2="8" y2="6"></line>
+                          <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        Ngày kết thúc
+                      </div>
+                      <div class="info-value">
+                        @if(userPosition.endDate) {
+                          {{ userPosition.endDate | date:'dd/MM/yyyy' }}
+                        } @else {
+                          <span class="text-muted">Chưa có</span>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <div class="empty-icon">
+              <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <div class="empty-content">
+              <h3>Chưa có chức vụ nào</h3>
+              <p>Người dùng này chưa được gán chức vụ nào trong hệ thống. Hãy thêm chức vụ đầu tiên để bắt đầu.</p>
+              <button class="btn btn-primary btn-large" (click)="onUserPostionCreate()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Thêm chức vụ đầu tiên
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="onClose()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
 }
 
 @if (isOpenCreateFormUserPosition) {
-<app-user-position-create [userId]="userId" [isOpen]="isOpenCreateFormUserPosition"
-  (close)="isOpenCreateFormUserPosition = false" />
+  <app-user-position-create 
+    [userId]="userId" 
+    [isOpen]="isOpenCreateFormUserPosition"
+    (close)="isOpenCreateFormUserPosition = false" 
+  />
 }
 
 <p-confirmdialog />

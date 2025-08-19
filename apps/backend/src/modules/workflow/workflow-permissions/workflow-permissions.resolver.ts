@@ -30,21 +30,7 @@ export class WorkflowPermissionsResolver {
     private readonly workflowStepsService: WorkflowStepsService,
   ) {}
 
-  @Query(() => [String], {
-    name: 'workflowRoles',
-    description: 'Lấy danh sách các vai trò có thể gán cho workflow step',
-  })
-  getRoles() {
-    return [
-      'SYSTEM_ADMIN',
-      'UNIVERSITY_LEADER',
-      'DEPARTMENT_HEAD',
-      'DEPARTMENT_STAFF',
-      'CLERK',
-      'DEGREE_MANAGER',
-      'BASIC_USER',
-    ];
-  }
+  // Removed duplicate workflowRoles query - using the one from RolesResolver instead
 
   @Query(() => [String], {
     name: 'workflowActionTypes',

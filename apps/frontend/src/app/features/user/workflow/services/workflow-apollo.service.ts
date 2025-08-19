@@ -278,7 +278,10 @@ const CHECK_WORKFLOW_VIEW_PERMISSION = gql`
 
 const GET_WORKFLOW_ROLES = gql`
   query GetWorkflowRoles {
-    workflowRoles
+    workflowRoles {
+      value
+      label
+    }
   }
 `;
 
@@ -407,7 +410,7 @@ export class WorkflowApolloService {
     );
   }
 
-  getWorkflowRoles(): Observable<string[]> {
+  getWorkflowRoles(): Observable<{ value: string; label: string }[]> {
     return this.apollo.watchQuery<any>({
       query: GET_WORKFLOW_ROLES
     }).valueChanges.pipe(

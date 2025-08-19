@@ -8,6 +8,7 @@ import { GraphQLResponseError } from '../../../shared/models/graphql-error.model
 import { ErrorHandlerService } from '../../../core/services/error-handler.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import { AuthState } from '../../../core/state/auth.state';
 
 @Component({
   selector: 'app-reset-password',
@@ -24,7 +25,8 @@ export class ResetPassword {
     private usersService: UsersService,
     private errorHandlerService: ErrorHandlerService,
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    private authState: AuthState
   ) {
     this.resetPasswordForm = this.fb.group({
       password: [
@@ -63,7 +65,9 @@ export class ResetPassword {
     ).subscribe({
       next: response => {
         this.toastr.success(response.metadata.message)
-        this.router.navigate(['auth'])
+        // Clear emailForOtp sau khi hoàn thành đổi mật khẩu
+        this.authState.clearEmailForOtp();
+        this.router.navigate([''])
       },
       error: (errorResponse: GraphQLResponseError) => {
         const { message, code } = this.errorHandlerService.extractGraphQLError(errorResponse);

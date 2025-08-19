@@ -6,11 +6,12 @@ import { IUser } from '../../../../../core/interfaces/user.interface';
 import { ToastrService } from 'ngx-toastr';
 import { finalize } from 'rxjs';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ImagePreview } from '../../../../../shared/components/image-preview/image-preview';
 
 @Component({
   selector: 'app-user-roles',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ImagePreview],
   templateUrl: './user-roles.html',
   styleUrl: './user-roles.css'
 })
@@ -36,6 +37,19 @@ export class UserRoles implements OnInit {
     if (this.user) {
       this.selectedRoles = [...(this.user.roles || [])];
     }
+  }
+
+  getRoleDescription(role: Role): string {
+    const descriptions: Record<Role, string> = {
+      [Role.SYSTEM_ADMIN]: 'Quản trị viên hệ thống với toàn quyền truy cập',
+      [Role.UNIVERSITY_LEADER]: 'Lãnh đạo cấp cao với quyền phê duyệt văn bản quan trọng',
+      [Role.DEPARTMENT_HEAD]: 'Trưởng đơn vị với quyền quản lý nhân sự và phê duyệt văn bản',
+      [Role.DEPARTMENT_STAFF]: 'Chuyên viên/nhân viên với quyền soạn thảo văn bản',
+      [Role.CLERK]: 'Văn thư với quyền xử lý luồng văn bản và lưu trữ',
+      [Role.DEGREE_MANAGER]: 'Quản lý văn bằng, chứng chỉ với quyền truy cập module phôi bằng',
+      [Role.BASIC_USER]: 'Người dùng cơ bản với quyền xem thông tin cá nhân'
+    };
+    return descriptions[role] || 'Vai trò trong hệ thống';
   }
 
   onRoleChange(role: Role, checked: boolean) {

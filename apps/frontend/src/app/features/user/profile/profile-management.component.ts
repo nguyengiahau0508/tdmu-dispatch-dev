@@ -9,42 +9,51 @@ import { ProfileStatsComponent } from './profile-stats.component';
   standalone: true,
   imports: [CommonModule, ProfileComponent, ProfileActivitiesComponent, ProfileStatsComponent],
   template: `
-    <div class="profile-management-container">
-      <div class="profile-header">
-        <h1>Quản lý Profile</h1>
-        <p>Quản lý thông tin cá nhân, xem lịch sử hoạt động và thống kê</p>
+    <div class="profile-management">
+      <div class="profile-management__header">
+        <div class="header__content">
+          <h1 class="header__title">Quản lý Profile</h1>
+          <p class="header__subtitle">Quản lý thông tin cá nhân, xem lịch sử hoạt động và thống kê</p>
+        </div>
       </div>
 
       <!-- Navigation Tabs -->
-      <div class="nav-tabs">
+      <div class="profile-management__tabs">
         <button 
-          class="nav-tab" 
+          class="tab-btn" 
           [class.active]="activeTab === 'profile'"
           (click)="setActiveTab('profile')"
         >
-          <img src="/icons/account_circle.svg" alt="Profile">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
           <span>Thông tin cá nhân</span>
         </button>
         <button 
-          class="nav-tab" 
+          class="tab-btn" 
           [class.active]="activeTab === 'activities'"
           (click)="setActiveTab('activities')"
         >
-          <img src="/icons/history.svg" alt="Activities">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path>
+          </svg>
           <span>Lịch sử hoạt động</span>
         </button>
         <button 
-          class="nav-tab" 
+          class="tab-btn" 
           [class.active]="activeTab === 'stats'"
           (click)="setActiveTab('stats')"
         >
-          <img src="/icons/analytics.svg" alt="Stats">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"></path>
+          </svg>
           <span>Thống kê</span>
         </button>
       </div>
 
       <!-- Tab Content -->
-      <div class="tab-content">
+      <div class="profile-management__content">
         <div *ngIf="activeTab === 'profile'" class="tab-pane">
           <app-profile></app-profile>
         </div>
@@ -60,97 +69,149 @@ import { ProfileStatsComponent } from './profile-stats.component';
     </div>
   `,
   styles: [`
-    .profile-management-container {
+    /* ===== Container ===== */
+    .profile-management {
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 24px;
+      padding: 2rem;
     }
 
-    .profile-header {
+    /* ===== Header ===== */
+    .profile-management__header {
       text-align: center;
-      margin-bottom: 32px;
+      margin-bottom: 3rem;
+      background: var(--color-background-primary);
+      padding: 2.5rem;
+      border-radius: 16px;
+      box-shadow: var(--shadow-default);
+      border: 1px solid var(--color-border);
     }
 
-    .profile-header h1 {
+    .header__content {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .header__title {
       color: var(--color-text-primary);
-      margin-bottom: 8px;
-      font-size: 1.75rem;
-      font-weight: 600;
+      margin: 0 0 1rem 0;
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1.2;
+      background: linear-gradient(135deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 70%, black) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .profile-header p {
+    .header__subtitle {
       color: var(--color-text-secondary);
-      font-size: 1rem;
+      font-size: 1.1rem;
+      line-height: 1.5;
+      margin: 0;
     }
 
-    .nav-tabs {
+    /* ===== Tabs ===== */
+    .profile-management__tabs {
       display: flex;
       justify-content: center;
-      margin-bottom: 32px;
-      border-bottom: 1px solid var(--color-border);
-      background-color: var(--color-background-primary);
-      border-radius: 8px;
-      padding: 4px;
+      margin-bottom: 3rem;
+      background: var(--color-background-primary);
+      border-radius: 16px;
+      padding: 0.5rem;
       box-shadow: var(--shadow-default);
+      border: 1px solid var(--color-border);
+      gap: 0.5rem;
     }
 
-    .nav-tab {
+    .tab-btn {
       background: none;
       border: none;
-      padding: 12px 20px;
-      margin: 0 2px;
+      padding: 1rem 2rem;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 0.95rem;
       font-weight: 500;
       color: var(--color-text-secondary);
-      border-radius: 6px;
-      transition: all 0.2s ease;
+      border-radius: 12px;
+      transition: all 0.3s ease;
       display: flex;
       align-items: center;
-      gap: 8px;
-      min-width: 140px;
+      gap: 0.75rem;
+      min-width: 180px;
       justify-content: center;
+      position: relative;
+      overflow: hidden;
     }
 
-    .nav-tab:hover {
-      color: var(--color-primary);
-      background-color: var(--color-background-secondary);
+    .tab-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 80%, black) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 0;
     }
 
-    .nav-tab.active {
-      color: var(--color-primary);
-      background-color: color-mix(in srgb, var(--color-primary) 10%, var(--color-background-secondary));
-      box-shadow: var(--shadow-default);
+    .tab-btn:hover::before {
+      opacity: 0.1;
     }
 
-    .nav-tab img {
-      width: 18px;
-      height: 18px;
-      object-fit: contain;
-      filter: brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
-      transition: filter 0.2s ease;
+    .tab-btn > * {
+      position: relative;
+      z-index: 1;
     }
 
-    .nav-tab:hover img,
-    .nav-tab.active img {
-      filter: brightness(0) saturate(100%) invert(27%) sepia(87%) saturate(5091%) hue-rotate(202deg) brightness(94%) contrast(101%);
+    .tab-btn:hover {
+      color: var(--color-text-primary);
+      transform: translateY(-1px);
     }
 
-    .nav-tab span {
-      font-weight: 500;
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 80%, black) 100%);
+      color: var(--color-text-on-primary);
+      box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary) 40%, transparent);
+      transform: translateY(-2px);
     }
 
-    .tab-content {
-      min-height: 500px;
+    .tab-btn.active::before {
+      opacity: 0;
+    }
+
+    .tab-btn svg {
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn:hover svg {
+      transform: scale(1.1);
+    }
+
+    .tab-btn.active svg {
+      transform: scale(1.1);
+    }
+
+    .tab-btn span {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* ===== Content ===== */
+    .profile-management__content {
+      min-height: 600px;
     }
 
     .tab-pane {
-      animation: fadeIn 0.3s ease-in;
+      animation: fadeInUp 0.4s ease-out;
     }
 
-    @keyframes fadeIn {
+    @keyframes fadeInUp {
       from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(20px);
       }
       to {
         opacity: 1;
@@ -158,30 +219,70 @@ import { ProfileStatsComponent } from './profile-stats.component';
       }
     }
 
+    /* ===== Responsive Design ===== */
     @media (max-width: 768px) {
-      .profile-management-container {
-        padding: 16px;
+      .profile-management {
+        padding: 1rem;
+      }
+
+      .profile-management__header {
+        padding: 2rem 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .header__title {
+        font-size: 2rem;
+      }
+
+      .header__subtitle {
+        font-size: 1rem;
       }
       
-      .nav-tabs {
+      .profile-management__tabs {
         flex-direction: column;
-        gap: 4px;
-        padding: 8px;
+        gap: 0.25rem;
+        padding: 0.75rem;
+        margin-bottom: 2rem;
       }
       
-      .nav-tab {
+      .tab-btn {
         margin: 0;
         min-width: auto;
         justify-content: flex-start;
+        padding: 1rem 1.5rem;
       }
       
-      .nav-tab.active {
-        background-color: var(--color-primary);
+      .tab-btn.active {
+        background: linear-gradient(135deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 80%, black) 100%);
         color: var(--color-text-on-primary);
+        transform: translateY(-1px);
       }
-      
-      .nav-tab.active img {
-        filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+    }
+
+    @media (max-width: 480px) {
+      .profile-management {
+        padding: 0.5rem;
+      }
+
+      .profile-management__header {
+        padding: 1.5rem 1rem;
+      }
+
+      .header__title {
+        font-size: 1.75rem;
+      }
+
+      .profile-management__tabs {
+        padding: 0.5rem;
+      }
+
+      .tab-btn {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+      }
+
+      .tab-btn span {
+        font-size: 0.85rem;
       }
     }
   `]

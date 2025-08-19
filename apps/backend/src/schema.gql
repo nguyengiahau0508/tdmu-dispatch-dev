@@ -1705,7 +1705,7 @@ type Query {
   workflowStepTypes: [StepTypeDto!]!
 
   """Lấy danh sách các vai trò có thể gán cho workflow step"""
-  workflowRoles: [String!]!
+  workflowRoles: [RoleDto!]!
 
   """Lấy tất cả workflow templates"""
   workflowTemplates: [WorkflowTemplate!]!

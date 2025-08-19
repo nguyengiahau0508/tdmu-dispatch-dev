@@ -9,83 +9,96 @@ import { NotificationService } from '../../../core/services/notification.service
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="activities-container">
-
+    <div class="profile-activities">
       <!-- Filters -->
-      <div class="filters-section">
-        <h3>Bộ lọc</h3>
-        <div class="filter-row">
+      <div class="profile-activities__filters">
+        <h3 class="filters__title">Bộ lọc hoạt động</h3>
+        <div class="filters__content">
           <div class="filter-group">
-            <label for="activityType">Loại hoạt động</label>
+            <label for="activityType" class="filter-group__label">Loại hoạt động</label>
             <select 
               id="activityType" 
               [(ngModel)]="filters.activityType" 
               (change)="loadActivities()"
-              class="form-control"
+              class="filter-group__select"
             >
-              <option value="">Tất cả</option>
-              <option value="LOGIN">Đăng nhập</option>
-              <option value="LOGOUT">Đăng xuất</option>
-              <option value="PROFILE_UPDATE">Cập nhật profile</option>
-              <option value="PASSWORD_CHANGE">Đổi mật khẩu</option>
-              <option value="AVATAR_UPDATE">Cập nhật avatar</option>
-              <option value="DOCUMENT_VIEW">Xem tài liệu</option>
-              <option value="DOCUMENT_CREATE">Tạo tài liệu</option>
-              <option value="DOCUMENT_UPDATE">Cập nhật tài liệu</option>
-              <option value="DOCUMENT_DELETE">Xóa tài liệu</option>
-              <option value="TASK_ASSIGNED">Được giao nhiệm vụ</option>
-              <option value="TASK_COMPLETED">Hoàn thành nhiệm vụ</option>
-              <option value="APPROVAL_REQUESTED">Yêu cầu phê duyệt</option>
-              <option value="APPROVAL_APPROVED">Phê duyệt</option>
-              <option value="APPROVAL_REJECTED">Từ chối phê duyệt</option>
+              <option value="">Tất cả hoạt động</option>
+              <option value="LOGIN">🔐 Đăng nhập</option>
+              <option value="LOGOUT">🚪 Đăng xuất</option>
+              <option value="PROFILE_UPDATE">👤 Cập nhật profile</option>
+              <option value="PASSWORD_CHANGE">🔑 Đổi mật khẩu</option>
+              <option value="AVATAR_UPDATE">🖼️ Cập nhật avatar</option>
+              <option value="DOCUMENT_VIEW">👁️ Xem tài liệu</option>
+              <option value="DOCUMENT_CREATE">📄 Tạo tài liệu</option>
+              <option value="DOCUMENT_UPDATE">✏️ Cập nhật tài liệu</option>
+              <option value="DOCUMENT_DELETE">🗑️ Xóa tài liệu</option>
+              <option value="TASK_ASSIGNED">📋 Được giao nhiệm vụ</option>
+              <option value="TASK_COMPLETED">✅ Hoàn thành nhiệm vụ</option>
+              <option value="APPROVAL_REQUESTED">⏳ Yêu cầu phê duyệt</option>
+              <option value="APPROVAL_APPROVED">👍 Phê duyệt</option>
+              <option value="APPROVAL_REJECTED">👎 Từ chối phê duyệt</option>
             </select>
           </div>
 
           <div class="filter-group">
-            <label for="startDate">Từ ngày</label>
+            <label for="startDate" class="filter-group__label">Từ ngày</label>
             <input 
               type="date" 
               id="startDate" 
               [(ngModel)]="filters.startDate" 
               (change)="loadActivities()"
-              class="form-control"
+              class="filter-group__input"
             />
           </div>
 
           <div class="filter-group">
-            <label for="endDate">Đến ngày</label>
+            <label for="endDate" class="filter-group__label">Đến ngày</label>
             <input 
               type="date" 
               id="endDate" 
               [(ngModel)]="filters.endDate" 
               (change)="loadActivities()"
-              class="form-control"
+              class="filter-group__input"
             />
           </div>
         </div>
       </div>
 
       <!-- Activities List -->
-      <div class="activities-list" *ngIf="!isLoading && activities.length > 0">
-        <div class="activity-item" *ngFor="let activity of activities">
-          <div class="activity-icon">
-            <img [src]="getActivityIcon(activity.activityType)" [alt]="getActivityTitle(activity.activityType)">
-          </div>
-          <div class="activity-content">
-            <div class="activity-header">
-              <h4>{{ getActivityTitle(activity.activityType) }}</h4>
-              <span class="activity-time">{{ formatDate(activity.createdAt) }}</span>
+      <div class="profile-activities__content" *ngIf="!isLoading && activities.length > 0">
+        <div class="activities-list">
+          <div class="activity-item" *ngFor="let activity of activities">
+            <div class="activity-item__icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+              </svg>
             </div>
-            <p class="activity-description" *ngIf="activity.description">
-              {{ activity.description }}
-            </p>
-            <div class="activity-meta" *ngIf="activity.ipAddress || activity.userAgent">
-              <small *ngIf="activity.ipAddress">
-                <i class="fas fa-globe"></i> {{ activity.ipAddress }}
-              </small>
-              <small *ngIf="activity.userAgent">
-                <i class="fas fa-desktop"></i> {{ getBrowserInfo(activity.userAgent) }}
-              </small>
+            <div class="activity-item__content">
+              <div class="activity-item__header">
+                <h4 class="activity-item__title">{{ getActivityTitle(activity.activityType) }}</h4>
+                <span class="activity-item__time">{{ formatDate(activity.createdAt) }}</span>
+              </div>
+              <p class="activity-item__description" *ngIf="activity.description">
+                {{ activity.description }}
+              </p>
+              <div class="activity-item__meta" *ngIf="activity.ipAddress || activity.userAgent">
+                <div class="meta-item" *ngIf="activity.ipAddress">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M2 12h20"></path>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                  </svg>
+                  <span>{{ activity.ipAddress }}</span>
+                </div>
+                <div class="meta-item" *ngIf="activity.userAgent">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                  </svg>
+                  <span>{{ getBrowserInfo(activity.userAgent) }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -93,14 +106,16 @@ import { NotificationService } from '../../../core/services/notification.service
 
       <!-- Empty State -->
       <div class="empty-state" *ngIf="!isLoading && activities.length === 0">
-        <i class="fas fa-history"></i>
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path>
+        </svg>
         <h3>Chưa có hoạt động nào</h3>
-        <p>Hoạt động của bạn sẽ xuất hiện ở đây</p>
+        <p>Hoạt động của bạn sẽ xuất hiện ở đây khi bạn sử dụng hệ thống</p>
       </div>
 
       <!-- Loading State -->
       <div class="loading-state" *ngIf="isLoading">
-        <div class="spinner"></div>
+        <div class="loading__spinner"></div>
         <p>Đang tải lịch sử hoạt động...</p>
       </div>
 
@@ -111,10 +126,13 @@ import { NotificationService } from '../../../core/services/notification.service
           [disabled]="meta.page <= 1"
           (click)="changePage(meta.page - 1)"
         >
-          <i class="fas fa-chevron-left"></i> Trước
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15,18 9,12 15,6"></polyline>
+          </svg>
+          Trước
         </button>
         
-        <span class="page-info">
+        <span class="pagination__info">
           Trang {{ meta.page }} / {{ meta.pageCount }}
         </span>
         
@@ -123,52 +141,53 @@ import { NotificationService } from '../../../core/services/notification.service
           [disabled]="meta.page >= meta.pageCount"
           (click)="changePage(meta.page + 1)"
         >
-          Sau <i class="fas fa-chevron-right"></i>
+          Sau
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9,18 15,12 9,6"></polyline>
+          </svg>
         </button>
       </div>
     </div>
   `,
   styles: [`
-    .activities-container {
+    /* ===== Container ===== */
+    .profile-activities {
+      max-width: 1000px;
       margin: 0 auto;
-      padding: 20px;
     }
 
-    .activities-header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .activities-header h2 {
-      color: #333;
-      margin-bottom: 10px;
-    }
-
-    .activities-header p {
-      color: #666;
-      font-size: 16px;
-    }
-
-    .filters-section {
+    /* ===== Filters ===== */
+    .profile-activities__filters {
       background: var(--color-background-primary);
-      padding: 24px;
+      padding: 2rem;
       border-radius: 12px;
       box-shadow: var(--shadow-default);
       border: 1px solid var(--color-border);
-      margin-bottom: 24px;
+      margin-bottom: 2rem;
     }
 
-    .filters-section h3 {
+    .filters__title {
       color: var(--color-text-primary);
-      margin: 0 0 20px 0;
-      font-size: 18px;
+      margin: 0 0 1.5rem 0;
+      font-size: 1.25rem;
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
     }
 
-    .filter-row {
+    .filters__title::before {
+      content: '';
+      width: 4px;
+      height: 1.25rem;
+      background: var(--color-primary);
+      border-radius: 2px;
+    }
+
+    .filters__content {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
     }
 
     .filter-group {
@@ -176,31 +195,34 @@ import { NotificationService } from '../../../core/services/notification.service
       flex-direction: column;
     }
 
-    .filter-group label {
-      margin-bottom: 8px;
+    .filter-group__label {
+      margin-bottom: 0.5rem;
       font-weight: 500;
       color: var(--color-text-primary);
-      font-size: 14px;
+      font-size: 0.9rem;
     }
 
-    .form-control {
-      padding: 12px 16px;
+    .filter-group__select,
+    .filter-group__input {
+      padding: 0.75rem 1rem;
       border: 1px solid var(--color-border);
       border-radius: 8px;
-      font-size: 14px;
+      font-size: 0.95rem;
       background-color: var(--color-background-secondary);
       color: var(--color-text-primary);
       transition: all 0.2s ease;
     }
 
-    .form-control:focus {
+    .filter-group__select:focus,
+    .filter-group__input:focus {
       outline: none;
       border-color: var(--color-primary);
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
       background-color: var(--color-background-primary);
     }
 
-    .activities-list {
+    /* ===== Content ===== */
+    .profile-activities__content {
       background: var(--color-background-primary);
       border-radius: 12px;
       box-shadow: var(--shadow-default);
@@ -208,11 +230,17 @@ import { NotificationService } from '../../../core/services/notification.service
       overflow: hidden;
     }
 
+    /* ===== Activities List ===== */
+    .activities-list {
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
     .activity-item {
       display: flex;
-      padding: 20px;
+      padding: 1.5rem;
       border-bottom: 1px solid var(--color-border);
-      transition: background-color 0.2s ease;
+      transition: all 0.2s ease;
     }
 
     .activity-item:hover {
@@ -223,103 +251,126 @@ import { NotificationService } from '../../../core/services/notification.service
       border-bottom: none;
     }
 
-    .activity-icon {
+    .activity-item__icon {
       width: 48px;
       height: 48px;
       border-radius: 50%;
-      background: var(--color-primary);
-      color: white;
+      background: color-mix(in srgb, var(--color-primary) 15%, var(--color-background-secondary));
+      color: var(--color-primary);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-right: 16px;
+      margin-right: 1rem;
       flex-shrink: 0;
+      transition: all 0.2s ease;
     }
 
-    .activity-icon img {
-      width: 20px;
-      height: 20px;
-      object-fit: contain;
-      filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+    .activity-item:hover .activity-item__icon {
+      background: var(--color-primary);
+      color: var(--color-text-on-primary);
+      transform: scale(1.05);
     }
 
-    .activity-content {
+    .activity-item__content {
       flex: 1;
     }
 
-    .activity-header {
+    .activity-item__header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+      gap: 1rem;
     }
 
-    .activity-header h4 {
+    .activity-item__title {
       margin: 0;
-      color: #333;
-      font-size: 16px;
+      color: var(--color-text-primary);
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.3;
     }
 
-    .activity-time {
-      color: #666;
-      font-size: 12px;
+    .activity-item__time {
+      color: var(--color-text-secondary);
+      font-size: 0.8rem;
+      font-weight: 500;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
-    .activity-description {
-      color: #555;
-      margin: 0 0 8px 0;
-      font-size: 14px;
+    .activity-item__description {
+      color: var(--color-text-secondary);
+      margin: 0 0 0.75rem 0;
+      font-size: 0.9rem;
+      line-height: 1.4;
     }
 
-    .activity-meta {
+    .activity-item__meta {
       display: flex;
-      gap: 15px;
-      font-size: 12px;
-      color: #888;
+      gap: 1rem;
+      font-size: 0.8rem;
+      color: var(--color-text-secondary);
     }
 
-    .activity-meta small {
+    .meta-item {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 0.5rem;
     }
 
+    .meta-item svg {
+      color: var(--color-primary);
+      flex-shrink: 0;
+    }
+
+    /* ===== Empty State ===== */
     .empty-state {
       text-align: center;
-      padding: 60px 20px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 4rem 2rem;
+      background: var(--color-background-primary);
+      border-radius: 12px;
+      box-shadow: var(--shadow-default);
+      border: 1px solid var(--color-border);
     }
 
-    .empty-state i {
-      font-size: 48px;
-      color: #ccc;
-      margin-bottom: 20px;
+    .empty-state svg {
+      opacity: 0.3;
+      margin-bottom: 1.5rem;
     }
 
     .empty-state h3 {
-      color: #666;
-      margin-bottom: 10px;
+      color: var(--color-text-primary);
+      margin: 0 0 0.5rem 0;
+      font-size: 1.25rem;
+      font-weight: 600;
     }
 
     .empty-state p {
-      color: #999;
+      color: var(--color-text-secondary);
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.5;
     }
 
+    /* ===== Loading State ===== */
     .loading-state {
       text-align: center;
-      padding: 40px;
+      padding: 4rem 2rem;
+      background: var(--color-background-primary);
+      border-radius: 12px;
+      box-shadow: var(--shadow-default);
+      border: 1px solid var(--color-border);
     }
 
-    .spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #007bff;
+    .loading__spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--color-background-secondary);
+      border-top: 4px solid var(--color-primary);
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
       animation: spin 1s linear infinite;
-      margin: 0 auto 20px;
+      margin: 0 auto 1rem auto;
     }
 
     @keyframes spin {
@@ -327,69 +378,132 @@ import { NotificationService } from '../../../core/services/notification.service
       100% { transform: rotate(360deg); }
     }
 
+    .loading-state p {
+      color: var(--color-text-secondary);
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    /* ===== Pagination ===== */
     .pagination {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 15px;
-      margin-top: 20px;
-      padding: 20px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      gap: 1rem;
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: var(--color-background-primary);
+      border-radius: 12px;
+      box-shadow: var(--shadow-default);
+      border: 1px solid var(--color-border);
     }
 
-    .btn {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
+    .pagination__info {
+      color: var(--color-text-secondary);
+      font-size: 0.9rem;
       font-weight: 500;
-      transition: all 0.3s;
+      min-width: 120px;
+      text-align: center;
+    }
+
+    /* ===== Buttons ===== */
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
     }
 
     .btn-secondary {
-      background: #6c757d;
-      color: white;
+      background: var(--color-text-secondary);
+      color: var(--color-text-on-primary);
     }
 
     .btn-secondary:hover:not(:disabled) {
-      background: #545b62;
+      background: color-mix(in srgb, var(--color-text-secondary) 90%, black);
+      transform: translateY(-1px);
     }
 
-    .btn-secondary:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-
-    .page-info {
-      color: #666;
-      font-size: 14px;
-    }
-
+    /* ===== Responsive Design ===== */
     @media (max-width: 768px) {
-      .filter-row {
+      .profile-activities__filters {
+        padding: 1.5rem;
+      }
+
+      .filters__content {
         grid-template-columns: 1fr;
+        gap: 1rem;
       }
       
       .activity-item {
         flex-direction: column;
         text-align: center;
+        gap: 1rem;
       }
       
-      .activity-icon {
-        margin: 0 auto 15px;
+      .activity-item__icon {
+        margin: 0 auto;
       }
       
-      .activity-header {
+      .activity-item__header {
         flex-direction: column;
-        gap: 5px;
+        gap: 0.5rem;
+        text-align: center;
+      }
+      
+      .activity-item__meta {
+        justify-content: center;
+        flex-wrap: wrap;
       }
       
       .pagination {
         flex-direction: column;
-        gap: 10px;
+        gap: 1rem;
+      }
+
+      .pagination__info {
+        min-width: auto;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .profile-activities__filters {
+        padding: 1rem;
+      }
+
+      .activity-item {
+        padding: 1rem;
+      }
+
+      .activity-item__icon {
+        width: 40px;
+        height: 40px;
+      }
+
+      .activity-item__title {
+        font-size: 0.9rem;
+      }
+
+      .activity-item__description {
+        font-size: 0.8rem;
+      }
+
+      .activity-item__meta {
+        font-size: 0.75rem;
       }
     }
   `]

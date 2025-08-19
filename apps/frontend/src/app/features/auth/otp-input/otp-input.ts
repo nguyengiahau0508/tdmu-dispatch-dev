@@ -103,15 +103,16 @@ export class OtpInput {
       this.isLoading = true
       const email = this.authState.getEmailForOtp()
       if (!email) {
-        this.toastr.error('Có lổi xảy ra vui lòng thử lại')
-        this.router.navigate(['auth'])
+        this.toastr.error('Có lỗi xảy ra vui lòng thử lại')
+        this.router.navigate(['auth', 'login'])
         return;
       }
       const loginWithOtpData: ILoginOtpInput = { email, otp }
       this.authService.loginWithOtp(loginWithOtpData).pipe(finalize(() => {
-        this.isLoading = true
+        this.isLoading = false
       })).subscribe({
         next: response => {
+          console.log('OTP verification successful, redirecting to reset password');
           this.router.navigate(['auth', 'reset-password'])
         },
         error: (errorResponse: GraphQLResponseError) => {
@@ -119,6 +120,10 @@ export class OtpInput {
           this.toastr.error(message)
           if (code === ErrorCode.OTP_INVALID) {
             this.clearCurrentOtp()
+          } else {
+            // Nếu có lỗi khác, clear emailForOtp và redirect về login
+            this.authState.clearEmailForOtp();
+            this.router.navigate(['auth', 'login']);
           }
         }
       })
