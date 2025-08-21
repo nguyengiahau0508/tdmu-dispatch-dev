@@ -106,6 +106,101 @@ export class DocumentProcessingApolloService {
     );
   }
 
+  // Get all workflow instances and filter by currentAssigneeUserId
+  getDocumentsForProcessingByAssignee(): Observable<DocumentProcessingInfo[]> {
+    const query = gql`
+      query {
+        workflowInstances {
+          id
+          documentId
+          currentStepId
+          currentStep {
+            id
+            name
+            description
+            type
+            assignedRole
+            orderNumber
+          }
+          currentAssigneeUserId
+          currentAssigneeUser {
+            id
+            fullName
+            email
+          }
+          status
+          createdByUserId
+          createdByUser {
+            id
+            fullName
+            email
+          }
+          createdAt
+          updatedAt
+          document {
+            id
+            title
+            documentType
+            documentCategory {
+              id
+              name
+            }
+            status
+            priority
+            deadline
+            createdAt
+            createdByUser {
+              id
+              fullName
+              email
+            }
+          }
+        }
+      }
+    `;
+
+    return this.apollo.watchQuery<any>({ query }).valueChanges.pipe(
+      map(result => {
+        const workflowInstances = result.data.workflowInstances;
+        console.log('All workflow instances:', workflowInstances);
+        
+        // Filter workflow instances that are IN_PROGRESS
+        const inProgressInstances = workflowInstances.filter(
+          (instance: any) => instance.status === 'IN_PROGRESS'
+        );
+        
+        console.log('In-progress workflow instances:', inProgressInstances);
+        
+        // Convert to DocumentProcessingInfo format
+        const documents: DocumentProcessingInfo[] = inProgressInstances.map((instance: any) => ({
+          documentId: instance.documentId,
+          documentTitle: instance.document?.title || 'Unknown Document',
+          documentType: instance.document?.documentType || 'UNKNOWN',
+          documentCategory: instance.document?.documentCategory?.name || 'Unknown',
+          status: instance.document?.status || 'DRAFT',
+          createdAt: instance.document?.createdAt || instance.createdAt,
+          workflowInstanceId: instance.id,
+          currentStepId: instance.currentStepId,
+          currentStepName: instance.currentStep?.name || 'Unknown Step',
+          workflowStatus: instance.status,
+          requiresAction: true, // All in-progress documents require action
+          actionType: 'APPROVE', // Default action type
+          deadline: instance.document?.deadline,
+          priority: (instance.document?.priority || 'MEDIUM') as any,
+          currentAssigneeUserId: instance.currentAssigneeUserId,
+          currentAssigneeName: instance.currentAssigneeUser?.fullName,
+          currentAssigneeEmail: instance.currentAssigneeUser?.email,
+          createdByUserId: instance.document?.createdByUser?.id || instance.createdByUserId,
+          createdByName: instance.document?.createdByUser?.fullName || instance.createdByUser?.fullName,
+          createdByEmail: instance.document?.createdByUser?.email || instance.createdByUser?.email,
+        }));
+        
+        console.log('Converted documents:', documents);
+        return documents;
+      })
+    );
+  }
+
   // Get processed documents
   getProcessedDocuments(): Observable<DocumentProcessingInfo[]> {
     const query = gql`

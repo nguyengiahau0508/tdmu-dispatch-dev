@@ -105,7 +105,17 @@ export class WorkflowInstancesService {
 
   async findAll(): Promise<WorkflowInstance[]> {
     return this.repository.find({
-      relations: ['template', 'currentStep', 'createdByUser', 'logs', 'logs.actionByUser'],
+      relations: [
+        'template', 
+        'currentStep', 
+        'createdByUser', 
+        'currentAssigneeUser',
+        'document',
+        'document.documentCategory',
+        'document.createdByUser',
+        'logs', 
+        'logs.actionByUser'
+      ],
       order: { createdAt: 'DESC' },
     });
   }
@@ -195,6 +205,28 @@ export class WorkflowInstancesService {
       .leftJoinAndSelect('instance.logs', 'logs')
       .leftJoinAndSelect('logs.actionByUser', 'actionByUser')
       .where('currentStep.assignedRole = :assignedRole', { assignedRole })
+      .andWhere('instance.status = :status', {
+        status: WorkflowStatus.IN_PROGRESS,
+      })
+      .orderBy('instance.createdAt', 'DESC')
+      .getMany();
+  }
+
+  /**
+   * Lấy workflow instances theo người đang được phân công xử lý
+   */
+  async findByCurrentAssigneeUserId(
+    currentAssigneeUserId: number,
+  ): Promise<WorkflowInstance[]> {
+    return this.repository
+      .createQueryBuilder('instance')
+      .leftJoinAndSelect('instance.template', 'template')
+      .leftJoinAndSelect('instance.currentStep', 'currentStep')
+      .leftJoinAndSelect('instance.createdByUser', 'createdByUser')
+      .leftJoinAndSelect('instance.currentAssigneeUser', 'currentAssigneeUser')
+      .leftJoinAndSelect('instance.logs', 'logs')
+      .leftJoinAndSelect('logs.actionByUser', 'actionByUser')
+      .where('instance.currentAssigneeUserId = :currentAssigneeUserId', { currentAssigneeUserId })
       .andWhere('instance.status = :status', {
         status: WorkflowStatus.IN_PROGRESS,
       })

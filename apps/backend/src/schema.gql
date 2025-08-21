@@ -303,11 +303,168 @@ type PageMetaDto {
   hasNextPage: Boolean!
 }
 
+type DocumentCategory {
+  id: Int!
+  name: String!
+  description: String
+}
+
+type DocumentComment {
+  id: Int!
+  content: String!
+  documentId: Int!
+  document: Document!
+  createdByUserId: Int!
+  createdByUser: User!
+  parentCommentId: Int
+  parentComment: DocumentComment
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type DocumentVersion {
+  id: Int!
+  documentId: Int!
+  document: Document!
+  title: String!
+  content: String
+  documentNumber: String
+  fileId: Int
+  file: File
+  versionNumber: Float!
+  changeDescription: String!
+  createdByUserId: Int!
+  createdByUser: User!
+  createdAt: DateTime!
+}
+
+type DocumentApprovalHistory {
+  id: Int!
+  documentId: Int!
+  document: Document!
+  action: ApprovalAction!
+  level: ApprovalLevel!
+  comment: String
+  approvedByUserId: Int!
+  approvedByUser: User!
+  createdAt: DateTime!
+}
+
+"""Type of approval action"""
+enum ApprovalAction {
+  APPROVE
+  REJECT
+  RETURN
+  FORWARD
+}
+
+"""Level of approval"""
+enum ApprovalLevel {
+  DRAFT
+  DEPARTMENT_HEAD
+  UNIVERSITY_LEADER
+  FINAL
+}
+
+type TaskRequest {
+  id: Int!
+  requestedByUserId: Int!
+  requestedByUser: User
+  assignedToUserId: Int!
+  assignedToUser: User
+  title: String!
+  description: String
+  priority: TaskPriority!
+  deadline: DateTime
+  instructions: String
+  notes: String
+  status: TaskRequestStatus!
+  rejectionReason: String
+  approvedAt: DateTime
+  rejectedAt: DateTime
+  cancelledAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""Priority level of task"""
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+"""Status of task request"""
+enum TaskRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+type Document {
+  id: Int!
+  title: String!
+  content: String
+  documentNumber: String
+  documentType: DocumentTypeEnum!
+  documentCategoryId: Int!
+  documentCategory: DocumentCategory
+  file: File
+  fileId: Int
+  status: DocumentStatus!
+  priority: DocumentPriority!
+  deadline: DateTime
+  assignedToUserId: Int
+  assignedToUser: User
+  createdByUserId: Int!
+  createdByUser: User
+  comments: [DocumentComment!]
+  versions: [DocumentVersion!]
+  approvalHistory: [DocumentApprovalHistory!]
+  taskRequestId: Int
+  taskRequest: TaskRequest
+  workflowInstanceId: Int
+  workflowInstance: WorkflowInstance
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+"""
+Type of document: OUTGOING (sent), INCOMING (received), INTERNAL (internal document)
+"""
+enum DocumentTypeEnum {
+  OUTGOING
+  INCOMING
+  INTERNAL
+}
+
+"""Status of document"""
+enum DocumentStatus {
+  DRAFT
+  PENDING
+  PROCESSING
+  APPROVED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
+
+"""Priority level of document"""
+enum DocumentPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
 type WorkflowInstance {
   id: Int!
   templateId: Int!
   template: WorkflowTemplate!
   documentId: Int!
+  document: Document
   currentStepId: Int
   currentStep: WorkflowStep
   currentAssigneeUserId: Int
@@ -1032,162 +1189,6 @@ type GetAllByUserReponse {
 
   """Thông tin metadata của response"""
   metadata: Metadata!
-}
-
-type DocumentCategory {
-  id: Int!
-  name: String!
-  description: String
-}
-
-type DocumentComment {
-  id: Int!
-  content: String!
-  documentId: Int!
-  document: Document!
-  createdByUserId: Int!
-  createdByUser: User!
-  parentCommentId: Int
-  parentComment: DocumentComment
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-type DocumentVersion {
-  id: Int!
-  documentId: Int!
-  document: Document!
-  title: String!
-  content: String
-  documentNumber: String
-  fileId: Int
-  file: File
-  versionNumber: Float!
-  changeDescription: String!
-  createdByUserId: Int!
-  createdByUser: User!
-  createdAt: DateTime!
-}
-
-type DocumentApprovalHistory {
-  id: Int!
-  documentId: Int!
-  document: Document!
-  action: ApprovalAction!
-  level: ApprovalLevel!
-  comment: String
-  approvedByUserId: Int!
-  approvedByUser: User!
-  createdAt: DateTime!
-}
-
-"""Type of approval action"""
-enum ApprovalAction {
-  APPROVE
-  REJECT
-  RETURN
-  FORWARD
-}
-
-"""Level of approval"""
-enum ApprovalLevel {
-  DRAFT
-  DEPARTMENT_HEAD
-  UNIVERSITY_LEADER
-  FINAL
-}
-
-type TaskRequest {
-  id: Int!
-  requestedByUserId: Int!
-  requestedByUser: User
-  assignedToUserId: Int!
-  assignedToUser: User
-  title: String!
-  description: String
-  priority: TaskPriority!
-  deadline: DateTime
-  instructions: String
-  notes: String
-  status: TaskRequestStatus!
-  rejectionReason: String
-  approvedAt: DateTime
-  rejectedAt: DateTime
-  cancelledAt: DateTime
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-"""Priority level of task"""
-enum TaskPriority {
-  LOW
-  MEDIUM
-  HIGH
-  URGENT
-}
-
-"""Status of task request"""
-enum TaskRequestStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  CANCELLED
-}
-
-type Document {
-  id: Int!
-  title: String!
-  content: String
-  documentNumber: String
-  documentType: DocumentTypeEnum!
-  documentCategoryId: Int!
-  documentCategory: DocumentCategory
-  file: File
-  fileId: Int
-  status: DocumentStatus!
-  priority: DocumentPriority!
-  deadline: DateTime
-  assignedToUserId: Int
-  assignedToUser: User
-  createdByUserId: Int!
-  createdByUser: User
-  comments: [DocumentComment!]
-  versions: [DocumentVersion!]
-  approvalHistory: [DocumentApprovalHistory!]
-  taskRequestId: Int
-  taskRequest: TaskRequest
-  workflowInstanceId: Int
-  workflowInstance: WorkflowInstance
-  createdAt: DateTime
-  updatedAt: DateTime
-}
-
-"""
-Type of document: OUTGOING (sent), INCOMING (received), INTERNAL (internal document)
-"""
-enum DocumentTypeEnum {
-  OUTGOING
-  INCOMING
-  INTERNAL
-}
-
-"""Status of document"""
-enum DocumentStatus {
-  DRAFT
-  PENDING
-  PROCESSING
-  APPROVED
-  REJECTED
-  COMPLETED
-  CANCELLED
-}
-
-"""Priority level of document"""
-enum DocumentPriority {
-  LOW
-  MEDIUM
-  HIGH
-  URGENT
 }
 
 type DocumentProcessingInfo {

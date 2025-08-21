@@ -105,6 +105,10 @@ import { UserState } from '../../../core/state/user.state';
                     <span class="action-icon">🔄</span>
                     Làm mới
                   </button>
+                  <button class="action-button debug" (click)="debugCurrentClassification()">
+                    <span class="action-icon">🐛</span>
+                    Debug
+                  </button>
                 </div>
               </div>
 
@@ -645,6 +649,17 @@ import { UserState } from '../../../core/state/user.state';
       border-color: var(--color-primary);
     }
 
+    .action-button.debug {
+      background: #f59e0b;
+      color: white;
+      border-color: #f59e0b;
+    }
+
+    .action-button.debug:hover {
+      background: #d97706;
+      border-color: #d97706;
+    }
+
     .action-icon {
       font-size: 1rem;
     }
@@ -1081,7 +1096,7 @@ export class DocumentProcessingComponent implements OnInit {
   }
 
   async loadPendingDocuments(): Promise<void> {
-    this.documentProcessingService.getDocumentsForProcessing().subscribe({
+    this.documentProcessingService.getDocumentsForProcessingByAssignee().subscribe({
       next: (documents) => {
         // Lấy current user
         const currentUser = this.userState.getUser();
@@ -1090,16 +1105,41 @@ export class DocumentProcessingComponent implements OnInit {
           return;
         }
 
-        // Phân loại documents theo logic mới:
-        // - Tab "Cần xử lý": Documents mà mình đang xử lý (currentAssigneeUserId = current user)
-        // - Tab "Đang xử lý": Documents mà mình đã tạo (createdByUserId = current user)
-        this.pendingDocuments = documents.filter(doc => 
-          doc.currentAssigneeUserId === currentUser.id && doc.requiresAction
-        );
+        console.log('Current user ID:', currentUser.id);
+        console.log('Total documents received:', documents.length);
+
+        // Debug document classification
+        this.debugDocumentClassification(documents);
+
+        // Phân loại documents theo logic:
+        // - Tab "Cần xử lý": Documents mà người dùng hiện tại được phân công xử lý
+        //   (currentAssigneeUserId === currentUser.id) và cần action
+        this.pendingDocuments = documents.filter(doc => {
+          const isAssignedToCurrentUser = this.isAssignedToCurrentUser(doc);
+          const requiresAction = doc.requiresAction;
+          
+          console.log(`Document ${doc.documentTitle}:`, {
+            currentAssigneeUserId: doc.currentAssigneeUserId,
+            currentUserID: currentUser.id,
+            isAssignedToCurrentUser,
+            requiresAction,
+            shouldShowInPending: isAssignedToCurrentUser && requiresAction
+          });
+          
+          return isAssignedToCurrentUser && requiresAction;
+        });
         
-        this.inProgressDocuments = documents.filter(doc => 
-          doc.createdByUserId === currentUser.id && doc.workflowStatus === 'IN_PROGRESS'
-        );
+        // Tab "Đang xử lý": Documents mà người dùng hiện tại đã tạo
+        // (createdByUserId === currentUser.id) và đang trong quá trình xử lý
+        this.inProgressDocuments = documents.filter(doc => {
+          const isCreatedByCurrentUser = this.isCreatedByCurrentUser(doc);
+          const isInProgress = doc.workflowStatus === 'IN_PROGRESS';
+          
+          return isCreatedByCurrentUser && isInProgress;
+        });
+
+        console.log('Pending documents count:', this.pendingDocuments.length);
+        console.log('In-progress documents count:', this.inProgressDocuments.length);
       },
       error: (error) => {
         console.error('Error loading pending documents:', error);
@@ -1143,6 +1183,21 @@ export class DocumentProcessingComponent implements OnInit {
 
   refreshPendingDocuments(): void {
     this.loadPendingDocuments();
+  }
+
+  debugCurrentClassification(): void {
+    const currentUser = this.userState.getUser();
+    if (!currentUser) {
+      this.showError('Không tìm thấy thông tin người dùng hiện tại');
+      return;
+    }
+
+    console.log('=== Current Classification Debug ===');
+    console.log('Current User:', currentUser);
+    console.log('Pending Documents:', this.pendingDocuments);
+    console.log('In-Progress Documents:', this.inProgressDocuments);
+    
+    this.showInfo(`Debug: ${this.pendingDocuments.length} pending, ${this.inProgressDocuments.length} in-progress documents`);
   }
 
   refreshProcessedDocuments(): void {
@@ -1213,6 +1268,60 @@ export class DocumentProcessingComponent implements OnInit {
   isOverdue(deadline: Date | undefined): boolean {
     if (!deadline) return false;
     return new Date() > deadline;
+  }
+
+  /**
+   * Kiểm tra xem document có được phân công cho người dùng hiện tại hay không
+   */
+  isAssignedToCurrentUser(document: DocumentProcessingInfo): boolean {
+    const currentUser = this.userState.getUser();
+    if (!currentUser || !document.currentAssigneeUserId) {
+      return false;
+    }
+    return document.currentAssigneeUserId === currentUser.id;
+  }
+
+  /**
+   * Kiểm tra xem document có được tạo bởi người dùng hiện tại hay không
+   */
+  isCreatedByCurrentUser(document: DocumentProcessingInfo): boolean {
+    const currentUser = this.userState.getUser();
+    if (!currentUser || !document.createdByUserId) {
+      return false;
+    }
+    return document.createdByUserId === currentUser.id;
+  }
+
+  /**
+   * Debug method để hiển thị thông tin phân loại documents
+   */
+  debugDocumentClassification(documents: DocumentProcessingInfo[]): void {
+    const currentUser = this.userState.getUser();
+    if (!currentUser) {
+      console.log('No current user found for debugging');
+      return;
+    }
+
+    console.log('=== Document Classification Debug ===');
+    console.log('Current User ID:', currentUser.id);
+    console.log('Total Documents:', documents.length);
+
+    documents.forEach((doc, index) => {
+      const isAssigned = this.isAssignedToCurrentUser(doc);
+      const isCreated = this.isCreatedByCurrentUser(doc);
+      
+      console.log(`Document ${index + 1}: ${doc.documentTitle}`, {
+        documentId: doc.documentId,
+        currentAssigneeUserId: doc.currentAssigneeUserId,
+        createdByUserId: doc.createdByUserId,
+        workflowStatus: doc.workflowStatus,
+        requiresAction: doc.requiresAction,
+        isAssignedToCurrentUser: isAssigned,
+        isCreatedByCurrentUser: isCreated,
+        shouldBeInPending: isAssigned && doc.requiresAction,
+        shouldBeInInProgress: isCreated && doc.workflowStatus === 'IN_PROGRESS'
+      });
+    });
   }
 
   async processDocument(document: DocumentProcessingInfo, action: string): Promise<void> {

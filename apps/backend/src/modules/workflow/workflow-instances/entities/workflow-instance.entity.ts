@@ -13,6 +13,7 @@ import { WorkflowTemplate } from '../../workflow-templates/entities/workflow-tem
 import { WorkflowStep } from '../../workflow-steps/entities/workflow-step.entity';
 import { WorkflowActionLog } from '../../workflow-action-logs/entities/workflow-action-log.entity';
 import { User } from 'src/modules/users/entities/user.entity';
+import { Document } from 'src/modules/dispatch/documents/entities/document.entity';
 
 export enum WorkflowStatus {
   IN_PROGRESS = 'IN_PROGRESS',
@@ -45,6 +46,11 @@ export class WorkflowInstance {
   @Field(() => Int)
   @Column()
   documentId: number;
+
+  @Field(() => Document, { nullable: true })
+  @ManyToOne(() => Document, { nullable: true })
+  @JoinColumn({ name: 'documentId' })
+  document?: Document;
 
   @Field(() => Int, { nullable: true })
   @Column({ nullable: true })

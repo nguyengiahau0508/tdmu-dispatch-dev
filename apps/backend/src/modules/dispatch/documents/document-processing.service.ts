@@ -19,23 +19,33 @@ export class DocumentProcessingService {
   ) {}
 
   /**
-   * Lấy danh sách văn bản cần xử lý theo vai trò của user
+   * Lấy danh sách văn bản cần xử lý theo người đang được phân công xử lý
    */
   async getDocumentsForProcessing(user: User): Promise<Document[]> {
-    const userRoles = user.roles;
+    console.log('=== Getting documents for processing ===');
+    console.log('User ID:', user.id);
+    console.log('User roles:', user.roles);
     
-    // Lấy workflow instances mà user có thể xử lý
-    const pendingWorkflows = await this.workflowInstancesService.findByCurrentStepAssignee(userRoles[0]); // Sử dụng role đầu tiên
+    // Lấy workflow instances mà user đang được phân công xử lý
+    const pendingWorkflows = await this.workflowInstancesService.findByCurrentAssigneeUserId(user.id);
+    
+    console.log('Found pending workflows:', pendingWorkflows.length);
+    pendingWorkflows.forEach(wf => {
+      console.log(`Workflow ${wf.id}: documentId=${wf.documentId}, currentAssigneeUserId=${wf.currentAssigneeUserId}`);
+    });
     
     // Lấy document IDs từ workflow instances
     const documentIds = pendingWorkflows.map(workflow => workflow.documentId);
     
     if (documentIds.length === 0) {
+      console.log('No documents found for processing');
       return [];
     }
 
+    console.log('Document IDs to fetch:', documentIds);
+
     // Lấy documents với relations
-    return this.documentRepository.find({
+    const documents = await this.documentRepository.find({
       where: { id: In(documentIds) },
       relations: ['documentCategory', 'file', 'createdByUser', 'assignedToUser'],
       order: { 
@@ -43,6 +53,13 @@ export class DocumentProcessingService {
         createdAt: 'ASC'  // Cũ trước
       }
     });
+
+    console.log('Found documents:', documents.length);
+    documents.forEach(doc => {
+      console.log(`Document ${doc.id}: ${doc.title}`);
+    });
+
+    return documents;
   }
 
   /**
