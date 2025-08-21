@@ -5,6 +5,7 @@ import { Document, DocumentTypeEnum, DocumentStatus, DocumentPriority } from './
 import { User } from 'src/modules/users/entities/user.entity';
 import { WorkflowInstancesService } from 'src/modules/workflow/workflow-instances/workflow-instances.service';
 import { WorkflowActionLogsService } from 'src/modules/workflow/workflow-action-logs/workflow-action-logs.service';
+import { WorkflowStepsService } from 'src/modules/workflow/workflow-steps/workflow-steps.service';
 import { DocumentActionInput } from './dto/document-processing/document-action.input';
 
 @Injectable()
@@ -14,6 +15,7 @@ export class DocumentProcessingService {
     private readonly documentRepository: Repository<Document>,
     private readonly workflowInstancesService: WorkflowInstancesService,
     private readonly workflowActionLogsService: WorkflowActionLogsService,
+    private readonly workflowStepsService: WorkflowStepsService,
   ) {}
 
   /**
@@ -388,6 +390,47 @@ export class DocumentProcessingService {
         }
         document.assignedToUserId = transferToUserId;
         document.status = DocumentStatus.PROCESSING;
+        
+        // Nếu có workflow instance, cần xử lý workflow transfer
+        if (document.workflowInstance) {
+          console.log('=== Processing workflow transfer ===');
+          console.log('Document workflow instance:', document.workflowInstance);
+          console.log('Current step ID:', document.workflowInstance.currentStepId);
+          console.log('Transfer to user ID:', transferToUserId);
+          
+          try {
+            // Tìm bước tiếp theo trong workflow để chuyển đến
+            const nextStep = await this.workflowStepsService.findNextStep(
+              document.workflowInstance.currentStepId || 1
+            );
+            
+            console.log('Next step found:', nextStep);
+            
+            if (nextStep) {
+              console.log('Updating workflow instance to step:', nextStep.id);
+              
+              // Cập nhật currentStepId và currentAssigneeUserId của workflow instance
+              await this.workflowInstancesService.updateCurrentStepAndAssignee(
+                document.workflowInstance.id,
+                nextStep.id,
+                transferToUserId
+              );
+              
+              // Cập nhật currentStepId trong document.workflowInstance để đồng bộ
+              document.workflowInstance.currentStepId = nextStep.id;
+              document.workflowInstance.currentAssigneeUserId = transferToUserId;
+              
+              console.log('Workflow step and assignee updated successfully');
+            } else {
+              console.log('No next step found, workflow may be completed');
+            }
+          } catch (error) {
+            console.error('Error updating workflow step during transfer:', error);
+            // Không throw error vì document đã được cập nhật thành công
+          }
+        } else {
+          console.log('No workflow instance found for document');
+        }
         break;
       case 'CANCEL':
         document.status = DocumentStatus.CANCELLED;

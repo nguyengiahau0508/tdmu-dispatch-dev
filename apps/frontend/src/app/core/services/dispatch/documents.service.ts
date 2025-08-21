@@ -311,6 +311,9 @@ export class DocumentsService {
   }
 
   updateDocument(input: UpdateDocumentInput): Observable<Document> {
+    console.log('=== DocumentsService.updateDocument ===');
+    console.log('Update input:', input);
+    
     return this.apollo.mutate<{
       updateDocument: ApiResponse<Document>
     }>({
@@ -318,12 +321,19 @@ export class DocumentsService {
       variables: { updateDocumentInput: input },
       refetchQueries: [
         {
+          query: GET_DOCUMENTS,
+          variables: {}
+        },
+        {
           query: GET_DOCUMENTS_PAGINATED,
           variables: { input: { page: 1, take: 10, order: 'DESC' } }
         }
       ]
     }).pipe(
-      map(result => result.data!.updateDocument.data)
+      map(result => {
+        console.log('Update mutation result:', result);
+        return result.data!.updateDocument.data;
+      })
     );
   }
 

@@ -55,6 +55,15 @@ export class WorkflowInstance {
   @JoinColumn({ name: 'currentStepId' })
   currentStep?: WorkflowStep;
 
+  @Field(() => Int, { nullable: true })
+  @Column({ nullable: true })
+  currentAssigneeUserId?: number;
+
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'currentAssigneeUserId' })
+  currentAssigneeUser?: User;
+
   @Field(() => WorkflowStatus)
   @Column({
     type: 'enum',

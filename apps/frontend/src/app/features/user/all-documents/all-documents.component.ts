@@ -47,10 +47,22 @@ export class AllDocumentsComponent implements OnInit {
   }
 
   onEditDocument(document: Document): void {
-    console.log('Editing document:', document);
+    console.log('=== onEditDocument ===');
+    console.log('Document to edit:', document);
+    console.log('Document ID:', document.id);
+    console.log('Document ID type:', typeof document.id);
+    console.log('Document title:', document.title);
+    
     this.selectedDocument = undefined;
-    this.documentToEdit = document;
+    
+    // Tạo deep copy để đảm bảo không có reference issues
+    this.documentToEdit = JSON.parse(JSON.stringify(document));
+    
     this.showDocumentForm = true;
+    
+    // console.log('documentToEdit set to:', this.documentToEdit);
+    // console.log('documentToEdit.id:', this.documentToEdit.id);
+    // console.log('documentToEdit.id type:', typeof this.documentToEdit.id);
   }
 
   onDeleteDocument(document: Document): void {
@@ -71,9 +83,14 @@ export class AllDocumentsComponent implements OnInit {
   }
 
   onDocumentSaved(): void {
+    console.log('=== onDocumentSaved ===');
+    console.log('Document saved successfully');
+    
     this.showDocumentForm = false;
     this.documentToEdit = undefined;
     this.loadDocuments();
+    
+    console.log('Form closed, documents reloaded');
   }
 
   onDocumentFormCancelled(): void {

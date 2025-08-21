@@ -16,7 +16,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 
 @Component({
   selector: 'app-user-position-create',
-  imports: [PanelModule, SelectModule, InputGroupModule, InputGroupAddonModule, ButtonModule,DatePickerModule,
+  imports: [PanelModule, SelectModule, InputGroupModule, InputGroupAddonModule, ButtonModule, DatePickerModule,
     CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './user-position-create.html',
   styleUrl: './user-position-create.css'
@@ -74,7 +74,7 @@ export class UserPositionCreate implements OnInit {
   }
 
   onDepartmentChange(event: any) {
-    const selectedDepartmentId = event.target.value;
+    const selectedDepartmentId = Number(event.target.value);
 
     if (selectedDepartmentId) {
       this.positionsService.getPostionsByDepartmnetId(selectedDepartmentId).subscribe({
@@ -94,6 +94,8 @@ export class UserPositionCreate implements OnInit {
   onSubmit() {
     if (this.userPositionCreateForm.invalid) return
     const userPositionCreateFormData: ICreateUserPositionInput = this.userPositionCreateForm.value
+    userPositionCreateFormData.departmentId = Number(userPositionCreateFormData.departmentId)
+    userPositionCreateFormData.positionId = Number(userPositionCreateFormData.positionId)
     this.userPositionsService.createUserPosition(userPositionCreateFormData).subscribe({
       next: (response) => {
         this.toasrt.success("Thêm thành công chức vụ cho người dùng")

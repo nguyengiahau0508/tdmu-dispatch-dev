@@ -196,13 +196,20 @@ export class DocumentsResolver {
     @Args('updateDocumentInput') updateDocumentInput: UpdateDocumentInput,
     @CurrentUser() user?: User,
   ): Promise<DocumentResponse> {
+    console.log('=== updateDocument mutation ===');
+    console.log('Update input:', updateDocumentInput);
+    console.log('Document ID:', updateDocumentInput.id);
+    console.log('User:', user?.id, user?.email);
+    
     try {
       const document = await this.documentsService.update(updateDocumentInput.id, updateDocumentInput);
+      console.log('Document updated successfully:', document);
       return {
         metadata: createMetadata(200, 'Document updated successfully'),
         data: document,
       };
     } catch (error) {
+      console.error('Error updating document:', error);
       return {
         metadata: createMetadata(400, error.message),
         data: null,
@@ -289,6 +296,14 @@ export class DocumentsResolver {
             actionType: 'APPROVE', // Default action type
             deadline: doc.deadline,
             priority: (doc.priority || 'MEDIUM') as unknown as PriorityEnum,
+            // Thông tin người đang xử lý
+            currentAssigneeUserId: workflowInstance?.currentAssigneeUserId,
+            currentAssigneeName: workflowInstance?.currentAssigneeUser?.fullName,
+            currentAssigneeEmail: workflowInstance?.currentAssigneeUser?.email,
+            // Thông tin người tạo
+            createdByUserId: doc.createdByUserId,
+            createdByName: doc.createdByUser?.fullName,
+            createdByEmail: doc.createdByUser?.email,
           };
         })
       );

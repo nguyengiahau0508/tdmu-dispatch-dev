@@ -5,6 +5,8 @@ import { DocumentActionDialogComponent, DocumentActionData } from './document-ac
 import { DocumentDetailsComponent } from './document-details.component';
 import { ToastNotificationService } from './toast-notification.service';
 import { DocumentProcessingApolloService, DocumentProcessingInfo, ProcessingStatistics, DocumentActionInput } from './services/document-processing-apollo.service';
+import { UsersService } from '../../../core/services/users.service';
+import { UserState } from '../../../core/state/user.state';
 
 @Component({
   selector: 'app-document-processing',
@@ -131,6 +133,13 @@ import { DocumentProcessingApolloService, DocumentProcessingInfo, ProcessingStat
                         <span class="label">Bước hiện tại:</span>
                         <span class="value">{{ doc.currentStepName || 'N/A' }}</span>
                       </div>
+                      <div class="info-row" *ngIf="doc.createdByName">
+                        <span class="label">Người tạo:</span>
+                        <span class="value creator-info">
+                          <span class="creator-name">{{ doc.createdByName }}</span>
+                          <span class="creator-email">({{ doc.createdByEmail }})</span>
+                        </span>
+                      </div>
                       <div class="info-row">
                         <span class="label">Ngày tạo:</span>
                         <span class="value">{{ doc.createdAt | date:'dd/MM/yyyy' }}</span>
@@ -217,6 +226,13 @@ import { DocumentProcessingApolloService, DocumentProcessingInfo, ProcessingStat
                       <div class="info-row">
                         <span class="label">Bước hiện tại:</span>
                         <span class="value">{{ doc.currentStepName || 'N/A' }}</span>
+                      </div>
+                      <div class="info-row" *ngIf="doc.currentAssigneeName">
+                        <span class="label">Đang xử lý bởi:</span>
+                        <span class="value assignee-info">
+                          <span class="assignee-name">{{ doc.currentAssigneeName }}</span>
+                          <span class="assignee-email">({{ doc.currentAssigneeEmail }})</span>
+                        </span>
                       </div>
                       <div class="info-row">
                         <span class="label">Ngày tạo:</span>
@@ -781,6 +797,40 @@ import { DocumentProcessingApolloService, DocumentProcessingInfo, ProcessingStat
       font-weight: 600;
     }
 
+    .assignee-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .assignee-name {
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    .assignee-email {
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      font-weight: 400;
+    }
+
+    .creator-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .creator-name {
+      font-weight: 600;
+      color: var(--color-accent);
+    }
+
+    .creator-email {
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      font-weight: 400;
+    }
+
     .available-actions {
       margin: 16px 0;
       padding: 12px;
@@ -978,11 +1028,25 @@ export class DocumentProcessingComponent implements OnInit {
 
   constructor(
     private documentProcessingService: DocumentProcessingApolloService,
-    private toastService: ToastNotificationService
+    private toastService: ToastNotificationService,
+    private usersService: UsersService,
+    private userState: UserState
   ) {}
 
   ngOnInit(): void {
-    this.loadData();
+    // Đảm bảo current user được load
+    this.loadCurrentUser();
+  }
+
+  async loadCurrentUser(): Promise<void> {
+    try {
+      await this.usersService.getCurrentUserData().toPromise();
+      // Sau khi load user, load data
+      this.loadData();
+    } catch (error) {
+      console.error('Error loading current user:', error);
+      this.showError('Lỗi khi tải thông tin người dùng');
+    }
   }
 
   async loadData(): Promise<void> {
@@ -1019,9 +1083,23 @@ export class DocumentProcessingComponent implements OnInit {
   async loadPendingDocuments(): Promise<void> {
     this.documentProcessingService.getDocumentsForProcessing().subscribe({
       next: (documents) => {
-        // Phân loại documents: pending vs in-progress
-        this.pendingDocuments = documents.filter(doc => doc.requiresAction);
-        this.inProgressDocuments = documents.filter(doc => !doc.requiresAction && doc.workflowStatus === 'IN_PROGRESS');
+        // Lấy current user
+        const currentUser = this.userState.getUser();
+        if (!currentUser) {
+          console.error('Current user not found');
+          return;
+        }
+
+        // Phân loại documents theo logic mới:
+        // - Tab "Cần xử lý": Documents mà mình đang xử lý (currentAssigneeUserId = current user)
+        // - Tab "Đang xử lý": Documents mà mình đã tạo (createdByUserId = current user)
+        this.pendingDocuments = documents.filter(doc => 
+          doc.currentAssigneeUserId === currentUser.id && doc.requiresAction
+        );
+        
+        this.inProgressDocuments = documents.filter(doc => 
+          doc.createdByUserId === currentUser.id && doc.workflowStatus === 'IN_PROGRESS'
+        );
       },
       error: (error) => {
         console.error('Error loading pending documents:', error);

@@ -310,6 +310,8 @@ type WorkflowInstance {
   documentId: Int!
   currentStepId: Int
   currentStep: WorkflowStep
+  currentAssigneeUserId: Int
+  currentAssigneeUser: User
   status: WorkflowStatus!
   createdByUserId: Int!
   createdByUser: User!
@@ -1230,6 +1232,24 @@ type DocumentProcessingInfo {
 
   """Mức độ ưu tiên"""
   priority: PriorityEnum!
+
+  """ID của người đang xử lý"""
+  currentAssigneeUserId: Int
+
+  """Tên người đang xử lý"""
+  currentAssigneeName: String
+
+  """Email người đang xử lý"""
+  currentAssigneeEmail: String
+
+  """ID của người tạo"""
+  createdByUserId: Int
+
+  """Tên người tạo"""
+  createdByName: String
+
+  """Email người tạo"""
+  createdByEmail: String
 }
 
 """Mức độ ưu tiên của document"""

@@ -17,6 +17,14 @@ export interface DocumentProcessingInfo {
   actionType?: string;
   deadline?: Date;
   priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  // Thông tin người đang xử lý
+  currentAssigneeUserId?: number;
+  currentAssigneeName?: string;
+  currentAssigneeEmail?: string;
+  // Thông tin người tạo
+  createdByUserId?: number;
+  createdByName?: string;
+  createdByEmail?: string;
 }
 
 export interface ProcessingStatistics {
@@ -82,6 +90,12 @@ export class DocumentProcessingApolloService {
             actionType
             deadline
             priority
+            currentAssigneeUserId
+            currentAssigneeName
+            currentAssigneeEmail
+            createdByUserId
+            createdByName
+            createdByEmail
           }
         }
       }

@@ -1,5 +1,6 @@
 import { inject, Injectable } from "@angular/core";
 import { Apollo, QueryRef } from "apollo-angular";
+import { gql } from "apollo-angular";
 import { IResetPasswordInput, IResetPasswordOutput } from "../../features/auth/reset-password/interfaces/reset-password.interface";
 import { map, Observable, tap } from "rxjs";
 import { IApiResponse, IPaginatedResponse } from "../../shared/models/api-response.model";
@@ -73,6 +74,27 @@ export class UsersService {
       }),
       map(response => response.data!.getCurrentUserData)
     )
+  }
+
+  getAllUsers(): Observable<IUser[]> {
+    return this.apollo.query<{
+      users: IUser[]
+    }>({
+      query: gql`
+        query GetAllUsers {
+          users {
+            id
+            fullName
+            email
+            roles
+            isActive
+          }
+        }
+      `,
+      fetchPolicy: 'network-only'
+    }).pipe(
+      map(result => result.data.users)
+    );
   }
 
 

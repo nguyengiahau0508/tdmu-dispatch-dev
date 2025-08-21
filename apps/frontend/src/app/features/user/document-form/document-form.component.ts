@@ -20,6 +20,10 @@ import { TaskAssignmentModalComponent } from '../task-assignment/task-assignment
           <div class="header__content">
             <h3 class="header__title">{{ isEditMode ? 'Chỉnh sửa văn bản' : 'Tạo văn bản mới' }}</h3>
             <p class="header__subtitle">{{ isEditMode ? 'Cập nhật thông tin văn bản' : 'Tạo văn bản mới trong hệ thống' }}</p>
+            <!-- Debug info -->
+            <div style="background: #f0f0f0; padding: 5px; margin-top: 5px; border-radius: 3px; font-size: 11px;">
+              <strong>Debug:</strong> isEditMode={{ isEditMode }}, document.id={{ document?.id }}, document.title={{ document?.title }}
+            </div>
           </div>
           <button class="header__close-btn" (click)="close()" title="Đóng">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -742,7 +746,18 @@ export class DocumentFormComponent implements OnInit {
   @Input() document?: Document;
   @Input() documentType?: 'INCOMING' | 'OUTGOING' | 'INTERNAL';
   @Output() saved = new EventEmitter<Document>();
+  @Output() documentSaved = new EventEmitter<Document>(); // Alias for compatibility
   @Output() cancelled = new EventEmitter<void>();
+  
+  // Debug method to log input changes
+  ngOnChanges(changes: any): void {
+    console.log('=== DocumentFormComponent ngOnChanges ===');
+    console.log('Changes:', changes);
+    if (changes.document) {
+      console.log('Document input changed:', changes.document.currentValue);
+      console.log('Document ID:', changes.document.currentValue?.id);
+    }
+  }
 
   documentForm: FormGroup;
   documentCategories: IDocumentCategory[] = [];
@@ -780,9 +795,16 @@ export class DocumentFormComponent implements OnInit {
     this.loadDocumentCategories();
     this.loadWorkflowTemplates();
     
-    if (this.document) {
+    // Kiểm tra chặt chẽ hơn để xác định chế độ edit
+    console.log('Checking document for edit mode:');
+    console.log('  - document exists:', !!this.document);
+    console.log('  - document.id:', this.document?.id);
+    console.log('  - document.id type:', typeof this.document?.id);
+    console.log('  - document.id truthy:', !!this.document?.id);
+    
+    if (this.document && this.document.id && typeof this.document.id === 'number' && this.document.id > 0) {
       this.isEditMode = true;
-      console.log('✅ Setting edit mode - document provided');
+      console.log('✅ Setting edit mode - document with valid ID provided');
       console.log('Document ID:', this.document.id);
       console.log('Document title:', this.document.title);
       
@@ -806,6 +828,8 @@ export class DocumentFormComponent implements OnInit {
     }
     
     console.log('Final isEditMode:', this.isEditMode);
+    console.log('Document object:', this.document);
+    console.log('Document ID check:', this.document?.id);
 
     // Debug: Log form value changes
     this.documentForm.valueChanges.subscribe(values => {
@@ -866,6 +890,7 @@ export class DocumentFormComponent implements OnInit {
     console.log('=== DocumentFormComponent onSubmit ===');
     console.log('isEditMode:', this.isEditMode);
     console.log('document:', this.document);
+    console.log('document.id:', this.document?.id);
     console.log('documentForm.valid:', this.documentForm.valid);
     console.log('documentForm.value:', this.documentForm.value);
     
@@ -900,11 +925,18 @@ export class DocumentFormComponent implements OnInit {
       return;
     }
 
-    if (this.isEditMode && this.document) {
+    // Kiểm tra chặt chẽ hơn cho chế độ edit
+    if (this.isEditMode && this.document && this.document.id && typeof this.document.id === 'number' && this.document.id > 0) {
       console.log('✅ Executing UPDATE logic');
+      console.log('Document ID for update:', this.document.id);
+      
       const updateInput: UpdateDocumentInput = {
         id: this.document.id,
-        ...processedValues
+        title: processedValues.title,
+        content: processedValues.content,
+        documentType: processedValues.documentType,
+        documentCategoryId: processedValues.documentCategoryId,
+        status: processedValues.status
       };
       
       console.log('Update input:', updateInput);
@@ -913,6 +945,7 @@ export class DocumentFormComponent implements OnInit {
         next: (updatedDocument) => {
           console.log('✅ Update successful:', updatedDocument);
           this.saved.emit(updatedDocument);
+          this.documentSaved.emit(updatedDocument);
           this.isSubmitting = false;
         },
         error: (error) => {
@@ -922,7 +955,18 @@ export class DocumentFormComponent implements OnInit {
       });
     } else {
       console.log('✅ Executing CREATE logic');
-      const createInput: CreateDocumentInput = processedValues;
+      console.log('isEditMode:', this.isEditMode);
+      console.log('document exists:', !!this.document);
+      console.log('document.id:', this.document?.id);
+      
+      const createInput: CreateDocumentInput = {
+        title: processedValues.title,
+        content: processedValues.content,
+        documentType: processedValues.documentType,
+        documentCategoryId: processedValues.documentCategoryId,
+        status: processedValues.status,
+        workflowTemplateId: processedValues.workflowTemplateId
+      };
       
       console.log('Create input:', createInput);
       
@@ -930,6 +974,7 @@ export class DocumentFormComponent implements OnInit {
         next: (createdDocument) => {
           console.log('✅ Create successful:', createdDocument);
           this.saved.emit(createdDocument);
+          this.documentSaved.emit(createdDocument);
           this.isSubmitting = false;
         },
         error: (error) => {

@@ -66,6 +66,7 @@ export class WorkflowInstancesService {
     const instance = this.repository.create({
       ...createWorkflowInstanceInput,
       currentStepId: startStep.id,
+      currentAssigneeUserId: user.id, // Set current assignee to creator initially
       createdByUserId: user.id,
       status: WorkflowStatus.IN_PROGRESS,
     });
@@ -204,7 +205,7 @@ export class WorkflowInstancesService {
   async findByDocumentId(documentId: number): Promise<WorkflowInstance[]> {
     return this.repository.find({
       where: { documentId },
-      relations: ['template', 'currentStep', 'createdByUser', 'logs', 'logs.actionByUser'],
+      relations: ['template', 'currentStep', 'createdByUser', 'currentAssigneeUser', 'logs', 'logs.actionByUser'],
       order: { createdAt: 'DESC' },
     });
   }
@@ -272,7 +273,7 @@ export class WorkflowInstancesService {
     switch (actionInput.actionType) {
       case ActionType.APPROVE:
         console.log('Handling APPROVE action...');
-        result = await this.handleApproveAction(instance, currentStep);
+        result = await this.handleApproveAction(instance, currentStep, user);
         break;
       case ActionType.REJECT:
         console.log('Handling REJECT action...');
@@ -280,7 +281,7 @@ export class WorkflowInstancesService {
         break;
       case ActionType.TRANSFER:
         console.log('Handling TRANSFER action...');
-        result = await this.handleTransferAction(instance, currentStep, actionInput);
+        result = await this.handleTransferAction(instance, currentStep, actionInput, user);
         break;
       case ActionType.CANCEL:
         console.log('Handling CANCEL action...');
@@ -301,6 +302,7 @@ export class WorkflowInstancesService {
   private async handleApproveAction(
     instance: WorkflowInstance,
     currentStep: any,
+    user: User,
   ): Promise<WorkflowInstance> {
     console.log('Handling approve action for instance:', instance.id);
     
@@ -323,6 +325,7 @@ export class WorkflowInstancesService {
       // Update only the necessary fields to avoid relation issues
       const updateData = {
         currentStepId: nextStep.id,
+        currentAssigneeUserId: user.id, // Set current assignee to the user who approved
         updatedAt: new Date()
       };
       
@@ -408,10 +411,11 @@ export class WorkflowInstancesService {
     instance: WorkflowInstance,
     currentStep: any,
     actionInput: WorkflowActionInput,
+    user: User,
   ): Promise<WorkflowInstance> {
     // For transfer, we might want to move to a specific step
     // For now, just move to next step like approve
-    return this.handleApproveAction(instance, currentStep);
+    return this.handleApproveAction(instance, currentStep, user);
   }
 
   private async handleCancelAction(
@@ -479,5 +483,54 @@ export class WorkflowInstancesService {
     }
     
     return this.workflowPermissionsService.getAvailableActions(instance.currentStep);
+  }
+
+  /**
+   * Cập nhật currentStepId của workflow instance
+   */
+  async updateCurrentStep(instanceId: number, newStepId: number): Promise<WorkflowInstance> {
+    console.log(`Updating workflow instance ${instanceId} to step ${newStepId}`);
+    
+    const updateData = {
+      currentStepId: newStepId,
+      updatedAt: new Date()
+    };
+    
+    try {
+      await this.repository.update(instanceId, updateData);
+      console.log(`Workflow instance ${instanceId} updated to step ${newStepId} successfully`);
+      
+      return this.findOne(instanceId);
+    } catch (error) {
+      console.error(`Error updating workflow instance ${instanceId} to step ${newStepId}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Cập nhật currentStepId và currentAssigneeUserId của workflow instance
+   */
+  async updateCurrentStepAndAssignee(
+    instanceId: number, 
+    newStepId: number, 
+    newAssigneeUserId: number
+  ): Promise<WorkflowInstance> {
+    console.log(`Updating workflow instance ${instanceId} to step ${newStepId} with assignee ${newAssigneeUserId}`);
+    
+    const updateData = {
+      currentStepId: newStepId,
+      currentAssigneeUserId: newAssigneeUserId,
+      updatedAt: new Date()
+    };
+    
+    try {
+      await this.repository.update(instanceId, updateData);
+      console.log(`Workflow instance ${instanceId} updated to step ${newStepId} with assignee ${newAssigneeUserId} successfully`);
+      
+      return this.findOne(instanceId);
+    } catch (error) {
+      console.error(`Error updating workflow instance ${instanceId} to step ${newStepId} with assignee ${newAssigneeUserId}:`, error);
+      throw error;
+    }
   }
 }

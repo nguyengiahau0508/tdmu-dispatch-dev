@@ -105,6 +105,7 @@
 
 .user-avatar {
   position: relative;
+  width: 64px;
 }
 
 .avatar-image {

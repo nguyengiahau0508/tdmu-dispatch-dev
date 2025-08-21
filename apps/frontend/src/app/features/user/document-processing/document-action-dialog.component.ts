@@ -1,7 +1,10 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DocumentProcessingInfo } from './services/document-processing-apollo.service';
+import { UsersService } from '../../../core/services/users.service';
+import { IUser } from '../../../core/interfaces/user.interface';
+import { Subject, takeUntil } from 'rxjs';
 
 export interface DocumentActionData {
   documentId: number;
@@ -87,12 +90,17 @@ export interface DocumentActionData {
               <select 
                 id="transferUser"
                 class="form-select" 
-                [(ngModel)]="selectedTransferUserId">
+                [(ngModel)]="selectedTransferUserId"
+                [disabled]="isLoadingUsers">
                 <option value="">-- Chọn người dùng --</option>
+                <option *ngIf="isLoadingUsers" value="" disabled>Đang tải danh sách người dùng...</option>
                 <option *ngFor="let user of availableUsers" [value]="user.id">
-                  {{ user.name }} ({{ user.email }})
+                  {{ user.fullName }} ({{ user.email }})
                 </option>
               </select>
+              <div *ngIf="isLoadingUsers" class="loading-indicator">
+                <span class="loading-spinner">⏳</span> Đang tải danh sách người dùng...
+              </div>
             </div>
 
             <!-- Confirmation Message -->
@@ -483,6 +491,15 @@ export interface DocumentActionData {
       to { transform: rotate(360deg); }
     }
 
+    .loading-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+    }
+
     /* Responsive Design */
     @media (max-width: 768px) {
       .dialog-container {
@@ -515,7 +532,7 @@ export interface DocumentActionData {
     }
   `]
 })
-export class DocumentActionDialogComponent {
+export class DocumentActionDialogComponent implements OnInit, OnDestroy {
   @Input() document: DocumentProcessingInfo | null = null;
   @Input() actionType: string = '';
   @Output() actionConfirmed = new EventEmitter<DocumentActionData>();
@@ -524,14 +541,39 @@ export class DocumentActionDialogComponent {
   notes: string = '';
   selectedTransferUserId: number | null = null;
   isProcessing = false;
+  isLoadingUsers = false;
 
-  // Mock data for available users (in real app, this would come from a service)
-  availableUsers = [
-    { id: 1, name: 'Nguyễn Văn A', email: 'nguyenvana@tdmu.edu.vn' },
-    { id: 2, name: 'Trần Thị B', email: 'tranthib@tdmu.edu.vn' },
-    { id: 3, name: 'Lê Văn C', email: 'levanc@tdmu.edu.vn' },
-    { id: 4, name: 'Phạm Thị D', email: 'phamthid@tdmu.edu.vn' },
-  ];
+  // Users thực tế từ hệ thống
+  availableUsers: IUser[] = [];
+  private destroy$ = new Subject<void>();
+
+  constructor(private usersService: UsersService) {}
+
+  ngOnInit(): void {
+    this.loadAvailableUsers();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private loadAvailableUsers(): void {
+    this.isLoadingUsers = true;
+    this.usersService.getAllUsers()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (users) => {
+          // Lọc chỉ những user active
+          this.availableUsers = users.filter(user => user.isActive);
+          this.isLoadingUsers = false;
+        },
+        error: (error) => {
+          console.error('Error loading users:', error);
+          this.isLoadingUsers = false;
+        }
+      });
+  }
 
   getActionIcon(actionType: string): string {
     switch (actionType) {
@@ -614,7 +656,7 @@ export class DocumentActionDialogComponent {
         documentId: this.document!.documentId,
         actionType: this.actionType,
         notes: this.notes || undefined,
-        transferToUserId: this.selectedTransferUserId || undefined
+        transferToUserId: Number(this.selectedTransferUserId) || undefined
       };
 
       this.actionConfirmed.emit(actionData);

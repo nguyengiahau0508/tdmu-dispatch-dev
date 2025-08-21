@@ -55,6 +55,24 @@ export class DocumentProcessingInfo {
 
   @Field(() => PriorityEnum, { description: 'Mức độ ưu tiên' })
   priority: PriorityEnum;
+
+  @Field(() => Int, { nullable: true, description: 'ID của người đang xử lý' })
+  currentAssigneeUserId?: number;
+
+  @Field(() => String, { nullable: true, description: 'Tên người đang xử lý' })
+  currentAssigneeName?: string;
+
+  @Field(() => String, { nullable: true, description: 'Email người đang xử lý' })
+  currentAssigneeEmail?: string;
+
+  @Field(() => Int, { nullable: true, description: 'ID của người tạo' })
+  createdByUserId?: number;
+
+  @Field(() => String, { nullable: true, description: 'Tên người tạo' })
+  createdByName?: string;
+
+  @Field(() => String, { nullable: true, description: 'Email người tạo' })
+  createdByEmail?: string;
 }
 
 @ObjectType()

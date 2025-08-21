@@ -20,6 +20,8 @@ import { WorkflowActionLog } from '../../modules/workflow/workflow-action-logs/e
 import { Assignment } from '../../modules/organizational/assignments/entities/assignment.entity';
 import { UserPosition } from '../../modules/organizational/user-positions/entities/user-position.entity';
 import { File } from '../../modules/files/entities/file.entity';
+import { UserActivity } from '../../modules/users/entities/user-activity.entity';
+import { TaskRequest } from '../../modules/dispatch/documents/entities/task-request.entity';
 
 @Module({
   imports: [
@@ -53,6 +55,8 @@ import { File } from '../../modules/files/entities/file.entity';
         Assignment,
         UserPosition,
         File,
+        UserActivity,
+        TaskRequest,
       ],
       synchronize: true,
       logging: false,

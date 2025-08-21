@@ -245,8 +245,15 @@ export class DocumentsService {
     id: number,
     updateDocumentInput: UpdateDocumentInput,
   ): Promise<Document> {
+    console.log('=== DocumentsService.update ===');
+    console.log('ID to update:', id);
+    console.log('Update input:', updateDocumentInput);
+    
     const entity = await this.documentRepository.findOne({ where: { id } });
+    console.log('Found entity:', entity);
+    
     if (!entity) {
+      console.log('❌ Document not found with ID:', id);
       throw new BadRequestException(`Document with ID ${id} not found`);
     }
     
@@ -277,18 +284,25 @@ export class DocumentsService {
       entity.status = updateDocumentInput.status as DocumentStatus;
     }
     
+    console.log('Saving updated entity...');
     const savedDocument = await this.documentRepository.save(entity);
+    console.log('Saved document:', savedDocument);
     
     // Load relations for the updated document
+    console.log('Loading document with relations...');
     const documentWithRelations = await this.documentRepository.findOne({
       where: { id: savedDocument.id },
       relations: ['documentCategory', 'file']
     });
     
+    console.log('Document with relations:', documentWithRelations);
+    
     if (!documentWithRelations) {
+      console.log('❌ Failed to load document with relations');
       throw new BadRequestException('Failed to load document with relations');
     }
     
+    console.log('✅ Returning updated document:', documentWithRelations);
     return documentWithRelations;
   }
 
@@ -365,8 +379,13 @@ export class DocumentsService {
     };
 
     try {
-      await this.workflowInstancesService.create(workflowInput, user);
+      const workflowInstance = await this.workflowInstancesService.create(workflowInput, user);
       console.log('Workflow created successfully for document:', document.id);
+      
+      // Cập nhật workflowInstanceId của document
+      document.workflowInstanceId = workflowInstance.id;
+      await this.documentRepository.save(document);
+      console.log('Document workflowInstanceId updated:', workflowInstance.id);
     } catch (error) {
       console.error('Failed to create workflow for document:', document.id, error);
       // Don't fail document creation if workflow creation fails

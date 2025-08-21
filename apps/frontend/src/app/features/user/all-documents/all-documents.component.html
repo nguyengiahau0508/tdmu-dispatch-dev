@@ -88,6 +88,14 @@
         (documentSaved)="onDocumentSaved()"
         (cancelled)="onDocumentFormCancelled()">
       </app-document-form>
+      
+      <!-- Debug info -->
+      <div style="background: #f0f0f0; padding: 10px; margin: 10px; border-radius: 5px; font-size: 12px;">
+        <strong>Debug Info:</strong><br>
+        documentToEdit: {{ documentToEdit ? 'EXISTS' : 'NULL' }}<br>
+        documentToEdit.id: {{ documentToEdit?.id }}<br>
+        documentToEdit.title: {{ documentToEdit?.title }}
+      </div>
     </div>
   </div>
 
