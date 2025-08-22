@@ -345,7 +345,7 @@ export class DocumentDetailsService {
       return [];
     }
 
-    const steps = workflowInstance.template.steps.sort((a, b) => a.orderNumber - b.orderNumber);
+    const steps = [...workflowInstance.template.steps].sort((a, b) => a.orderNumber - b.orderNumber);
     const logs = workflowInstance.logs || [];
     const currentStepId = workflowInstance.currentStepId;
     

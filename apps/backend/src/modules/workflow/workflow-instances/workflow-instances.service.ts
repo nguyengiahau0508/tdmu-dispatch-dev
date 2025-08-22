@@ -107,6 +107,7 @@ export class WorkflowInstancesService {
     return this.repository.find({
       relations: [
         'template', 
+        'template.steps',
         'currentStep', 
         'createdByUser', 
         'currentAssigneeUser',
@@ -145,6 +146,7 @@ export class WorkflowInstancesService {
         where: { id },
         relations: [
           'template',
+          'template.steps',
           'currentStep',
           'createdByUser',
         ],
@@ -206,7 +208,7 @@ export class WorkflowInstancesService {
   async findByUser(userId: number): Promise<WorkflowInstance[]> {
     return this.repository.find({
       where: { createdByUserId: userId },
-      relations: ['template', 'currentStep', 'createdByUser', 'logs', 'logs.actionByUser'],
+      relations: ['template', 'template.steps', 'currentStep', 'createdByUser', 'logs', 'logs.actionByUser'],
       order: { createdAt: 'DESC' },
     });
   }
@@ -217,6 +219,7 @@ export class WorkflowInstancesService {
     return this.repository
       .createQueryBuilder('instance')
       .leftJoinAndSelect('instance.template', 'template')
+      .leftJoinAndSelect('template.steps', 'templateSteps')
       .leftJoinAndSelect('instance.currentStep', 'currentStep')
       .leftJoinAndSelect('instance.createdByUser', 'createdByUser')
       .leftJoinAndSelect('instance.logs', 'logs')
@@ -238,6 +241,7 @@ export class WorkflowInstancesService {
     return this.repository
       .createQueryBuilder('instance')
       .leftJoinAndSelect('instance.template', 'template')
+      .leftJoinAndSelect('template.steps', 'templateSteps')
       .leftJoinAndSelect('instance.currentStep', 'currentStep')
       .leftJoinAndSelect('instance.createdByUser', 'createdByUser')
       .leftJoinAndSelect('instance.currentAssigneeUser', 'currentAssigneeUser')
@@ -254,7 +258,7 @@ export class WorkflowInstancesService {
   async findByDocumentId(documentId: number): Promise<WorkflowInstance[]> {
     return this.repository.find({
       where: { documentId },
-      relations: ['template', 'currentStep', 'createdByUser', 'currentAssigneeUser', 'logs', 'logs.actionByUser'],
+      relations: ['template', 'template.steps', 'currentStep', 'createdByUser', 'currentAssigneeUser', 'logs', 'logs.actionByUser'],
       order: { createdAt: 'DESC' },
     });
   }
