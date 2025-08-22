@@ -54,8 +54,8 @@ export class WorkflowInstancesService {
       throw new BadRequestException('User does not have permission to create this workflow');
     }
 
-    // Get first step (START step)
-    const steps = await this.workflowStepsService.findByTemplateId(template.id);
+    // Get first step (START step) - include inactive steps to find START step
+    const steps = await this.workflowStepsService.findByTemplateIdIncludeInactive(template.id);
     const startStep = steps.find((step) => step.type === StepType.START);
 
     if (!startStep) {
@@ -135,6 +135,7 @@ export class WorkflowInstancesService {
 
       console.log('Basic instance found:', {
         id: basicInstance.id,
+        templateId: basicInstance.templateId,
         currentStepId: basicInstance.currentStepId,
         status: basicInstance.status
       });
@@ -153,6 +154,18 @@ export class WorkflowInstancesService {
         throw new NotFoundException(`Workflow instance with ID ${id} not found`);
       }
 
+      // Validate template exists
+      if (!instance.template) {
+        console.error(`Template not found for workflow instance ${id} with templateId ${instance.templateId}`);
+        throw new BadRequestException(`Template not found for workflow instance ${id}`);
+      }
+
+      // Validate createdByUser exists
+      if (!instance.createdByUser) {
+        console.error(`CreatedByUser not found for workflow instance ${id} with createdByUserId ${instance.createdByUserId}`);
+        throw new BadRequestException(`CreatedByUser not found for workflow instance ${id}`);
+      }
+
       // Load logs separately to avoid relation cascade issues
       const logs = await this.workflowActionLogsService.findByInstanceId(id);
       
@@ -165,11 +178,15 @@ export class WorkflowInstancesService {
         return true;
       });
 
-      // Assign logs to instance
-      instance.logs = validLogs;
+      // Assign logs to instance (ensure it's never null)
+      instance.logs = validLogs || [];
 
       console.log('Found workflow instance:', {
         id: instance.id,
+        templateId: instance.templateId,
+        templateName: instance.template?.name,
+        createdByUserId: instance.createdByUserId,
+        createdByUserName: instance.createdByUser?.fullName,
         logsCount: instance.logs?.length,
         logs: instance.logs?.map(log => ({
           id: log.id,

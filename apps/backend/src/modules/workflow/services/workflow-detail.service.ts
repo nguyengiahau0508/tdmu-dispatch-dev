@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Document } from '../../dispatch/documents/entities/document.entity';
@@ -41,6 +41,10 @@ export class WorkflowDetailService {
 
     const workflowInstance = document.workflowInstance;
     const workflowTemplate = workflowInstance.template;
+
+    if (!workflowTemplate) {
+      throw new BadRequestException('Workflow template not found for this document');
+    }
 
     // Lấy các bước trong quy trình
     const workflowSteps = await this.workflowStepRepository.find({

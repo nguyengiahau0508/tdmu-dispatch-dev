@@ -163,9 +163,9 @@ export class DocumentsService {
       console.log('Document saved successfully:', savedDocument.id);
       
       // Load relations for the saved document
-      const documentWithRelations = await this.documentRepository.findOne({
+      let documentWithRelations = await this.documentRepository.findOne({
         where: { id: savedDocument.id },
-        relations: ['documentCategory', 'file']
+        relations: ['documentCategory', 'file', 'workflowInstance']
       });
       
       if (!documentWithRelations) {
@@ -187,6 +187,17 @@ export class DocumentsService {
         try {
           await this.createWorkflowForDocument(documentWithRelations, user, createDocumentInput.workflowTemplateId);
           console.log('Workflow created successfully');
+          
+          // Reload document with workflow instance after creating workflow
+          const documentWithWorkflow = await this.documentRepository.findOne({
+            where: { id: documentWithRelations.id },
+            relations: ['documentCategory', 'file', 'workflowInstance']
+          });
+          
+          if (documentWithWorkflow) {
+            console.log('Document reloaded with workflow instance:', documentWithWorkflow.workflowInstanceId);
+            documentWithRelations = documentWithWorkflow;
+          }
         } catch (workflowError) {
           console.error('Error creating workflow:', workflowError);
           // Don't fail document creation if workflow creation fails
@@ -220,7 +231,7 @@ export class DocumentsService {
 
     const [data, itemCount] = await this.documentRepository.findAndCount({
       where: where.length > 0 ? where : undefined,
-      relations: ['documentCategory', 'file'],
+      relations: ['documentCategory', 'file', 'workflowInstance'],
       order: { id: input.order },
       skip: input.skip,
       take: input.take,
@@ -231,13 +242,45 @@ export class DocumentsService {
   }
 
   async findOne(id: number): Promise<Document> {
+    console.log(`=== DocumentsService.findOne(${id}) ===`);
+    
     const entity = await this.documentRepository.findOne({ 
       where: { id },
-      relations: ['documentCategory', 'file']
+      relations: ['documentCategory', 'file', 'workflowInstance']
     });
+    
     if (!entity) {
       throw new BadRequestException(`Document with ID ${id} not found`);
     }
+
+    console.log('Document found:', {
+      id: entity.id,
+      title: entity.title,
+      workflowInstanceId: entity.workflowInstanceId,
+      workflowInstance: entity.workflowInstance ? 'EXISTS' : 'NULL'
+    });
+
+    // Load workflow instance with its relations if it exists
+    if (entity.workflowInstanceId) {
+      console.log(`Loading workflow instance ${entity.workflowInstanceId}...`);
+      try {
+        const workflowInstance = await this.workflowInstancesService.findOne(entity.workflowInstanceId);
+        entity.workflowInstance = workflowInstance;
+        console.log('Workflow instance loaded successfully:', {
+          id: workflowInstance.id,
+          templateId: workflowInstance.templateId,
+          template: workflowInstance.template ? 'EXISTS' : 'NULL',
+          currentStep: workflowInstance.currentStep ? 'EXISTS' : 'NULL'
+        });
+      } catch (error) {
+        console.error(`Error loading workflow instance ${entity.workflowInstanceId}:`, error);
+        // Don't throw error, just log it and continue
+      }
+    } else {
+      console.log('No workflowInstanceId found');
+    }
+
+    console.log('=== DocumentsService.findOne END ===');
     return entity;
   }
 

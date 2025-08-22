@@ -462,7 +462,7 @@ enum DocumentPriority {
 type WorkflowInstance {
   id: Int!
   templateId: Int!
-  template: WorkflowTemplate!
+  template: WorkflowTemplate
   documentId: Int!
   document: Document
   currentStepId: Int
@@ -471,9 +471,9 @@ type WorkflowInstance {
   currentAssigneeUser: User
   status: WorkflowStatus!
   createdByUserId: Int!
-  createdByUser: User!
+  createdByUser: User
   notes: String
-  logs: [WorkflowActionLog!]!
+  logs: [WorkflowActionLog!]
   createdAt: DateTime!
   updatedAt: DateTime!
 }

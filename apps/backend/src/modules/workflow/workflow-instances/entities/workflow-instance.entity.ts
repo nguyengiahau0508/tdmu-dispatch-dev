@@ -38,10 +38,10 @@ export class WorkflowInstance {
   @Field(() => Int)
   templateId: number;
 
-  @Field(() => WorkflowTemplate)
+  @Field(() => WorkflowTemplate, { nullable: true })
   @ManyToOne(() => WorkflowTemplate, (template) => template.instances)
   @JoinColumn({ name: 'templateId' })
-  template: WorkflowTemplate;
+  template?: WorkflowTemplate;
 
   @Field(() => Int)
   @Column()
@@ -82,18 +82,18 @@ export class WorkflowInstance {
   @Column()
   createdByUserId: number;
 
-  @Field(() => User)
+  @Field(() => User, { nullable: true })
   @ManyToOne(() => User)
   @JoinColumn({ name: 'createdByUserId' })
-  createdByUser: User;
+  createdByUser?: User;
 
   @Field({ nullable: true })
   @Column({ type: 'text', nullable: true })
   notes?: string;
 
-  @Field(() => [WorkflowActionLog])
+  @Field(() => [WorkflowActionLog], { nullable: true })
   @OneToMany(() => WorkflowActionLog, (log) => log.instance)
-  logs: WorkflowActionLog[];
+  logs?: WorkflowActionLog[];
 
   @Field()
   @CreateDateColumn({ type: 'datetime' })

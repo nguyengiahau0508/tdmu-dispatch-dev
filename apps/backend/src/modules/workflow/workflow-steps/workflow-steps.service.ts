@@ -113,6 +113,13 @@ export class WorkflowStepsService {
     });
   }
 
+  async findByTemplateIdIncludeInactive(templateId: number): Promise<WorkflowStep[]> {
+    return this.repository.find({
+      where: { templateId },
+      order: { orderNumber: 'ASC' },
+    });
+  }
+
   async update(
     id: number,
     updateWorkflowStepInput: UpdateWorkflowStepInput,
