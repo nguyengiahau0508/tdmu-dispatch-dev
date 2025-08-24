@@ -1638,6 +1638,57 @@ type UpdateDocumentTypeResponse {
   metadata: Metadata!
 }
 
+type Certificate {
+  id: Int!
+  userId: Int!
+  certificateData: String!
+  publicKey: String!
+  serialNumber: String!
+  issuer: String!
+  validFrom: DateTime!
+  validTo: DateTime!
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: User
+  signatures: [DigitalSignature!]
+}
+
+type SignatureLog {
+  id: Int!
+  signatureId: Int!
+  action: SignatureAction!
+  performedByUserId: Int!
+  details: String
+  createdAt: DateTime!
+  signature: DigitalSignature
+  performedByUser: User
+}
+
+"""Các loại hành động chữ ký số"""
+enum SignatureAction {
+  SIGN
+  VERIFY
+  REVOKE
+}
+
+type DigitalSignature {
+  id: Int!
+  documentId: Int!
+  signedByUserId: Int!
+  signatureData: String!
+  certificateId: Int!
+  signatureHash: String!
+  signatureTimestamp: DateTime!
+  isValid: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  document: Document
+  signedByUser: User
+  certificate: Certificate
+  logs: [SignatureLog!]
+}
+
 type Query {
   users: [User!]!
   user(id: Int!): User
@@ -1807,6 +1858,27 @@ type Query {
   allDocumentCategories: [DocumentCategory!]!
   documentTypes(input: GetDocumentTypesPaginatedInput!): GetDocumentTypesPaginatedResponse!
   documentType(id: Int!): GetDocumentTypeResponse!
+
+  """Lấy danh sách chữ ký số của văn bản"""
+  getDocumentSignatures(documentId: Int!): [DigitalSignature!]!
+
+  """Lấy chữ ký số theo ID"""
+  getSignatureById(signatureId: Int!): DigitalSignature!
+
+  """Lấy lịch sử chữ ký số của văn bản"""
+  getSignatureHistory(documentId: Int!): [SignatureLog!]!
+
+  """Kiểm tra người dùng có chữ ký hợp lệ cho văn bản không"""
+  hasValidSignature(documentId: Int!, userId: Int!): Boolean!
+
+  """Lấy danh sách chứng thư số của user"""
+  getUserCertificates(userId: Int!): [Certificate!]!
+
+  """Lấy chứng thư số theo ID"""
+  getCertificateById(certificateId: Int!): Certificate!
+
+  """Xác thực chứng thư số"""
+  validateCertificate(certificateData: String!): Boolean!
 }
 
 input GetUsersPaginatedInput {
@@ -2120,6 +2192,21 @@ type Mutation {
   createDocumentType(createDocumentTypeInput: CreateDocumentTypeInput!): CreateDocumentTypeResponse!
   updateDocumentType(updateDocumentTypeInput: UpdateDocumentTypeInput!): UpdateDocumentTypeResponse!
   removeDocumentType(id: Int!): RemoveDocumentTypeResponse!
+
+  """Tạo chữ ký số cho văn bản"""
+  createDigitalSignature(input: CreateSignatureInput!): DigitalSignature!
+
+  """Xác thực chữ ký số"""
+  verifyDigitalSignature(input: VerifySignatureInput!): Boolean!
+
+  """Thu hồi chữ ký số"""
+  revokeDigitalSignature(signatureId: Int!): Boolean!
+
+  """Upload chứng thư số"""
+  uploadCertificate(input: UploadCertificateInput!): Certificate!
+
+  """Thu hồi chứng thư số"""
+  revokeCertificate(certificateId: Int!): Boolean!
 }
 
 input SignInInput {
@@ -2659,4 +2746,31 @@ input UpdateDocumentTypeInput {
   id: Float!
   name: String
   description: String
+}
+
+input CreateSignatureInput {
+  """ID của văn bản cần ký số"""
+  documentId: Int!
+
+  """ID của chứng thư số sử dụng"""
+  certificateId: Int!
+
+  """Dữ liệu chữ ký số"""
+  signatureData: String!
+
+  """Ghi chú khi ký số"""
+  comment: String
+}
+
+input VerifySignatureInput {
+  """ID của chữ ký số cần xác thực"""
+  signatureId: Int!
+}
+
+input UploadCertificateInput {
+  """Dữ liệu chứng thư số"""
+  certificateData: String!
+
+  """Mật khẩu chứng thư số (nếu có)"""
+  password: String
 }

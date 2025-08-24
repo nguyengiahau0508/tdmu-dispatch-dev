@@ -4,6 +4,7 @@ import { OraganizationalModule } from './organizational/oraganizational.module';
 import { FilesModule } from './files/files.module';
 import { DispatchModule } from './dispatch/dispatch.module';
 import { WorkflowModule } from './workflow/workflow.module';
+import { DigitalSignatureModule } from './digital-signature/digital-signature.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { WorkflowModule } from './workflow/workflow.module';
     FilesModule,
     WorkflowModule,
     DispatchModule,
+    DigitalSignatureModule,
   ],
   providers: [],
 })
